@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { FaHeart, FaShoppingBag, FaUser, FaSearch } from "react-icons/fa";
 import logo from "../../../assets/Navbar/DVYB_Enterprise_Logo.png";
 import EtImg from "../../../assets/Navbar/ET-WEAR.png"
-
+import fav from '../../../assets/B2Cassets/NavbarImages/heart.png'
+import cart from '../../../assets/B2Cassets/NavbarImages/cart.png'
+import profile from '../../../assets/B2Cassets/NavbarImages/profile.png'
 const Navbar = () => {
   const [showWomenCategories, setShowWomenCategories] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -53,14 +55,18 @@ const Navbar = () => {
 
         {/* Logo Center */}
         <div className="flex justify-center w-1/3">
-          <img src={logo} alt="logo" className="h-10 object-contain" />
+          <img src={logo} alt="logo" className="h-12 object-contain" />
         </div>
 
         {/* Right Icons */}
         <div className="w-1/3 flex justify-end space-x-6 text-xl text-blue-900">
-          <FaHeart className="cursor-pointer hover:opacity-70" />
+          {/* <FaHeart className="cursor-pointer hover:opacity-70" />
           <FaShoppingBag className="cursor-pointer hover:opacity-70" />
-          <FaUser className="cursor-pointer hover:opacity-70" />
+          <FaUser className="cursor-pointer hover:opacity-70" /> */}
+          <img className="cursor-pointer size-5" src={fav}  alt="" />
+          <img className="cursor-pointer size-5" src={cart} alt="" />
+          <img className="cursor-pointer size-5" src={profile}  alt="" />
+
         </div>
       </div>
 
@@ -81,7 +87,7 @@ const Navbar = () => {
 
           {/* Women Categories Mega Menu */}
           {showWomenCategories && (
-            <div className="fixed left-0 right-0 top-[100px] bg-gray-100 border-t shadow-md z-50">
+            <div className="fixed left-0 right-0 top-[110px] bg-gray-100 border-t shadow-md z-50">
               {/* First Row: Categories */}
               <div className="flex justify-center space-x-8 py-3 text-sm font-medium text-gray-700 border-b">
                 {Object.keys(womenCategories).map((cat, index) => (
