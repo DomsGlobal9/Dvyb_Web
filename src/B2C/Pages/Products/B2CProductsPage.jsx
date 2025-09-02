@@ -15,8 +15,8 @@ import {
 } from '../../../utils/filterUtils';
 
 // Import components
-import ProductCard from '../../Components/Products/ProductCard';
-import FilterSidebar from '../../Components/Products/FiltersBar';
+import ProductCard from '../../Components/products/ProductCard';
+import FilterSidebar from '../../Components/products/FiltersBar';
 import ProductDetailPage from './ProductDetails';
 
 const B2CProductsPage = () => {
