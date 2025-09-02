@@ -20,7 +20,7 @@ import FilterSidebar from '../../Components/Products/FiltersBar';
 import ProductDetailPage from './ProductDetails';
 
 const B2CProductsPage = () => {
-  // State management
+
   const navigate = useNavigate(); 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
