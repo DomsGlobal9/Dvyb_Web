@@ -1,5 +1,5 @@
 import React from 'react';
-import banner01 from '../../../assets/B2Cassets/HomePageAssets/newCollectionBanner.png'
+import banner01 from '../../../assets/B2Cassets/Banners/newCollectionBanner.png'
 import slide01 from '../../../assets/B2Cassets/HomePageAssets/slide01.png'
 import slide02 from '../../../assets/B2Cassets/HomePageAssets/slide02.png'
 import slide03 from '../../../assets/B2Cassets/HomePageAssets/slide03.png'
@@ -47,7 +47,6 @@ const NewCollectionPage = () => {
   return (
   
   <>
-
       {/* Header Section */}
       <img src={banner01} alt="" />
   
@@ -66,10 +65,6 @@ const NewCollectionPage = () => {
               <div className={`relative h-64 sm:h-72 lg:h-80 overflow-hidden`}>
                  <h1 className=''>{product.id}</h1>
                 <img src= {product.image} alt="" />
-               
-
-               
-
 
               </div>
 

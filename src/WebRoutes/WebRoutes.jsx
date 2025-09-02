@@ -7,7 +7,9 @@ import TryOnPreview from "../B2C/Pages/TryOnPreview/TryOnPreview";
 
 import HomePages from "../B2C/Pages/HomePages/HomePages";
 import LoginPage from "../B2C/Pages/AuthPage/LoginPage";
-import B2CSignUpPage from "../B2C/Pages/AuthPage/SignUpForm";
+import B2CProductsPage from "../B2C/Pages/Products/B2CProductsPage";
+import ResetPasswordRequest from "../B2C/Pages/AuthPage/ResetPasswordRequest";
+import ResetPasswordConfirm from "../B2C/Pages/AuthPage/ResetPasswordConfirm";
 
 
 
@@ -16,14 +18,26 @@ import B2CSignUpPage from "../B2C/Pages/AuthPage/SignUpForm";
 const WebRoutes = () => {
     return (
         <Routes>
-            <Route path="/login" element={<LoginPage/>} />
-            <Route path="/SignUp-form" element={<B2CSignUpPage/>} />
-            <Route path="/home" element={<HomePages/>} />
+            <Route path="/b2b-login" element={<LoginPage/>} />
+            <Route path="/reset-password" element={<ResetPasswordRequest />} />
+            <Route path="/reset-password/confirm" element={<ResetPasswordConfirm />} />
+            <Route path="/b2b-home" element={<HomePages/>} />
             <Route path="/" element = {<HomePages/>}/>
             <Route path="/TryOnCart" element = {<TryOnCart />}/>
             <Route path="/TryYourOutfit" element = {<TryYourOutfit />}/>
             <Route path="/upload-selfie" element = {<UploadSelfie/>}/>
             <Route path="/preview" element = {<TryOnPreview/>}/>
+
+            <Route path="/upload-selfie" element = {<UploadSelfie/>}/>
+            <Route path="/preview" element = {<TryOnPreview/>}/>
+            <Route path="/products" element = {<B2CProductsPage/>}/>
+
+    
+          {/* <Route path="/orders" element={<Orders />} /> */}
+            
+
+            
+
        
 
         </Routes>

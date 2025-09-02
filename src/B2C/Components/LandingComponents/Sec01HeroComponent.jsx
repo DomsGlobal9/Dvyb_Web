@@ -9,9 +9,6 @@ const HeroComponent = () => {
     <div className="min-h-screen bg-[#D3DDE5] relative overflow-hidden">
       {/* Decorative stars */}
       <div className="absolute top-5 left-122 ">
-        {/* <svg className="w-8 h-8 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74L12 2z"/>
-        </svg> */}
         <img src={longStar} alt="Star" />
       </div>
       

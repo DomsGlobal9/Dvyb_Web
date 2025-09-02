@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { registerB2B, registerWithGoogle } from "../../../services/authService";
 import frameb2b from '../../../assets/AuthImages/b2bLogin_frame.png';
+import { useNavigate } from 'react-router-dom';
 
 // Logo Component
 const DVYBLogo = () => (
@@ -124,21 +126,7 @@ const ProgressIndicator = ({ currentStep = 2, totalSteps = 3 }) => (
   </div>
 );
 
-// // Image Section Component
-// const ImageSection = () => (
-//   <div className="hidden lg:flex lg:w-1/2 relative">
-//     <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 to-pink-900/20"></div>
-//     <div className="w-full h-full bg-gradient-to-br from-red-800 to-pink-700 flex items-center justify-center">
-//       <div className="text-center text-white p-8">
-//         <div className="w-80 h-80 bg-red-900/30 rounded-lg mb-4 flex items-center justify-center">
-//           <div className="text-6xl">👥</div>
-//         </div>
-//         <p className="text-lg opacity-90">Traditional Indian Wedding Collection</p>
-//       </div>
-//     </div>
-//     <div className="absolute inset-0 bg-black/10"></div>
-//   </div>
-// );
+
 
 // Sign Up Form Component
 const SignUpForm = () => {
@@ -147,19 +135,27 @@ const SignUpForm = () => {
   const [password, setPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [subscribeNewsletter, setSubscribeNewsletter] = useState(false);
+  // const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!agreeTerms) {
-      alert('Please agree to the terms of use and privacy policy');
-      return;
-    }
-    console.log('Form submitted:', { email, password, agreeTerms, subscribeNewsletter });
-  };
 
-  const handleGoogleSignUp = () => {
-    console.log('Google sign up clicked');
-  };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await registerB2B(email, password);
+    alert("B2B account created!");
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
+const handleGoogleSignUp = async () => {
+  try {
+    await registerWithGoogle("b2b");
+    alert("Google B2B sign-in successful!");
+  } catch (err) {
+    alert(err.message);
+  }
+};
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-8">
@@ -224,7 +220,9 @@ const SignUpForm = () => {
 
       <p className="text-center text-sm text-gray-600 mt-6">
         Already have an account?{' '}
-        <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer">
+        <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+          // onClick={()=> navigate("/b2b-login")}
+        >
           Log In
         </span>
       </p>
