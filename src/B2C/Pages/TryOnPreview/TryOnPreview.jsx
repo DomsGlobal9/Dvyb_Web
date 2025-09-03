@@ -25,47 +25,63 @@ function TryOnPreview() {
   }, [modelImage, garmentImage]);
 
   const performTryOn = async () => {
-    setIsProcessing(true);
-    setErrorMsg('');
-    setTryOnResult(null);
+  setIsProcessing(true);
+  setErrorMsg('');
+  setTryOnResult(null);
 
-    try {
-      console.log("Sending to API:", {
+  try {
+    console.log("Sending to API:", {
+      modelImage: modelImage,
+      garmentImage: garmentImage,
+    });
+
+    const response = await fetch("/api/tryon", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         modelImage: modelImage,
         garmentImage: garmentImage,
-      });
+      }),
+    });
 
-      // Use relative path for API route - works with both development and production
-      const response = await fetch("/api/tryon", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          modelImage: modelImage,
-          garmentImage: garmentImage,
-        }),
-      });
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers.get('content-type'));
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.output && data.output.length > 0) {
-        setTryOnResult(data.output[0]);
-      } else {
-        setErrorMsg("Try-on failed. Please try again with different images.");
-      }
-    } catch (error) {
-      console.error("Try-on failed:", error);
-      setErrorMsg(error.message || "Something went wrong. Please try again.");
-    } finally {
-      setIsProcessing(false);
+    // Check if response is JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response:", text);
+      throw new Error("Server returned HTML instead of JSON. Check API deployment.");
     }
-  };
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (jsonError) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+      throw new Error(errorData.error || `API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("API response:", data);
+
+    if (data.output && data.output.length > 0) {
+      setTryOnResult(data.output[0]);
+    } else {
+      setErrorMsg("Try-on failed. Please try again with different images.");
+    }
+  } catch (error) {
+    console.error("Try-on failed:", error);
+    setErrorMsg(error.message || "Something went wrong. Please try again.");
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   const handleBackClick = () => {
     navigate(-1);
