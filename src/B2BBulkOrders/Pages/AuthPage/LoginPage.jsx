@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { auth } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { registerB2B, registerWithGoogle } from "../../../services/authService";
-import frameb2b from "../../../assets/AuthImages/b2bLogin_frame.png";
+import { registerB2BBulkOrders, registerWithGoogle } from "../../../services/authService";
+import frameB2BBulkOrders from "../../../assets/AuthImages/B2BLogin_frame.png";
 import { useNavigate } from "react-router-dom";
 import DVYBLogo from "../../Components/common/DVYBLogo";
 import {
@@ -40,12 +40,12 @@ const LoginPage = () => {
       if (isLogin) {
         // 🔹 LOGIN
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        navigate("/b2b-home");
+        navigate("/B2BBulkOrders-home");
         alert("Login successful!");
         console.log("Logged in:", userCredential.user);
       } else {
         // 🔹 SIGNUP
-        const user = await registerB2B(email, password);
+        const user = await registerB2BBulkOrders(email, password);
         alert("Signup successful!");
         console.log("Signed up:", user);
       }
@@ -57,9 +57,9 @@ const LoginPage = () => {
 
   const handleGoogleSignUp = async () => {
     try {
-      await registerWithGoogle("b2b");
-      navigate("/b2b-home");
-      alert("Google B2B sign-in successful!");
+      await registerWithGoogle("B2BBulkOrders");
+      navigate("/B2BBulkOrders-home");
+      alert("Google B2BBulkOrders sign-in successful!");
     } catch (err) {
       alert(err.message);
     }
@@ -72,7 +72,7 @@ const LoginPage = () => {
         {/* Left Image Section */}
         <div className="hidden md:flex w-1/2">
           <img
-            src={frameb2b}
+            src={frameB2BBulkOrders}
             alt="Traditional Clothing"
             className="w-full h-full object-cover"
           />

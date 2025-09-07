@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { FaHeart, FaShoppingBag, FaUser, FaSearch } from "react-icons/fa";
 import logo from "../../../assets/Navbar/DVYB_Enterprise_Logo.png";
 import EtImg from "../../../assets/Navbar/ET-WEAR.png"
-import fav from '../../../assets/B2Cassets/NavbarImages/heart.png'
-import cart from '../../../assets/B2Cassets/NavbarImages/cart.png'
-import profile from '../../../assets/B2Cassets/NavbarImages/profile.png'
+import fav from '../../../assets/B2Bassets/NavbarImages/heart.png'
+import cart from '../../../assets/B2Bassets/NavbarImages/cart.png'
+import profile from '../../../assets/B2Bassets/NavbarImages/profile.png'
 const Navbar = () => {
   const [showWomenCategories, setShowWomenCategories] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);

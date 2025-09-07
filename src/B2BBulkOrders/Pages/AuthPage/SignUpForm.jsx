@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { registerB2B, registerWithGoogle } from "../../../services/authService";
-import frameb2b from '../../../assets/AuthImages/b2bLogin_frame.png';
+import { registerB2BBulkOrders, registerWithGoogle } from "../../../services/authService";
+import frameB2BBulkOrders from '../../../assets/AuthImages/B2BBulkOrdersLogin_frame.png';
 import { useNavigate } from 'react-router-dom';
 
 // Logo Component
@@ -141,8 +141,8 @@ const SignUpForm = () => {
  const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    await registerB2B(email, password);
-    alert("B2B account created!");
+    await registerB2BBulkOrders(email, password);
+    alert("B2BBulkOrders account created!");
   } catch (err) {
     alert(err.message);
   }
@@ -150,8 +150,8 @@ const SignUpForm = () => {
 
 const handleGoogleSignUp = async () => {
   try {
-    await registerWithGoogle("b2b");
-    alert("Google B2B sign-in successful!");
+    await registerWithGoogle("B2BBulkOrders");
+    alert("Google B2BBulkOrders sign-in successful!");
   } catch (err) {
     alert(err.message);
   }
@@ -221,7 +221,7 @@ const handleGoogleSignUp = async () => {
       <p className="text-center text-sm text-gray-600 mt-6">
         Already have an account?{' '}
         <span className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
-          // onClick={()=> navigate("/b2b-login")}
+          // onClick={()=> navigate("/B2BBulkOrders-login")}
         >
           Log In
         </span>
@@ -236,7 +236,7 @@ const B2CSignUpPage = () => (
     
   <div className="hidden md:flex w-1/2">
         <img
-          src={frameb2b} 
+          src={frameB2BBulkOrders} 
           alt="Traditional Clothing"
           className="w-full h-full object-cover"
         />

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { auth } from "../../../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 import DVYBLogo from "../../Components/common/DVYBLogo";
-import frameb2b from "../../../assets/AuthImages/b2bLogin_frame.png";
+import frameB2BBulkOrders from "../../../assets/AuthImages/B2BLogin_frame.png";
 
 const actionCodeSettings = {
   // After user sets a new password on Firebase’s page,
@@ -65,7 +65,7 @@ const ResetPasswordRequest = () => {
       {/* Left Image Section */}
               <div className="hidden md:flex w-1/2">
                 <img
-                  src={frameb2b}
+                  src={frameB2BBulkOrders}
                   alt="Traditional Clothing"
                   className="w-full h-full object-cover"
                 />

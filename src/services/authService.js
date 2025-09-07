@@ -25,13 +25,13 @@ export const registerB2C = async (email, password, extraData = {}) => {
   }
 };
 
-// Register B2B user
-export const registerB2B = async (email, password, extraData = {}) => {
+// Register B2BBulkOrders user
+export const registerB2BBulkOrders = async (email, password, extraData = {}) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    await setDoc(doc(db, "b2b_users", user.uid), {
+    await setDoc(doc(db, "B2BBulkOrders_users", user.uid), {
       uid: user.uid,
       email: user.email,
       ...extraData,
@@ -51,7 +51,7 @@ export const registerWithGoogle = async (type = "b2c", extraData = {}) => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    const collectionName = type === "b2b" ? "b2b_users" : "b2c_users";
+    const collectionName = type === "B2BBulkOrders" ? "B2BBulkOrders_users" : "b2c_users";
 
     await setDoc(doc(db, collectionName, user.uid), {
       uid: user.uid,

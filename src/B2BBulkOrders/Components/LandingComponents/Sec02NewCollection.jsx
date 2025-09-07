@@ -1,8 +1,8 @@
 import React from 'react';
-import banner01 from '../../../assets/B2Cassets/Banners/newCollectionBanner.png'
-import slide01 from '../../../assets/B2Cassets/HomePageAssets/slide01.png'
-import slide02 from '../../../assets/B2Cassets/HomePageAssets/slide02.png'
-import slide03 from '../../../assets/B2Cassets/HomePageAssets/slide03.png'
+import banner01 from '../../../assets/B2Bassets/Banners/newCollectionBanner.png'
+import slide01 from '../../../assets/B2Bassets/HomePageAssets/slide01.png'
+import slide02 from '../../../assets/B2Bassets/HomePageAssets/slide02.png'
+import slide03 from '../../../assets/B2Bassets/HomePageAssets/slide03.png'
 
 const NewCollectionPage = () => {
   const products = [
@@ -106,13 +106,13 @@ const NewCollectionPage = () => {
           </button>
         </div>
       </div>
-
-      {/* Background Decorative Elements */}
+{/* 
+      Background Decorative Elements
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-20 left-10 w-32 h-32 bg-blue-100 rounded-full opacity-20 animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-24 h-24 bg-pink-100 rounded-full opacity-30 animate-bounce"></div>
         <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-purple-100 rounded-full opacity-25 animate-ping"></div>
-      </div>
+      </div> */}
     </div>
 
     </>
