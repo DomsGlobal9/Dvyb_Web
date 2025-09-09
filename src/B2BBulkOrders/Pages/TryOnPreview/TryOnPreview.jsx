@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import hall from '../../assets/hall.jpg';
-import beach from '../../assets/beach.jpg';
-import office from '../../assets/office.jpg';
-import mall from '../../assets/mall.jpg';
+import hall from '../../../assets/TryOn/hall.jpg';  // Local image for Function Hall background
+import beach from '../../../assets/TryOn/beach.jpg';
+import office from '../../../assets/TryOn/office.jpg';
+import mall from '../../../assets/TryOn/mall.jpg';
 
 function TryOnPreview() {
   const { state } = useLocation();
