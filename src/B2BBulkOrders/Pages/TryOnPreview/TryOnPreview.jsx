@@ -1,3 +1,10 @@
+// import React, { useState, useEffect } from 'react';
+// import { ArrowLeft } from 'lucide-react';
+// import { useLocation, useNavigate } from 'react-router-dom';
+// import hall from '../../../assets/TryOn/hall.jpg';  // Local image for Function Hall background
+// import beach from '../../../assets/TryOn/beach.jpg';
+// import office from '../../../assets/TryOn/office.jpg';
+// import mall from '../../../assets/TryOn/mall.jpg';
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -122,7 +129,39 @@ function TryOnPreview() {
     }
   };
 
-  // CLIENT-SIDE background change function (like in your demo)
+  // Background removal function using Remove.bg API (like in your demo)
+  const removeBackground = async (imageUrl) => {
+    try {
+      // Convert image URL to blob
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      
+      // Try Remove.bg first
+      const formData = new FormData();
+      formData.append('image_file', blob);
+      formData.append('size', 'auto');
+
+      const removeBgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
+        method: 'POST',
+        headers: {
+          'X-Api-Key': 'nKY5RdiBBARJWYBnme6M6RdJ', // Your API key from demo
+        },
+        body: formData,
+      });
+
+      if (!removeBgResponse.ok) {
+        throw new Error(`Remove.bg failed: ${removeBgResponse.status}`);
+      }
+
+      const removedBgBlob = await removeBgResponse.blob();
+      return URL.createObjectURL(removedBgBlob);
+    } catch (error) {
+      console.error('Background removal failed:', error);
+      throw error;
+    }
+  };
+
+  // Background change function with background removal
   const changeBackground = async (backgroundType) => {
     if (!tryOnResult) {
       setBgError("No try-on result available for background change");
@@ -134,7 +173,12 @@ function TryOnPreview() {
     setSelectedBackground(backgroundType);
 
     try {
-      console.log("Changing background to:", backgroundType);
+      console.log("Removing background from try-on result...");
+      
+      // Step 1: Remove background from try-on result
+      const personWithoutBg = await removeBackground(tryOnResult);
+      
+      console.log("Background removed, now changing to:", backgroundType);
 
       const selectedBg = backgroundOptions.find(bg => bg.id === backgroundType);
       const canvas = document.createElement('canvas');
@@ -149,13 +193,13 @@ function TryOnPreview() {
         bgImg.src = selectedBg.imagePath;
       });
 
-      // Load try-on result image
+      // Load person without background
       const personImg = new window.Image();
       await new Promise((resolve, reject) => {
         personImg.onload = resolve;
         personImg.onerror = reject;
         personImg.crossOrigin = 'anonymous';
-        personImg.src = tryOnResult;
+        personImg.src = personWithoutBg;
       });
 
       // Set canvas to background size
@@ -183,7 +227,7 @@ function TryOnPreview() {
       const personX = (canvas.width - personWidth) / 2;
       const personY = canvas.height - personHeight;
       
-      // Draw person on background
+      // Draw person (without background) on new background
       ctx.drawImage(personImg, personX, personY, personWidth, personHeight);
 
       // Create final result
