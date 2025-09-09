@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import hall from '../../../assets/TryOn/hall.jpg';
-import beach from '../../../assets/TryOn/beach.jpg';
-import office from '../../../assets/TryOn/office.jpg';
-import mall from '../../../assets/TryOn/mall.jpg';
-
+import hall from '../../assets/hall.jpg';
+import beach from '../../assets/beach.jpg';
+import office from '../../assets/office.jpg';
+import mall from '../../assets/mall.jpg';
 
 function TryOnPreview() {
   const { state } = useLocation();
@@ -28,31 +27,31 @@ function TryOnPreview() {
     { name: 'brown', image: garmentImage },
   ];
 
-  // Background options - you can replace these with actual image URLs
+  // Background options with local images
   const backgroundOptions = [
     {
       id: 'function-hall',
       name: 'Function Hall',
       description: 'Elegant wedding venue',
-      previewUrl: hall // or use actual image URL
+      imagePath: hall
     },
     {
       id: 'beach',
       name: 'Beach',
       description: 'Tropical paradise',
-      previewUrl: beach
+      imagePath: beach
     },
     {
       id: 'office',
       name: 'Office',
       description: 'Professional workspace',
-      previewUrl: office
+      imagePath: office
     },
     {
       id: 'mall',
       name: 'Mall',
       description: 'Shopping center',
-      previewUrl: mall
+      imagePath: mall
     }
   ];
 
@@ -123,7 +122,7 @@ function TryOnPreview() {
     }
   };
 
-  // New function to handle background change
+  // CLIENT-SIDE background change function (like in your demo)
   const changeBackground = async (backgroundType) => {
     if (!tryOnResult) {
       setBgError("No try-on result available for background change");
@@ -137,31 +136,62 @@ function TryOnPreview() {
     try {
       console.log("Changing background to:", backgroundType);
 
-      // Convert try-on result URL to blob for upload
-      const response = await fetch(tryOnResult);
-      const blob = await response.blob();
-      
-      // Create FormData for the background change API
-      const formData = new FormData();
-      formData.append('image', blob, 'tryon-result.png');
-      formData.append('background', backgroundType);
+      const selectedBg = backgroundOptions.find(bg => bg.id === backgroundType);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
 
-      const bgResponse = await fetch('/api/replace-background', {
-        method: 'POST',
-        body: formData,
+      // Load background image
+      const bgImg = new window.Image();
+      await new Promise((resolve, reject) => {
+        bgImg.onload = resolve;
+        bgImg.onerror = reject;
+        bgImg.crossOrigin = 'anonymous';
+        bgImg.src = selectedBg.imagePath;
       });
 
-      if (!bgResponse.ok) {
-        const errorData = await bgResponse.text();
-        throw new Error(`Background change failed: ${bgResponse.status} - ${errorData}`);
-      }
+      // Load try-on result image
+      const personImg = new window.Image();
+      await new Promise((resolve, reject) => {
+        personImg.onload = resolve;
+        personImg.onerror = reject;
+        personImg.crossOrigin = 'anonymous';
+        personImg.src = tryOnResult;
+      });
 
-      // Get the processed image as blob and create URL
-      const processedBlob = await bgResponse.blob();
-      const processedImageUrl = URL.createObjectURL(processedBlob);
+      // Set canvas to background size
+      canvas.width = bgImg.width;
+      canvas.height = bgImg.height;
+
+      // Draw background
+      ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+
+      // Calculate person size and position
+      const maxPersonWidth = canvas.width * 0.7;
+      const maxPersonHeight = canvas.height * 0.9;
       
-      setBackgroundChangedImage(processedImageUrl);
-      console.log("Background changed successfully");
+      let personWidth = personImg.width;
+      let personHeight = personImg.height;
+      
+      // Scale to fit while maintaining aspect ratio
+      if (personWidth > maxPersonWidth || personHeight > maxPersonHeight) {
+        const scale = Math.min(maxPersonWidth / personWidth, maxPersonHeight / personHeight);
+        personWidth *= scale;
+        personHeight *= scale;
+      }
+      
+      // Center horizontally, bottom aligned
+      const personX = (canvas.width - personWidth) / 2;
+      const personY = canvas.height - personHeight;
+      
+      // Draw person on background
+      ctx.drawImage(personImg, personX, personY, personWidth, personHeight);
+
+      // Create final result
+      canvas.toBlob((blob) => {
+        const finalUrl = URL.createObjectURL(blob);
+        setBackgroundChangedImage(finalUrl);
+        console.log("Background changed successfully");
+      }, 'image/png', 0.95);
 
     } catch (error) {
       console.error("Background change failed:", error);
@@ -265,22 +295,9 @@ function TryOnPreview() {
                     onClick={() => changeBackground(bg.id)}
                   >
                     <img 
-                      src={bg.previewUrl} // Use local image first
+                      src={bg.imagePath}
                       alt={bg.name}
                       className="w-full h-16 object-cover"
-                      onError={(e) => {
-                        // Fallback to API endpoint if local image fails
-                        if (e.target.src !== bg.previewUrl) {
-                          e.target.src = bg.previewUrl;
-                        } else {
-                          // Final fallback with color background
-                          e.target.style.backgroundColor = bg.fallbackColor;
-                          e.target.style.display = 'flex';
-                          e.target.style.alignItems = 'center';
-                          e.target.style.justifyContent = 'center';
-                          e.target.innerHTML = `<span style="color: #666; font-size: 12px;">${bg.name}</span>`;
-                        }
-                      }}
                     />
                     
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
