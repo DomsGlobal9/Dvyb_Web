@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { auth } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { registerB2BBulkOrders, registerWithGoogle } from "../../../services/authService";
-import frameB2BBulkOrders from "../../../assets/AuthImages/B2BLogin_frame.png";
+import frameB2BBulkOrders from "../../../assets/AuthImages/b2bLogin_frame.png";
 import { useNavigate } from "react-router-dom";
 import DVYBLogo from "../../../CommonPages/DVYBLogo";
 import {
