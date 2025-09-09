@@ -265,7 +265,7 @@ function TryOnPreview() {
                     onClick={() => changeBackground(bg.id)}
                   >
                     <img 
-                      src={bg.localImage} // Use local image first
+                      src={bg.previewUrl} // Use local image first
                       alt={bg.name}
                       className="w-full h-16 object-cover"
                       onError={(e) => {
