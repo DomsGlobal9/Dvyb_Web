@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { auth } from "../../../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
-import DVYBLogo from "../../Components/common/DVYBLogo";
+import DVYBLogo from "../../../CommonPages/DVYBLogo";
 import frameB2BBulkOrders from "../../../assets/AuthImages/B2BLogin_frame.png";
 
 const actionCodeSettings = {

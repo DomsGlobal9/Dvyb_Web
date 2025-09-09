@@ -6,7 +6,7 @@ import {
   confirmPasswordReset,
 } from "firebase/auth";
 import { useLocation, useNavigate } from "react-router-dom";
-import DVYBLogo from "../../Components/common/DVYBLogo";
+import DVYBLogo from "../../../CommonPages/DVYBLogo";
 
 const ResetPasswordConfirm = () => {
   const navigate = useNavigate();
