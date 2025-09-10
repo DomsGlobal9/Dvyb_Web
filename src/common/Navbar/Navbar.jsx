@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { FaHeart, FaShoppingBag, FaUser, FaSearch, FaTimes, FaBars } from "react-icons/fa";
+import { toast } from "react-toastify"; // Install with: npm install react-toastify
+import "react-toastify/dist/ReactToastify.css";
 
 import logo from "../../assets/Navbar/DVYB_Enterprise_Logo.png";
 import EtImg from "../../assets/Navbar/ET-WEAR.png";
@@ -8,6 +10,8 @@ import cart from '../../assets/B2Bassets/NavbarImages/cart.png';
 import profile from '../../assets/B2Bassets/NavbarImages/profile.png';
 import { useNavigate } from "react-router-dom";
 
+
+
 const Navbar = () => {
   const [showWomenCategories, setShowWomenCategories] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -15,6 +19,17 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+
+const isLoggedIn = !!localStorage.getItem("authToken");
+
+  const handleProtectedClick = (callback) => {
+    if (!isLoggedIn) {
+      toast.error("Please log in to continue!", { position: "top-center" });
+    } else {
+      callback();
+    }
+  };
 
   // Women Categories + Sub Collections
   const womenCategories = {
@@ -124,8 +139,10 @@ const Navbar = () => {
               />
               
               <div className="hidden md:flex items-center space-x-6 text-xl text-blue-900">
-                <img className="cursor-pointer w-5 h-5" src={fav} alt="favorites" />
-                <img className="cursor-pointer w-5 h-5" src={cart} alt="cart" />
+                <img className="cursor-pointer w-5 h-5" src={fav} alt="favorites" 
+                 onClick={() => handleProtectedClick(() => navigate("/favorites"))}/>
+                <img className="cursor-pointer w-5 h-5" src={cart} alt="cart"
+                 onClick={() => handleProtectedClick(() => navigate("/cart"))} />
                 <img className="cursor-pointer w-5 h-5" src={profile} alt="profile"
                   onClick={() => navigate("/your-profile")} />
               </div>
@@ -280,15 +297,20 @@ const Navbar = () => {
 
                   {/* Mobile bottom icons */}
                   <div className="flex justify-around items-center mt-8 pt-4 border-t">
-                    <div className="flex flex-col items-center">
-                      <img className="w-6 h-6 mb-1" src={fav} alt="favorites" />
+                    <div className="flex flex-col items-center"
+                     onClick={() => handleProtectedClick(() => navigate("/favorites"))} >
+                      <img className="w-6 h-6 mb-1" src={fav} alt="favorites"
+                       />
                       <span className="text-xs text-gray-600">Favorites</span>
                     </div>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center" 
+                     onClick={() => handleProtectedClick(() => navigate("/cart"))}>
                       <img className="w-6 h-6 mb-1" src={cart} alt="cart" />
                       <span className="text-xs text-gray-600">Cart</span>
                     </div>
-                    <div className="flex flex-col items-center" onClick={() => navigate("/your-profile")}>
+                    <div className="flex flex-col items-center" 
+                     onClick={() => handleProtectedClick(() => navigate("/your-profile"))}
+                     >
                       <img className="w-6 h-6 mb-1" src={profile} alt="profile" />
                       <span className="text-xs text-gray-600">Profile</span>
                     </div>

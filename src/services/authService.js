@@ -6,6 +6,12 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
+// Helper: Save token
+const saveAuthToken = async (user) => {
+  const token = await user.getIdToken();
+  localStorage.setItem("authToken", token);
+};
+
 // Register B2C user
 export const registerB2C = async (email, password, extraData = {}) => {
   try {
@@ -18,6 +24,8 @@ export const registerB2C = async (email, password, extraData = {}) => {
       ...extraData,
       createdAt: new Date(),
     });
+
+    await saveAuthToken(user); // 🔥 Save token
 
     return user;
   } catch (error) {
@@ -38,13 +46,15 @@ export const registerB2BBulkOrders = async (email, password, extraData = {}) => 
       createdAt: new Date(),
     });
 
+    await saveAuthToken(user); // 🔥 Save token
+
     return user;
   } catch (error) {
     throw error;
   }
 };
 
-// Google Sign-Up (with type)
+// Google Sign-Up
 export const registerWithGoogle = async (type = "b2c", extraData = {}) => {
   try {
     const provider = new GoogleAuthProvider();
@@ -61,6 +71,8 @@ export const registerWithGoogle = async (type = "b2c", extraData = {}) => {
       ...extraData,
       createdAt: new Date(),
     }, { merge: true });
+
+    await saveAuthToken(user); // 🔥 Save token
 
     return user;
   } catch (error) {

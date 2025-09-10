@@ -65,6 +65,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
       window.location.href = "/B2c-login"; // Redirect to login
     } catch (error) {
       console.error("Logout error:", error);

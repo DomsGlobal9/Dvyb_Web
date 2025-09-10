@@ -1,12 +1,19 @@
 import { useState } from 'react'
 import './App.css'
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import WebRoutes from './WebRoutes/WebRoutes'
 
 function App() {
 
 
   return (
-   <WebRoutes/>
+    <>
+       <ToastContainer position="top-center" autoClose={3000} />
+       <WebRoutes/>
+    
+    </>
+
   )
 }
 

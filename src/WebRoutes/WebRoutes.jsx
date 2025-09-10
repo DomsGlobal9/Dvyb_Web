@@ -35,8 +35,8 @@ const WebRoutes = () => {
             <Route path="/TryYourOutfit" element = {<TryYourOutfit />}/>
             <Route path="/upload-selfie" element = {<UploadSelfie />}/>
             <Route path="/preview" element = {<TryOnPreview/>}/>
-            <Route path="/upload-selfie" element = {<UploadSelfie/>}/>
-            <Route path="/preview" element = {<TryOnPreview/>}/>
+            {/* <Route path="/upload-selfie" element = {<UploadSelfie/>}/>
+            <Route path="/preview" element = {<TryOnPreview/>}/> */}
 
     {/* B2c PRODUCTS ROUTES */}
           <Route path="B2c-login" element={<B2cLoginPage/>}/>
@@ -50,6 +50,7 @@ const WebRoutes = () => {
             <Route path= '/TermsAndConditions' element={<TermsAndConditions/>}/>
     
           {/* <Route path="/orders" element={<Orders />} /> */}
+         
 
         </Routes>
     )
