@@ -16,34 +16,33 @@ import PrivacyPolicy from "../CommonPages/PrivacyPolicy";
 import TermsAndConditions from "../CommonPages/TermsAndConditions";
 import B2cHomePages from "../B2C/B2CPages/B2cHomePage/B2cHomePages";
 import ProfilePage from "../CommonPages/ProfilePage/ProfilePage";
+import B2cProductsPage from "../B2C/B2CPages/B2cProductsPage/B2cProductsPage";
 
 
 
 const WebRoutes = () => {
     return (
         <Routes>
-            <Route path="B2c-login" element={<B2cLoginPage/>}/>
-
-              {/* <Route path="/B2C-home" element={<HomePages/>} /> */}
-
-            
-
-            {/* B2B bulk routes */}
+      {/* B2B bulk routes */}
             <Route path="/B2BBulkOrders-login" element={<LoginPage/>} />
             <Route path="/reset-password" element={<ResetPasswordRequest />} />
             <Route path="/reset-password/confirm" element={<ResetPasswordConfirm />} />
             <Route path="/B2BBulkOrders-home" element={<HomePages/>} />
             <Route path="/" element = {<B2cHomePages/>}/>
+    {/* B2B PRODUCTS ROUTES */}
+            <Route path="/products" element = {<B2BBulkOdersProductsPage/>}/>
             <Route path="/TryOnCart" element = {<TryOnCart />}/>
             <Route path="/TryYourOutfit" element = {<TryYourOutfit />}/>
             <Route path="/upload-selfie" element = {<UploadSelfie />}/>
             <Route path="/preview" element = {<TryOnPreview/>}/>
-
             <Route path="/upload-selfie" element = {<UploadSelfie/>}/>
             <Route path="/preview" element = {<TryOnPreview/>}/>
-            <Route path="/products" element = {<B2BBulkOdersProductsPage/>}/>
 
-            {/* common pagges */}
+    {/* B2c PRODUCTS ROUTES */}
+          <Route path="B2c-login" element={<B2cLoginPage/>}/>
+          <Route path="/b2c-products" element = {<B2cProductsPage/>}/>
+
+    {/*COMMON PAGE ROUTES*/}
             <Route path = "/your-profile" element ={<ProfilePage/>}/>
             <Route path="/aboutUs" element = {<AboutPage/>}/>
             <Route path="/faq" element = {<FAQPage/>}/>
@@ -51,11 +50,6 @@ const WebRoutes = () => {
             <Route path= '/TermsAndConditions' element={<TermsAndConditions/>}/>
     
           {/* <Route path="/orders" element={<Orders />} /> */}
-            
-
-            
-
-       
 
         </Routes>
     )

@@ -14,7 +14,7 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Women Categories + Sub Collections
   const womenCategories = {
@@ -101,7 +101,7 @@ const Navbar = () => {
         <>
           {/* Top Row */}
           <div className="flex justify-between items-center px-4 sm:px-6 py-3 sm:py-4">
-            {/* Mobile Menu Button (Left side on mobile) */}
+            {/* Mobile Menu Button */}
             <div className="flex items-center md:hidden">
               <FaBars
                 className="text-xl text-gray-600 cursor-pointer"
@@ -109,28 +109,25 @@ const Navbar = () => {
               />
             </div>
 
-            {/* Desktop: Empty space for layout, Mobile: Search icon */}
             <div className="hidden md:block md:w-1/3"></div>
 
-            {/* Logo Center */}
+            {/* Logo */}
             <div className="flex justify-center flex-1 md:w-1/3">
               <img src={logo} alt="logo" className="h-8 sm:h-10 md:h-12 object-contain" />
             </div>
 
             {/* Right Icons */}
             <div className="flex justify-end items-center space-x-3 sm:space-x-4 md:space-x-6 md:w-1/3">
-              {/* Mobile: Only search icon visible */}
               <FaSearch
                 className="md:hidden text-lg cursor-pointer text-gray-600 hover:text-blue-900"
                 onClick={() => setSearchOpen(true)}
               />
               
-              {/* Desktop: All icons */}
               <div className="hidden md:flex items-center space-x-6 text-xl text-blue-900">
                 <img className="cursor-pointer w-5 h-5" src={fav} alt="favorites" />
                 <img className="cursor-pointer w-5 h-5" src={cart} alt="cart" />
                 <img className="cursor-pointer w-5 h-5" src={profile} alt="profile"
-                onClick={()=>navigate("/your-profile")} />
+                  onClick={() => navigate("/your-profile")} />
               </div>
             </div>
           </div>
@@ -138,27 +135,21 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex justify-center items-center space-x-8 py-2 text-sm font-medium text-gray-700 relative">
             {/* WOMEN Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setShowWomenCategories(true)}
-              onMouseLeave={() => {
-                setShowWomenCategories(false);
-                setActiveCategory(null);
-              }}
-            >
-              <a href="#" className="text-blue-900 font-semibold hover:text-blue-700">
+            <div className="relative">
+              <button
+                onClick={toggleWomenCategories}
+                className="text-blue-900 font-semibold hover:text-blue-700"
+              >
                 WOMEN
-              </a>
+              </button>
 
-              {/* Women Categories Mega Menu - Desktop Only */}
               {showWomenCategories && (
                 <div className="fixed left-0 right-0 top-[110px] bg-gray-100 border-t shadow-md z-50">
-                  {/* First Row: Categories */}
                   <div className="flex justify-center space-x-8 py-3 text-sm font-medium text-gray-700 border-b">
                     {Object.keys(womenCategories).map((cat, index) => (
                       <button
                         key={index}
-                        onMouseEnter={() => setActiveCategory(cat)}
+                        onClick={() => setActiveCategory(cat)}
                         className={`transition ${
                           activeCategory === cat
                             ? "text-blue-900 border-b-2 border-blue-900"
@@ -170,7 +161,6 @@ const Navbar = () => {
                     ))}
                   </div>
 
-                  {/* Second Row: Sub Collections */}
                   {activeCategory && (
                     <div className="flex justify-center gap-8 py-6 flex-wrap bg-white">
                       {womenCategories[activeCategory].map((item, idx) => (
@@ -202,7 +192,6 @@ const Navbar = () => {
               2D TRY ON
             </a>
 
-            {/* Search Icon */}
             <FaSearch
               className="ml-6 cursor-pointer text-gray-600 hover:text-blue-900"
               onClick={() => setSearchOpen(true)}
@@ -212,15 +201,12 @@ const Navbar = () => {
           {/* Mobile Menu Overlay */}
           {mobileMenuOpen && (
             <div className="fixed inset-0 z-50 md:hidden">
-              {/* Background overlay */}
               <div
                 className="fixed inset-0 bg-black bg-opacity-50"
                 onClick={() => setMobileMenuOpen(false)}
               ></div>
               
-              {/* Menu content */}
               <div className="fixed top-0 left-0 w-4/5 max-w-sm h-full bg-white shadow-lg overflow-y-auto">
-                {/* Menu header */}
                 <div className="flex justify-between items-center p-4 border-b">
                   <img src={logo} alt="logo" className="h-8 object-contain" />
                   <FaTimes
@@ -229,7 +215,6 @@ const Navbar = () => {
                   />
                 </div>
 
-                {/* Menu items */}
                 <div className="p-4">
                   {/* Women section */}
                   <div className="mb-4">
@@ -243,7 +228,6 @@ const Navbar = () => {
                       </span>
                     </button>
                     
-                    {/* Women categories - Mobile */}
                     {showWomenCategories && (
                       <div className="mt-2 ml-4">
                         {Object.keys(womenCategories).map((cat, index) => (
@@ -261,7 +245,6 @@ const Navbar = () => {
                               {cat}
                             </button>
                             
-                            {/* Sub categories */}
                             {activeCategory === cat && (
                               <div className="mt-2 ml-4 grid grid-cols-2 gap-3">
                                 {womenCategories[cat].map((item, idx) => (
@@ -305,7 +288,7 @@ const Navbar = () => {
                       <img className="w-6 h-6 mb-1" src={cart} alt="cart" />
                       <span className="text-xs text-gray-600">Cart</span>
                     </div>
-                    <div className="flex flex-col items-center" onClick={()=>navigate("/your-profile")}>
+                    <div className="flex flex-col items-center" onClick={() => navigate("/your-profile")}>
                       <img className="w-6 h-6 mb-1" src={profile} alt="profile" />
                       <span className="text-xs text-gray-600">Profile</span>
                     </div>
@@ -321,3 +304,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

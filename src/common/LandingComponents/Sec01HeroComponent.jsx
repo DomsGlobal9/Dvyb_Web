@@ -8,7 +8,7 @@ const HeroComponent = () => {
   return (
     <div className="min-h-screen bg-[#D3DDE5] relative overflow-hidden">
       {/* Decorative stars */}
-      <div className="absolute top-5 left-122 sm:left-8 md:left-16 lg:left-32 xl:left-122">
+      <div className="absolute top-5 left-129 sm:left-12 md:left-18 lg:left-38 xl:left-122">
         <img src={longStar} alt="Star" />
       </div>
       
@@ -20,13 +20,15 @@ const HeroComponent = () => {
         {/* Left Content */}
         <div className="flex-1 max-w-md lg:max-w-md text-center lg:text-left mb-8 lg:mb-0"  style={{ fontFamily: "'Solitreo', cursive" }} >
           <h1 className="text-5xl font-bold text-gray-800 mb-6 leading-tight sm:text-4xl lg:text-5xl xl:text-6xl   sm:mb-6 ">
-            Shop More &<br />
-            Save More
+             Experience the<br /> Next Era of <br />
+            Shopping
           </h1>
           
           <p className="text-gray-600 text-lg mb-8 leading-relaxed sm:text-lg lg:text-xl sm:mb-8 px-4 lg:px-0">
-            Shopping Built, Made Easy With Huge<br />
-            Discount Like Never Before
+             Build a digital twin of yourself in <br />
+            seconds and try on outfits just like you <br />
+            would in-store. But smarter, faster, and <br />
+            from anywhere
           </p>
           
           <button className="bg-[#1C4C74] text-white px-12 pt-4 sm:px-10 lg:px-12 py-3 sm:py-4 rounded-full text-sm sm:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg ">
