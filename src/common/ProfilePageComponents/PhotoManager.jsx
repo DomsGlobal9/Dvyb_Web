@@ -3,7 +3,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "../../firebase";
 import { useAuth } from "../../context/AuthContext";
-import { Camera, Upload, Trash2, User, X, CheckCircle, AlertCircle } from "lucide-react";
+import { Camera, Upload, Trash2, User, X, CheckCircle, AlertCircle, Scissors } from "lucide-react";
 
 const PhotoManager = () => {
   const { user } = useAuth();
@@ -13,10 +13,13 @@ const PhotoManager = () => {
   const [collectionName, setCollectionName] = useState("");
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [removingBg, setRemovingBg] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [processedPreviewUrl, setProcessedPreviewUrl] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showFullPhoto, setShowFullPhoto] = useState(false);
+  const [processedBlob, setProcessedBlob] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -69,7 +72,38 @@ const PhotoManager = () => {
     return null;
   };
 
-  const handleFileSelect = (e) => {
+  const removeBackground = async (imageFile) => {
+    try {
+      setRemovingBg(true);
+      
+      // Try Remove.bg first
+      const formData = new FormData();
+      formData.append('image_file', imageFile);
+      formData.append('size', 'auto');
+
+      const removeBgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
+        method: 'POST',
+        headers: {
+          'X-Api-Key': 'nKY5RdiBBARJWYBnme6M6RdJ', // Your API key
+        },
+        body: formData,
+      });
+
+      if (!removeBgResponse.ok) {
+        throw new Error(`Remove.bg failed: ${removeBgResponse.status}`);
+      }
+
+      const removedBgBlob = await removeBgResponse.blob();
+      return removedBgBlob;
+    } catch (error) {
+      console.error('Background removal failed:', error);
+      throw error;
+    } finally {
+      setRemovingBg(false);
+    }
+  };
+
+  const handleFileSelect = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const error = validateFile(file);
@@ -81,6 +115,28 @@ const PhotoManager = () => {
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
+      
+      // Reset processed preview
+      setProcessedPreviewUrl("");
+      setProcessedBlob(null);
+    }
+  };
+
+  const handleRemoveBackground = async () => {
+    if (!selectedFile) return;
+    
+    try {
+      const processedBlob = await removeBackground(selectedFile);
+      setProcessedBlob(processedBlob);
+      
+      // Create preview URL for processed image
+      const processedUrl = URL.createObjectURL(processedBlob);
+      setProcessedPreviewUrl(processedUrl);
+      
+      alert("Background removed successfully!");
+    } catch (error) {
+      console.error("Error removing background:", error);
+      alert("Failed to remove background. You can still upload the original image.");
     }
   };
 
@@ -90,11 +146,21 @@ const PhotoManager = () => {
     setUploading(true);
     try {
       const timestamp = Date.now();
-      const fileName = `profile_${timestamp}_${selectedFile.name}`;
+      let fileToUpload, fileName;
+      
+      // Use processed image if available, otherwise use original
+      if (processedBlob) {
+        fileToUpload = processedBlob;
+        fileName = `profile_${timestamp}_processed_${selectedFile.name.split('.')[0]}.png`;
+      } else {
+        fileToUpload = selectedFile;
+        fileName = `profile_${timestamp}_${selectedFile.name}`;
+      }
+      
       const storageRef = ref(storage, `users/${user.uid}/photos/${fileName}`);
       
       // Upload file to Firebase Storage
-      const snapshot = await uploadBytes(storageRef, selectedFile);
+      const snapshot = await uploadBytes(storageRef, fileToUpload);
       const downloadURL = await getDownloadURL(snapshot.ref);
       
       // Delete old profile photo if exists
@@ -121,6 +187,8 @@ const PhotoManager = () => {
       // Reset form
       setSelectedFile(null);
       setPreviewUrl("");
+      setProcessedPreviewUrl("");
+      setProcessedBlob(null);
       setShowUploadModal(false);
       alert("Profile photo uploaded successfully!");
       
@@ -161,14 +229,21 @@ const PhotoManager = () => {
     setShowUploadModal(true);
     setSelectedFile(null);
     setPreviewUrl("");
+    setProcessedPreviewUrl("");
+    setProcessedBlob(null);
   };
 
   const closeUploadModal = () => {
     setShowUploadModal(false);
     setSelectedFile(null);
     setPreviewUrl("");
+    setProcessedPreviewUrl("");
+    setProcessedBlob(null);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
+    }
+    if (processedPreviewUrl) {
+      URL.revokeObjectURL(processedPreviewUrl);
     }
   };
 
@@ -207,6 +282,10 @@ const PhotoManager = () => {
                 <CheckCircle size={16} className="text-green-600" />
                 <span className="text-gray-700">Good lighting, clear image</span>
               </div>
+              <div className="flex items-center gap-2">
+                <Scissors size={16} className="text-purple-600" />
+                <span className="text-gray-700">Background removal available</span>
+              </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -219,7 +298,7 @@ const PhotoManager = () => {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle size={16} className="text-green-600" />
-                <span className="text-gray-700">Minimal background preferred</span>
+                <span className="text-gray-700">Auto background removal</span>
               </div>
             </div>
           </div>
@@ -282,7 +361,7 @@ const PhotoManager = () => {
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h3 className="text-lg font-medium text-gray-900">Upload Your Photo</h3>
               <button
@@ -329,16 +408,54 @@ const PhotoManager = () => {
                 </div>
               )}
 
-              {previewUrl && (
+              {/* Preview Section */}
+              {(previewUrl || processedPreviewUrl) && (
                 <div className="mb-4">
                   <p className="text-sm font-medium text-gray-700 mb-2">Preview</p>
-                  <div className="w-32 h-40 bg-gray-100 overflow-hidden border border-gray-200 mx-auto rounded-lg">
-                    <img 
-                      src={previewUrl} 
-                      alt="Preview" 
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="flex gap-4 justify-center">
+                    {previewUrl && (
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-2">Original</p>
+                        <div className="w-32 h-40 bg-gray-100 overflow-hidden border border-gray-200 rounded-lg">
+                          <img 
+                            src={previewUrl} 
+                            alt="Original" 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {processedPreviewUrl && (
+                      <div className="text-center">
+                        <p className="text-xs text-purple-600 mb-2">Background Removed</p>
+                        <div className="w-32 h-40 bg-gray-100 overflow-hidden border border-purple-200 rounded-lg">
+                          <img 
+                            src={processedPreviewUrl} 
+                            alt="Processed" 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
+                </div>
+              )}
+
+              {/* Background Removal Button */}
+              {selectedFile && !processedPreviewUrl && (
+                <div className="mb-4">
+                  <button
+                    onClick={handleRemoveBackground}
+                    disabled={removingBg}
+                    className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium mx-auto"
+                  >
+                    <Scissors size={16} />
+                    {removingBg ? 'Removing Background...' : 'Remove Background'}
+                  </button>
+                  <p className="text-xs text-gray-500 text-center mt-2">
+                    Optional: Remove background for better results
+                  </p>
                 </div>
               )}
 
@@ -348,7 +465,7 @@ const PhotoManager = () => {
                   disabled={!selectedFile || uploading}
                   className="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                 >
-                  {uploading ? 'Uploading...' : 'Upload Photo'}
+                  {uploading ? 'Uploading...' : processedPreviewUrl ? 'Upload Processed Photo' : 'Upload Photo'}
                 </button>
                 <button
                   onClick={closeUploadModal}
@@ -378,7 +495,8 @@ const PhotoManager = () => {
               className="max-w-full max-h-[90vh] object-contain rounded-lg"
               onClick={() => setShowFullPhoto(false)}
             />
-          </div>
+          </div>  
+          
         </div>
       )}
     </div>
