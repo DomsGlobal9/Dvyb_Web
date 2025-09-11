@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Sidebar from '../../common/ProfilePageComponents/Sidebar'
 import MyInfo from "../../common/ProfilePageComponents/MyInfo";
 import ProfileImage from "../../common/ProfilePageComponents/PhotoManager";
+import MyOrders from "../../common/ProfilePageComponents/Orders";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("my-info");
@@ -13,9 +14,9 @@ const ProfilePage = () => {
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="flex-1 p-6 bg-gray-100">
         {activeTab === "my-info" && <MyInfo userId={userId} />}
-        {activeTab === "my-orders" && <p>My Orders Section</p>}
+        {activeTab === "my-orders" && <MyOrders/>}
         {activeTab === "my-model" &&  <ProfileImage /> }
-        {activeTab === "my-orders" && <p>My Orders Section</p>}
+        {/* {activeTab === "my-orders" && <p>My Orders Section</p>} */}
         {activeTab === "wishlist" && <p>Wishlist Section</p>}
       </div>
     </div>

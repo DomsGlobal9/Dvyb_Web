@@ -2,7 +2,7 @@ import { auth, db } from "../firebase";
 import { 
   createUserWithEmailAndPassword, 
   GoogleAuthProvider, 
-  signInWithPopup 
+  signInWithPopup ,signInWithRedirect 
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -11,6 +11,7 @@ const saveAuthToken = async (user) => {
   const token = await user.getIdToken();
   localStorage.setItem("authToken", token);
 };
+
 
 // Register B2C user
 export const registerB2C = async (email, password, extraData = {}) => {
@@ -21,6 +22,7 @@ export const registerB2C = async (email, password, extraData = {}) => {
     await setDoc(doc(db, "b2c_users", user.uid), {
       uid: user.uid,
       email: user.email,
+      role: "B2C", 
       ...extraData,
       createdAt: new Date(),
     });
@@ -42,6 +44,7 @@ export const registerB2BBulkOrders = async (email, password, extraData = {}) => 
     await setDoc(doc(db, "B2BBulkOrders_users", user.uid), {
       uid: user.uid,
       email: user.email,
+       role: "B2b",
       ...extraData,
       createdAt: new Date(),
     });
@@ -68,6 +71,7 @@ export const registerWithGoogle = async (type = "b2c", extraData = {}) => {
       email: user.email,
       name: user.displayName,
       photo: user.photoURL,
+      role: type === "B2BBulkOrders" ? "B2BBulkOrders" : "B2C",
       ...extraData,
       createdAt: new Date(),
     }, { merge: true });

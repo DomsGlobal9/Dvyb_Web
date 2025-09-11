@@ -4,11 +4,13 @@ import { toast } from "react-toastify"; // Install with: npm install react-toast
 import "react-toastify/dist/ReactToastify.css";
 
 import logo from "../../assets/Navbar/DVYB_Enterprise_Logo.png";
+import b2clogo from "../../assets/Navbar/B2cLogo.png";
 import EtImg from "../../assets/Navbar/ET-WEAR.png";
 import fav from '../../assets/B2Bassets/NavbarImages/heart.png';
 import cart from '../../assets/B2Bassets/NavbarImages/cart.png';
 import profile from '../../assets/B2Bassets/NavbarImages/profile.png';
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 
 
@@ -20,13 +22,17 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+    const { userData, loading } = useAuth();
 
+    console.log("userData", userData)
   // Click outside to close dropdown
   useEffect(() => {
+        
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowWomenCategories(false);
         setActiveCategory(null);
+         
       }
     };
 
@@ -49,7 +55,7 @@ const isLoggedIn = !!localStorage.getItem("authToken");
       callback();
     }
   };
-
+if (loading) return <p>Loading...</p>;
   // Women Categories + Sub Collections
   const womenCategories = {
     "ETHNIC WEAR": [
@@ -107,7 +113,7 @@ const isLoggedIn = !!localStorage.getItem("authToken");
           <div className="flex flex-col items-center flex-1">
             {/* Logo */}
             <div className="mb-4">
-              <img src={logo} alt="logo" className="h-8 sm:h-12 object-contain" />
+              <img src={loading || !userData ? logo : userData.role === "b2b" ? logo : b2clogo} alt="logo" className="h-8 sm:h-12 object-contain" />
             </div>
 
             {/* Search Input */}
@@ -147,7 +153,8 @@ const isLoggedIn = !!localStorage.getItem("authToken");
 
             {/* Logo */}
             <div className="flex justify-center flex-1 md:w-1/3">
-              <img src={logo} alt="logo" className="h-8 sm:h-10 md:h-12 object-contain" />
+              <img src={loading || !userData ? logo : userData.role === "b2b" ? logo : b2clogo}
+               alt="logo" className="h-8 sm:h-10 md:h-12 object-contain" />
             </div>
 
             {/* Right Icons */}
@@ -249,7 +256,7 @@ const isLoggedIn = !!localStorage.getItem("authToken");
               
               <div className="fixed top-0 left-0 w-4/5 max-w-sm h-full bg-white shadow-lg overflow-y-auto">
                 <div className="flex justify-between items-center p-4 border-b">
-                  <img src={logo} alt="logo" className="h-8 object-contain" />
+                  <img src={loading || !userData ? logo : userData.role === "b2b" ? logo : b2clogo} alt="logo" className="h-8 object-contain" />
                   <FaTimes
                     className="text-xl text-gray-600 cursor-pointer"
                     onClick={() => setMobileMenuOpen(false)}
