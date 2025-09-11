@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaHeart, FaShoppingBag, FaUser, FaSearch, FaTimes, FaBars } from "react-icons/fa";
 import { toast } from "react-toastify"; // Install with: npm install react-toastify
 import "react-toastify/dist/ReactToastify.css";
@@ -19,6 +19,25 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowWomenCategories(false);
+        setActiveCategory(null);
+      }
+    };
+
+    if (showWomenCategories) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showWomenCategories]);
 
 
 const isLoggedIn = !!localStorage.getItem("authToken");
@@ -80,7 +99,7 @@ const isLoggedIn = !!localStorage.getItem("authToken");
   };
 
   return (
-    <header className="border-b relative bg-white">
+    <header className="border-b relative bg-white sticky top-0 z-50">
       {/* Search Mode - Mobile & Desktop */}
       {searchOpen ? (
         <div className="flex justify-between items-start px-4 sm:px-6 py-4 bg-white">
@@ -117,7 +136,7 @@ const isLoggedIn = !!localStorage.getItem("authToken");
           {/* Top Row */}
           <div className="flex justify-between items-center px-4 sm:px-6 py-3 sm:py-4">
             {/* Mobile Menu Button */}
-            <div className="flex items-center md:hidden">
+            <div className="flex items-center lg:hidden">
               <FaBars
                 className="text-xl text-gray-600 cursor-pointer"
                 onClick={toggleMobileMenu}
@@ -150,9 +169,9 @@ const isLoggedIn = !!localStorage.getItem("authToken");
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex justify-center items-center space-x-8 py-2 text-sm font-medium text-gray-700 relative">
+          <nav className="hidden lg:flex justify-center items-center space-x-8 py-2 text-sm font-medium text-gray-700 relative">
             {/* WOMEN Dropdown */}
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleWomenCategories}
                 className="text-blue-900 font-semibold hover:text-blue-700"
@@ -161,7 +180,12 @@ const isLoggedIn = !!localStorage.getItem("authToken");
               </button>
 
               {showWomenCategories && (
-                <div className="fixed left-0 right-0 top-[110px] bg-gray-100 border-t shadow-md z-50">
+                <div className="absolute left-0 right-0 top-full bg-gray-100 border-t shadow-md z-50" style={{
+                  left: '470%',
+                  // transform: 'translateX(-50%)',
+                  width: '100vw',
+                  marginLeft: '-50vw'
+                }}>
                   <div className="flex justify-center space-x-8 py-3 text-sm font-medium text-gray-700 border-b">
                     {Object.keys(womenCategories).map((cat, index) => (
                       <button
@@ -217,9 +241,9 @@ const isLoggedIn = !!localStorage.getItem("authToken");
 
           {/* Mobile Menu Overlay */}
           {mobileMenuOpen && (
-            <div className="fixed inset-0 z-50 md:hidden">
+            <div className="fixed inset-0 z-50 lg:hidden">
               <div
-                className="fixed inset-0 bg-black bg-opacity-50"
+                className="fixed inset-0  bg-opacity-50"
                 onClick={() => setMobileMenuOpen(false)}
               ></div>
               
@@ -326,4 +350,3 @@ const isLoggedIn = !!localStorage.getItem("authToken");
 };
 
 export default Navbar;
-
