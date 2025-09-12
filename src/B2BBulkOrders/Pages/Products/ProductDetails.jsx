@@ -1,11 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { Package, ArrowLeft, ShoppingCart, Star, Heart, Shield, Truck, X, Eye } from 'lucide-react';
+import { Package, ArrowLeft, ShoppingCart, Star, Heart, Shield, Truck, X, Eye, Plus, Minus } from 'lucide-react';
+import { addToCart } from '../../../services/CartService';
+import { useAuth } from '../../../context/AuthContext'; // Import useAuth to access user role
 
 const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateToTryOn, onProductClick }) => {
+  const { userData } = useAuth(); // Get userData from AuthContext
   const [selectedSize, setSelectedSize] = useState('');
+  const [quantity, setQuantity] = useState(userData?.role === 'b2b' ? 11 : 1); // Default quantity: 11 for B2B, 1 for B2C
   const [showAddToCartModal, setShowAddToCartModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   if (!product) return null;
 
@@ -33,12 +38,11 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
       return randomProducts;
     }
     
-    // Match products that have at least one common color
     const currentColors = product.selectedColors.map(c => c.toUpperCase().trim());
     console.log('Normalized current colors:', currentColors);
     
     const filtered = allProducts.filter(p => {
-      if (p.id === product.id) return false; // Exclude current product
+      if (p.id === product.id) return false;
       
       if (!p.selectedColors || p.selectedColors.length === 0) return false;
       
@@ -64,12 +68,56 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
     return filtered.slice(0, 8);
   }, [product, allProducts]);
 
-  const handleAddToCart = () => {
-    // if (!selectedSize) {
-    //   alert('Please select a size');
-    //   return;
-    // }
+  const handleAddToCart = async (e) => {
+    e.stopPropagation();
     setShowAddToCartModal(true);
+  };
+
+  const handleConfirmAddToCart = async () => {
+    if (!selectedSize) {
+      alert('Please select a size');
+      return;
+    }
+
+    // Validate quantity based on user role
+    if (userData?.role === 'b2b' && quantity <= 10) {
+      alert('B2B users must select a quantity greater than 10');
+      return;
+    }
+    if (userData?.role === 'b2c' && quantity > 10) {
+      alert('B2C users cannot select a quantity greater than 10');
+      return;
+    }
+
+    setIsAddingToCart(true);
+
+    try {
+      const productData = {
+        name: product.title || product.name || 'Untitled Product',
+        price: discountedPrice,
+        image: product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls[0] : null,
+        fabric: product.fabric ?? null,
+        craft: product.craft ?? null,
+        rating: product.rating ?? null,
+        discount: product.discount ?? null,
+        selectedColors: Array.isArray(product.selectedColors) ? product.selectedColors : [],
+        color: product.selectedColors && product.selectedColors.length > 0 ? product.selectedColors[0] : null,
+        size: selectedSize,
+        freeShipping: product.freeShipping ?? false,
+        shippingMessage: product.shippingMessage ?? null
+      };
+
+      await addToCart(product.id, productData, quantity); // Pass selected quantity
+      setShowAddToCartModal(false);
+      setSelectedSize('');
+      setQuantity(userData?.role === 'b2b' ? 11 : 1); // Reset to default based on role
+      alert('Item added to cart successfully!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert(`Failed to add to cart: ${error.message}`);
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   const handleTryOnClick = () => {
@@ -84,6 +132,17 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
     }
   };
 
+  const handleIncrement = () => {
+    if (userData?.role === 'b2c' && quantity >= 10) return; // Max 10 for B2C
+    setQuantity(prev => prev + 1);
+  };
+
+  const handleDecrement = () => {
+    if (quantity <= 1) return; // Minimum 1 for all users
+    if (userData?.role === 'b2b' && quantity <= 11) return; // Minimum 11 for B2B
+    setQuantity(prev => prev - 1);
+  };
+
   const AddToCartModal = () => {
     if (!showAddToCartModal) return null;
 
@@ -91,22 +150,27 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg max-w-md w-full p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Select Size</h3>
+            <h3 className="text-lg font-semibold">Select Size and Quantity</h3>
             <button onClick={() => setShowAddToCartModal(false)}>
               <X className="w-5 h-5" />
             </button>
           </div>
           
-          <select 
-            value={selectedSize}
-            onChange={(e) => setSelectedSize(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg mb-4"
-          >
-            <option value="">Select Any</option>
-            {product.selectedSizes?.map((size, index) => (
-              <option key={index} value={size}>{size}</option>
-            ))}
-          </select>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Select Size</label>
+            <select 
+              value={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg"
+            >
+              <option value="">Select Any</option>
+              {product.selectedSizes?.map((size, index) => (
+                <option key={index} value={size}>{size}</option>
+              ))}
+            </select>
+          </div>
+
+          
 
           <div className="flex gap-3">
             <button 
@@ -117,14 +181,14 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
               TRY ON
             </button>
             <button 
-              onClick={() => {
-                setShowAddToCartModal(false);
-                alert('Added to cart!');
-              }}
-              className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium flex items-center justify-center"
+              onClick={handleConfirmAddToCart}
+              disabled={isAddingToCart}
+              className={`flex-1 py-3 px-6 rounded-lg font-medium flex items-center justify-center ${
+                isAddingToCart ? 'bg-gray-400 cursor-not-allowed' : 'border border-gray-300 text-gray-700'
+              }`}
             >
               <ShoppingCart className="w-4 h-4 mr-2" />
-              Add to cart
+              {isAddingToCart ? 'Adding...' : 'Add to cart'}
             </button>
           </div>
         </div>
@@ -213,7 +277,9 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
               </div>
 
               {product.selectedColors?.length > 0 && (
-                <div>
+                
+                <div className=' flex justify-between mr-12 '>
+                  <div>
                   <h3 className="text-sm font-semibold text-gray-900 mb-3">Colours Available</h3>
                   <div className="flex space-x-2">
                     {product.selectedColors.map((color, index) => (
@@ -225,28 +291,81 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                       />
                     ))}
                   </div>
+                  </div>
+                  <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Quantity {userData?.role === 'b2b' ? '(Minimum 11)' : '(Maximum 10)'}
+            </label>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={handleDecrement}
+                disabled={quantity <= 1 || (userData?.role === 'b2b' && quantity <= 11)}
+                className={`p-2 border rounded-lg ${
+                  quantity <= 1 || (userData?.role === 'b2b' && quantity <= 11)
+                    ? 'bg-gray-200 cursor-not-allowed'
+                    : 'bg-white hover:bg-gray-100'
+                }`}
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 1;
+                  if (userData?.role === 'b2b' && value <= 10) {
+                    setQuantity(11);
+                  } else if (userData?.role === 'b2c' && value > 10) {
+                    setQuantity(10);
+                  } else {
+                    setQuantity(Math.max(1, value));
+                  }
+                }}
+                className="w-16 p-2 border border-gray-300 rounded-lg text-center"
+                min={userData?.role === 'b2b' ? 11 : 1}
+                max={userData?.role === 'b2c' ? 10 : undefined}
+              />
+              <button
+                onClick={handleIncrement}
+                disabled={userData?.role === 'b2c' && quantity >= 10}
+                className={`p-2 border rounded-lg ${
+                  userData?.role === 'b2c' && quantity >= 10
+                    ? 'bg-gray-200 cursor-not-allowed'
+                    : 'bg-white hover:bg-gray-100'
+                }`}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
                 </div>
+                
               )}
 
-              <div className="space-y-3 flex gap-5" >
-                <button onClick={handleAddToCart} className="w-auto bg-white text-black py-3 px-6 rounded-lg shadow-2xs font-medium flex items-center justify-center">
-                  <ShoppingCart className=" h-5 mr-2" />
-                  Add to cart
+              <div className="space-y-3 flex gap-5">
+                <button 
+                  onClick={handleAddToCart} 
+                  disabled={isAddingToCart}
+                  className={`w-auto py-3 px-6 rounded-lg shadow-2xs font-medium flex items-center justify-center ${
+                    isAddingToCart ? 'bg-gray-400 cursor-not-allowed' : 'bg-white text-black border border-gray-300'
+                  }`}
+                >
+                  <ShoppingCart className="h-5 mr-2" />
+                  {isAddingToCart ? 'Adding...' : 'Add to cart'}
                 </button>
-                <button className="w-42 h-12  bg-[#1C4C74] shadow-2xs text-white py-3 px-6 rounded-lg hover:bg-orange-600 font-medium">
+                <button className="w-42 h-12 bg-[#1C4C74] shadow-2xs text-white py-3 px-6 rounded-lg hover:bg-orange-600 font-medium">
                   Buy Now
                 </button>
               </div>
 
-              <div className="space-y-3 text-sm  pt-6">
-                <div className="flex items-center text-gray-600 ">
+              <div className="space-y-3 text-sm pt-6">
+                <div className="flex items-center text-gray-600">
                   <Shield className="w-4 h-4 mr-3" />
                   Secure payment
-                
+                </div>
                 <div className="flex pl-12 items-center text-gray-600">
                   <Package className="w-4 h-4 mr-3" />
                   Free Size
-                </div>
                 </div>
                 <div className="flex items-center pt-5 text-gray-600">
                   <Truck className="w-4 h-4 mr-3" />
@@ -257,13 +376,13 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
           </div>
 
           {/* Product Description */}
-          <div className=" p-6">
+          <div className="p-6">
             <h3 className="text-lg font-semibold mb-4">Product Description</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div>
                 <h4 className="font-semibold mb-2">Description</h4>
                 <p className="text-gray-600 text-sm mb-4">{product.description}</p>
-                <p className="text-gray-600 text-sm">Crafted with intricate  embroidery. Perfect for any occasion. Comfortable fit and vibrant colors.</p>
+                <p className="text-gray-600 text-sm">Crafted with intricate embroidery. Perfect for any occasion. Comfortable fit and vibrant colors.</p>
                 
                 <div className="mt-4 grid bg-blue-100 h-26 items-center p-7 grid-cols-3 gap-4 text-sm">
                   <div>
@@ -296,13 +415,13 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
           </div>
 
           {/* Similar Products */}
-          <div className=" p-6">
+          <div className="p-6">
             <h3 className="text-lg font-semibold mb-6">Similar Products</h3>
             
             {similarProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {similarProducts.map((item) => (
-                  <div key={item.id} className="bg-white  rounded-lg overflow-hidden hover:shadow-md transition-shadow ">
+                  <div key={item.id} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                     <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
                       {item.discount > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded z-10">
@@ -343,7 +462,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                           onClick={() => {
                             if (onProductClick) {
                               onProductClick(item);
-                              window.scrollTo(0, 0); // Scroll to top for better UX
+                              window.scrollTo(0, 0);
                             }
                           }}
                           className="text-xs bg-blue-600 text-white px-2 py-1 rounded"

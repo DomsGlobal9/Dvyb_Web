@@ -157,7 +157,7 @@ const MyInfo = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm ">
+    <div className=" max-w-4xl mx-auto bg-white rounded-lg shadow-sm ">
       {/* Header */}
       <div className="px-6 py-4 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">My Info</h1>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaHeart, FaShoppingBag, FaUser, FaSearch, FaTimes, FaBars } from "react-icons/fa";
 import { toast } from "react-toastify"; // Install with: npm install react-toastify
 import "react-toastify/dist/ReactToastify.css";
+import {womenCategories} from "./navCatData"
 
 import logo from "../../assets/Navbar/DVYB_Enterprise_Logo.png";
 import b2clogo from "../../assets/Navbar/B2cLogo.png";
@@ -10,7 +11,7 @@ import fav from '../../assets/B2Bassets/NavbarImages/heart.png';
 import cart from '../../assets/B2Bassets/NavbarImages/cart.png';
 import profile from '../../assets/B2Bassets/NavbarImages/profile.png';
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+
 
 
 
@@ -22,9 +23,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
-    const { userData, loading } = useAuth();
-
-    console.log("userData", userData)
+ 
   // Click outside to close dropdown
   useEffect(() => {
         
@@ -55,44 +54,6 @@ const isLoggedIn = !!localStorage.getItem("authToken");
       callback();
     }
   };
-if (loading) return <p>Loading...</p>;
-  // Women Categories + Sub Collections
-  const womenCategories = {
-    "ETHNIC WEAR": [
-      { name: "SAREE", img: EtImg },
-      { name: "SALWAR SUITS", img: EtImg },
-      { name: "LEHENGAS", img: EtImg },
-      { name: "ANARKALI", img: EtImg },
-      { name: "DUPATTAS", img: EtImg },
-      { name: "ETHNIC JACKET", img: EtImg },
-    ],
-    "TOP WEAR": [
-      { name: "T-SHIRTS", img: EtImg },
-      { name: "SHIRTS", img: EtImg },
-      { name: "BLOUSES", img: EtImg },
-    ],
-    "BOTTOM WEAR": [
-      { name: "JEANS", img: EtImg },
-      { name: "TROUSERS", img: EtImg },
-      { name: "SKIRTS", img: EtImg },
-    ],
-    "DRESSES & JUMPSUITS": [
-      { name: "MAXI DRESSES", img: EtImg },
-      { name: "JUMPSUITS", img: EtImg },
-    ],
-    "LOUNGE & SLEEPWEAR": [
-      { name: "NIGHT SUITS", img: EtImg },
-      { name: "PAJAMAS", img: EtImg },
-    ],
-    "ACTIVE WEAR": [
-      { name: "SPORTS BRAS", img: EtImg },
-      { name: "LEGGINGS", img: EtImg },
-    ],
-    "WINTER WEAR": [
-      { name: "SWEATERS", img: EtImg },
-      { name: "JACKETS", img: EtImg },
-    ],
-  };
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -113,7 +74,7 @@ if (loading) return <p>Loading...</p>;
           <div className="flex flex-col items-center flex-1">
             {/* Logo */}
             <div className="mb-4">
-              <img src={loading || !userData ? logo : userData.role === "b2b" ? logo : b2clogo} alt="logo" className="h-8 sm:h-12 object-contain" />
+              <img src={b2clogo} alt="logo" className="h-8 sm:h-12 object-contain" />
             </div>
 
             {/* Search Input */}
@@ -153,7 +114,7 @@ if (loading) return <p>Loading...</p>;
 
             {/* Logo */}
             <div className="flex justify-center flex-1 md:w-1/3">
-              <img src={loading || !userData ? logo : userData.role === "b2b" ? logo : b2clogo}
+              <img src={b2clogo}
                alt="logo" className="h-8 sm:h-10 md:h-12 object-contain" />
             </div>
 
@@ -166,9 +127,9 @@ if (loading) return <p>Loading...</p>;
               
               <div className="hidden md:flex items-center space-x-6 text-xl text-blue-900">
                 <img className="cursor-pointer w-5 h-5" src={fav} alt="favorites" 
-                 onClick={() => handleProtectedClick(() => navigate("/favorites"))}/>
+                 onClick={() => handleProtectedClick(() => navigate("/mywishlist"))}/>
                 <img className="cursor-pointer w-5 h-5" src={cart} alt="cart"
-                 onClick={() => handleProtectedClick(() => navigate("/cart"))} />
+                 onClick={() => handleProtectedClick(() => navigate("/mycart"))} />
                 <img className="cursor-pointer w-5 h-5" src={profile} alt="profile"
                   onClick={() => navigate("/your-profile")} />
               </div>
@@ -256,7 +217,7 @@ if (loading) return <p>Loading...</p>;
               
               <div className="fixed top-0 left-0 w-4/5 max-w-sm h-full bg-white shadow-lg overflow-y-auto">
                 <div className="flex justify-between items-center p-4 border-b">
-                  <img src={loading || !userData ? logo : userData.role === "b2b" ? logo : b2clogo} alt="logo" className="h-8 object-contain" />
+                  <img src={b2clogo} alt="logo" className="h-8 object-contain" />
                   <FaTimes
                     className="text-xl text-gray-600 cursor-pointer"
                     onClick={() => setMobileMenuOpen(false)}

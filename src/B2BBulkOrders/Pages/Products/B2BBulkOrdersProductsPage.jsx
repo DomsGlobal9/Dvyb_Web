@@ -420,6 +420,8 @@ const B2BBulkOdersProductsPage = () => {
                   <ProductCard
                     key={product.id}
                     product={product}
+            //         onProductClick={handleProductClick}
+            // onToggleFavorite={handleWishlistToggle}
                     onProductClick={setSelectedProduct}
                     onToggleFavorite={toggleFavorite}
                     isFavorite={favorites.has(product.id)}

@@ -1,12 +1,69 @@
 import React from 'react';
 import { Package, Heart, Eye, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { addToWishlist, removeFromWishlist, isInWishlist } from '../../../services/WishlistService';
+
 
 const ProductCard = ({ 
   product, 
   onProductClick, 
   onToggleFavorite, 
-  isFavorite 
+  // isFavorite 
 }) => {
+  const [isInWishlistState, setIsInWishlistState] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+   useEffect(() => {
+    checkWishlistStatus();
+  }, [product.id]);
+
+   const checkWishlistStatus = async () => {
+    try {
+      const inWishlist = await isInWishlist(product.id);
+      setIsInWishlistState(inWishlist);
+    } catch (error) {
+      console.error('Error checking wishlist status:', error);
+    }
+  };
+
+
+const handleToggleWishlist = async (e) => {
+  e.stopPropagation();
+  setIsLoading(true);
+
+  try {
+    if (isInWishlistState) {
+      await removeFromWishlist(product.id);
+      setIsInWishlistState(false);
+      if (onToggleFavorite) {
+        onToggleFavorite(product.id, false);
+      }
+    } else {
+      const productData = {
+        name: product.title || product.name || 'Untitled Product',
+        price: product.price || 0,
+        image: product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls[0] : null,
+        ...(product.fabric && { fabric: product.fabric }),
+        ...(product.craft && { craft: product.craft }),
+        ...(product.rating && { rating: product.rating }),
+        ...(product.discount && { discount: product.discount }),
+        ...(product.selectedColors && { selectedColors: product.selectedColors })
+      };
+
+      await addToWishlist(product.id, productData);
+      setIsInWishlistState(true);
+      if (onToggleFavorite) {
+        onToggleFavorite(product.id, true);
+      }
+    }
+  } catch (error) {
+    console.error('Error toggling wishlist:', error);
+    alert('Failed to update wishlist. Please try again.');
+  } finally {
+    setIsLoading(false);
+  }
+};
+
   return (
     <div
       className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
@@ -30,18 +87,18 @@ const ProductCard = ({
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div className="flex space-x-2">
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleFavorite(product.id);
-              }}
+              onClick={handleToggleWishlist}
+              disabled={isLoading}
               className={`p-2 rounded-full transition-colors ${
-                isFavorite
+                isInWishlistState
                   ? 'bg-red-500 text-white'
                   : 'bg-white text-gray-700'
-              }`}
+              } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
+              title={isInWishlistState ? 'Remove from wishlist' : 'Add to wishlist'}
             >
-              <Heart className="w-4 h-4" />
+              <Heart className={`w-4 h-4 ${isInWishlistState ? 'fill-current' : ''}`} />
             </button>
+             
             <button
               onClick={(e) => {
                 e.stopPropagation();

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Navbar from '../../../common/Navbar/Navbar'
+import Navbar from '../../../common/Navbar/b2cNavbar'
 import Footer from '../../../common/Footer/Footer'
 import B2cLandingPage from '../B2cLandingPage/B2cLandingPage'
 

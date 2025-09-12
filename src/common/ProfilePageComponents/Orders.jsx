@@ -229,7 +229,7 @@ const MyOrders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen  bg-gray-50">
       <div className="flex">
         <div className="flex-1 p-4 lg:p-6">
           <div className="max-w-6xl mx-auto">

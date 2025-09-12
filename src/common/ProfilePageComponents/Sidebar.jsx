@@ -74,9 +74,10 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   };
 
   return (
-    <div className="relative">
+    <div className=" fixed">
       {/* Sidebar */}
-      <div className="w-64 h-screen bg-gray-50 p-4">
+<div className="w-64 h-screen bg-gray-50 p-4 ">
+
         <h2 className="text-lg font-bold mb-6">
           Hello {data?.name || "User"}
         </h2>

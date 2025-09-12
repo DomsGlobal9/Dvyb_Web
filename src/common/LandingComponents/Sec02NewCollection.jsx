@@ -12,7 +12,7 @@ const NewCollectionPage = () => {
       description: "Elegantly designed palazzo style",
       price: "₹2,999",
       originalPrice: "₹3,999",
-      image: {slide01},
+      image: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757589958/sdgcyydcsbkb17b2iydx.png',
       modelBg: "bg-gradient-to-b from-pink-400 to-rose-600"
     },
     {
@@ -21,7 +21,7 @@ const NewCollectionPage = () => {
       description: "Premium velour fabric drapes",
       price: "₹3,499",
       originalPrice: "₹4,499", 
-      image: {slide02},
+      image: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757584132/ur9q2v8uvcarrj0aj6ts.png',
       modelBg: "bg-gradient-to-b from-red-600 to-red-800"
     },
     {
@@ -30,7 +30,7 @@ const NewCollectionPage = () => {
       description: "Traditional craft drapes",
       price: "₹2,299",
       originalPrice: "₹2,999",
-      image: {slide03},
+      image: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757574957/bjzuiiacycvncmychkss.webp',
       modelBg: "bg-gradient-to-b from-red-400 to-red-600"
     },
     {
@@ -39,7 +39,7 @@ const NewCollectionPage = () => {
       description: "Heritage inspired collection",
       price: "₹2,799",
       originalPrice: "₹3,499",
-      image: {},
+      image: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757576542/pwf5njimfg5fascbynnc.png',
       modelBg: "bg-gradient-to-b from-orange-400 to-orange-600"
     }
   ];
@@ -54,16 +54,16 @@ const NewCollectionPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2  gap-4 lg:grid-cols-4 overflow-hidden sm:gap-6 lg:gap-20">
           {products.map((product) => (
             <div 
               key={product.id}
-              className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
+              className="group bg-white rounded-2xl w-72   hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden"
             >
              
               {/* Product Image */}
-              <div className={`relative h-64 sm:h-72 lg:h-80 overflow-hidden`}>
-                 <h1 className=''>{product.id}</h1>
+              <div className={`relative h-64 sm:h-72 lg:h-72  overflow-hidden`}>
+                 {/* <h1 className=''>{product.id}</h1> */}
                 <img src= {product.image} alt="" />
 
               </div>
@@ -90,8 +90,8 @@ const NewCollectionPage = () => {
                     </span>
                   </div>
                   
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    Shop
+                  <button className="bg-[#789CB8] hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    View
                   </button>
                 </div>
               </div>

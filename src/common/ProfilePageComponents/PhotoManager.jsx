@@ -3,8 +3,8 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "../../firebase";
 import { useAuth } from "../../context/AuthContext";
-import { Camera, Upload, Trash2, User, X, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
-
+import { Camera, Upload, Trash2, User, X, CheckCircle, AlertCircle, ChevronDown,ChevronUp ,Loader2 } from "lucide-react";
+import MultiStepQuestionnaire from '../../common/ProfilePageComponents/Questionaries'
 const PhotoManager = () => {
   const { user } = useAuth();
   const [data, setData] = useState({
@@ -12,6 +12,7 @@ const PhotoManager = () => {
   });
   const [collectionName, setCollectionName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [processingImage, setProcessingImage] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -232,22 +233,151 @@ const PhotoManager = () => {
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <div className="flex items-center  justify-center h-64">
+      <div className="animate-spin  rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
     </div>
   );
 
+
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm">
+<div className=" bg-white rounded-lg h-screen overflow-hidden ">
       {/* Header */}
-      <div className="px-4 md:px-6 py-4 border-b border-gray-200">
-        <h1 className="text-xl md:text-2xl font-semibold text-gray-900">My Model</h1>
-        <p className="text-sm text-gray-600 mt-1">Upload your photo to create your personal model</p>
+      <div className="  ">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">My Model</h1>
+        {/* <p className="text-sm text-gray-600 mt-1">Upload your photo to create your personal model</p> */}
       </div>
 
-      <div className="p-4 md:p-6">
+      <div className="">
         {/* Instructions Section */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+         <div className="">
+      {/* Toggle Button */}
+      <div className="justify-end flex">
+      {/* <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2  bg-blue-100 text-blue-900 border border-blue-200 px-4 py-2 rounded-lg font-medium hover:bg-blue-200 transition"
+      >
+        <AlertCircle size={18} />
+        {open ? "Hide Photo Guidelines" : "Show Photo Guidelines"}
+        {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      </button> */}
+
+      </div>
+
+      {/* Collapsible Content */}
+      {/* {open && (
+      
+      )} */}
+    </div>
+
+        {/* Profile Photo Section */}
+        <div className="">
+
+<div className="flex justify-between ml-28 mt-9">
+
+          <div className="">
+            {data.profilePhoto ? (
+              <div className="relative inline-block">
+                <div 
+                  // className="w-48 h-64 md:w-56 md:h-72 lg:w-64  lg:h-80 rounded-lg overflow-hidden border border-gray-400  cursor-pointer mx-auto"
+                className="w-48 h-64 md:w-56 md:h-72  shadow-[0_4px_12px_rgba(0,0,0,0.08)] lg:w-56 lg:h-[440px]
+                rounded-[9999px] overflow-hidden bg-white 
+                 flex items-center justify-center mx-auto  "
+                  onClick={() => setShowFullPhoto(true)}
+
+                >
+                  <img 
+                    src={data.profilePhoto} 
+                    alt="My Model" 
+                    className=" object-cover h-full hover:scale-105 transition-transform duration-200"
+                    onError={(e) => {
+                      e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300' viewBox='0 0 200 300'%3E%3Crect width='200' height='300' fill='%23f3f4f6'/%3E%3Ctext x='100' y='150' text-anchor='middle' dy='.3em' font-family='Arial' font-size='16' fill='%236b7280'%3EError Loading%3C/text%3E%3C/svg%3E";
+                    }}
+                  />
+
+                  
+                </div>
+                
+                {/* <button
+                  onClick={deletePhoto}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg"
+                  title="Delete photo"
+                >
+                  <Trash2 size={16} />
+                </button> */}
+
+                
+              </div>
+            ) : (
+              <div className="w-48 h-64 md:w-56 md:h-72 lg:w-64 lg:h-80 rounded-lg bg-gray-100 border-4 border-white shadow-xl mx-auto flex items-center justify-center">
+                <div className="text-center">
+                  <User size={60} className="text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500 text-sm">No photo uploaded</p>
+                </div>
+              </div>
+            )}
+         
+           <button
+              onClick={openUploadModal}
+              disabled={uploading || processingImage}
+              className="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors mx-auto"
+            >
+              {uploading || processingImage ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Camera size={20} />
+                  {data.profilePhoto ? 'Change Photo' : 'Upload Photo'}
+                </>
+              )}
+            </button>
+          </div>
+         
+<div className="w-full ">
+
+<MultiStepQuestionnaire />
+</div>
+
+</div>
+          <div className="">
+          
+            
+            {/* {data.profilePhoto && (
+              <p className="text-sm text-gray-500">
+                Click on the photo to view full size
+              </p>
+            )}
+   */}
+
+            
+          </div>
+        </div>
+      </div>
+
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 backdrop-blur bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden ">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Upload Your Photo</h3>
+              <button
+                onClick={closeUploadModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                disabled={uploading || processingImage}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {/* Upload Section */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Choose Full Body Photo
+                </label>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-3 animate-fadeIn">
           <h3 className="text-lg font-medium text-blue-900 mb-3 flex items-center gap-2">
             <AlertCircle size={20} />
             Photo Guidelines
@@ -283,96 +413,11 @@ const PhotoManager = () => {
             </div>
           </div>
         </div>
-
-        {/* Profile Photo Section */}
-        <div className="text-center">
-          <div className="mb-6">
-            {data.profilePhoto ? (
-              <div className="relative inline-block">
-                <div 
-                  className="w-48 h-64 md:w-56 md:h-72 lg:w-64 lg:h-80 rounded-lg bg-gray-100 overflow-hidden border-4 border-white shadow-xl cursor-pointer mx-auto"
-                  onClick={() => setShowFullPhoto(true)}
-                >
-                  <img 
-                    src={data.profilePhoto} 
-                    alt="My Model" 
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                    onError={(e) => {
-                      e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300' viewBox='0 0 200 300'%3E%3Crect width='200' height='300' fill='%23f3f4f6'/%3E%3Ctext x='100' y='150' text-anchor='middle' dy='.3em' font-family='Arial' font-size='16' fill='%236b7280'%3EError Loading%3C/text%3E%3C/svg%3E";
-                    }}
-                  />
-                </div>
-                <button
-                  onClick={deletePhoto}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg"
-                  title="Delete photo"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ) : (
-              <div className="w-48 h-64 md:w-56 md:h-72 lg:w-64 lg:h-80 rounded-lg bg-gray-100 border-4 border-white shadow-xl mx-auto flex items-center justify-center">
-                <div className="text-center">
-                  <User size={60} className="text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-sm">No photo uploaded</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-3">
-            <button
-              onClick={openUploadModal}
-              disabled={uploading || processingImage}
-              className="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors mx-auto"
-            >
-              {uploading || processingImage ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Camera size={20} />
-                  {data.profilePhoto ? 'Change Photo' : 'Upload Photo'}
-                </>
-              )}
-            </button>
-            
-            {data.profilePhoto && (
-              <p className="text-sm text-gray-500">
-                Click on the photo to view full size
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Upload Modal */}
-      {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Upload Your Photo</h3>
-              <button
-                onClick={closeUploadModal}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-                disabled={uploading || processingImage}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-6">
-              {/* Upload Section */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Choose Full Body Photo
-                </label>
-                <div className="flex items-center justify-center w-full">
+                <div className="flex items-center mt-7 justify-center w-full">
                   <label className={`flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors ${
                     uploading || processingImage ? 'opacity-50 cursor-not-allowed' : ''
                   }`}>
+
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       {uploading || processingImage ? (
                         <>
