@@ -10,6 +10,7 @@ import profile from '../../assets/B2Bassets/NavbarImages/profile.png';
 import { useNavigate } from 'react-router-dom';
 import { useSearch } from '../../context/SearchContext';
 import { useFilter } from '../../context/FilterContext';
+import { useAuth } from '../../context/AuthContext';
 
 const B2bnavbar = () => {
   const { searchTerm, setSearchTerm } = useSearch();
