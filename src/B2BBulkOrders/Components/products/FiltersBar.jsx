@@ -12,12 +12,10 @@ const FilterSidebar = ({
   onFilterChange,
   onToggleFilterSection,
   onClearAllFilters,
-  onCloseMobile
+  onCloseMobile,
 }) => {
-
   return (
     <div className={`bg-white ${isMobile ? 'p-4' : 'p-6'} ${!isMobile ? 'sticky top-4' : ''}`}>
-      {/* Filter Header */}
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <Filter className="w-5 h-5 mr-2" />
@@ -37,8 +35,6 @@ const FilterSidebar = ({
           </button>
         )}
       </div>
-
-      {/* Clear All Filters */}
       {activeFiltersCount > 0 && (
         <button
           onClick={onClearAllFilters}
@@ -47,8 +43,6 @@ const FilterSidebar = ({
           Clear All Filters
         </button>
       )}
-
-      {/* Price Range */}
       <div className="mb-6">
         <button
           onClick={() => onToggleFilterSection('price')}
@@ -57,10 +51,8 @@ const FilterSidebar = ({
           <span className="font-medium text-gray-900">PRICE RANGE</span>
           {filterSections.price ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
-        
         {filterSections.price && (
           <div className="py-4 space-y-4">
-            {/* Price Sort */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Sort by:</label>
               <select
@@ -73,8 +65,6 @@ const FilterSidebar = ({
                 ))}
               </select>
             </div>
-            
-            {/* Price Range Inputs */}
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-xs text-gray-600 mb-1">Min Price</label>
@@ -100,8 +90,6 @@ const FilterSidebar = ({
           </div>
         )}
       </div>
-
-      {/* Dynamic Filter Sections */}
       {Object.entries(filterOptions).filter(([key]) => key !== 'priceSort').map(([filterType, options]) => (
         <div key={filterType} className="mb-6">
           <button
@@ -111,13 +99,11 @@ const FilterSidebar = ({
             <span className="font-medium text-gray-900">{filterType.toUpperCase()}</span>
             {filterSections[filterType] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
-          
           {filterSections[filterType] && (
             <div className="py-4 space-y-2 max-h-64 overflow-y-auto">
               {options.map((option) => {
                 const count = filterUtils.getFilterCount(products, filterType, option);
                 const isSelected = filters[filterType]?.includes(option);
-                
                 return (
                   <label
                     key={option}

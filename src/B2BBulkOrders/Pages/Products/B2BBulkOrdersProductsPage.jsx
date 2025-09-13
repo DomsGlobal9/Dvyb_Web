@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, RefreshCw, Database, Plus, Filter, X, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom'; 
-// Import services
 import { productService, debugService } from '../../../services/firebaseServices';
-// import { testDataService } from '../services/testDataService';
+
 
 // Import utils
 import { 
@@ -27,7 +26,6 @@ const B2BBulkOdersProductsPage = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [debugInfo, setDebugInfo] = useState({});
-  const [showDebug, setShowDebug] = useState(false);
   const [creatingTestData, setCreatingTestData] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -196,22 +194,10 @@ const B2BBulkOdersProductsPage = () => {
               Retry
             </button>
             
-            <button
-              onClick={() => setShowDebug(!showDebug)}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              {showDebug ? 'Hide' : 'Show'} Debug Info
-            </button>
+         
           </div>
           
-          {showDebug && (
-            <div className="mt-6 p-4 bg-gray-100 rounded-lg text-left">
-              <h3 className="font-semibold mb-2">Debug Information:</h3>
-              <pre className="text-xs overflow-auto max-h-64">
-                {JSON.stringify(debugInfo, null, 2)}
-              </pre>
-            </div>
-          )}
+        
         </div>
       </div>
     );
@@ -251,68 +237,11 @@ const B2BBulkOdersProductsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white ">
+        
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div className="mb-4 lg:mb-0">
-              <h1 className="text-3xl font-bold text-gray-900">WOMEN'S WEAR</h1>
-              <p className="text-gray-600">
-                {filteredProducts.length} of {products.length} product{products.length !== 1 ? 's' : ''} 
-                {activeFiltersCount > 0 && ` (${activeFiltersCount} filter${activeFiltersCount !== 1 ? 's' : ''} applied)`}
-              </p>
-            </div>
-            
-            {/* Search Bar & Mobile Filter Toggle */}
-            <div className="flex items-center space-x-4">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full lg:w-64"
-              />
-              
-              {/* Mobile Filter Button */}
-              <button
-                onClick={() => setShowMobileFilters(true)}
-                className="lg:hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                Filters
-                {activeFiltersCount > 0 && (
-                  <span className="ml-2 bg-white text-blue-600 text-xs px-2 py-1 rounded-full">
-                    {activeFiltersCount}
-                  </span>
-                )}
-              </button>
-              
-              <button
-                onClick={() => setShowDebug(!showDebug)}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm transition-colors"
-              >
-                {showDebug ? 'Hide' : 'Show'} Debug
-              </button>
-            </div>
-          </div>
-
-          {/* Categories */}
-          <div className="mt-6">
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
-                    selectedCategory === category
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                  }`}
-                >
-                  {category.replace('_', ' ')}
-                </button>
-              ))}
-            </div>
-          </div>
+         
+          
 
           {/* Active Filters Display */}
           {activeFiltersCount > 0 && (
@@ -341,7 +270,7 @@ const B2BBulkOdersProductsPage = () => {
       </div>
 
       {/* Debug Panel */}
-      {showDebug && (
+      {/* {showDebug && (
         <div className="bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="bg-gray-50 p-4 rounded-lg">
@@ -372,7 +301,7 @@ const B2BBulkOdersProductsPage = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Mobile Filter Overlay */}
       {showMobileFilters && (
