@@ -4,20 +4,20 @@ import { useState, useEffect } from 'react';
 import { addToWishlist, removeFromWishlist, isInWishlist } from '../../../services/WishlistService';
 
 
-const ProductCard = ({ 
-  product, 
-  onProductClick, 
-  onToggleFavorite, 
+const ProductCard = ({
+  product,
+  onProductClick,
+  onToggleFavorite,
   // isFavorite 
 }) => {
   const [isInWishlistState, setIsInWishlistState] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-   useEffect(() => {
+  useEffect(() => {
     checkWishlistStatus();
   }, [product.id]);
 
-   const checkWishlistStatus = async () => {
+  const checkWishlistStatus = async () => {
     try {
       const inWishlist = await isInWishlist(product.id);
       setIsInWishlistState(inWishlist);
@@ -27,42 +27,42 @@ const ProductCard = ({
   };
 
 
-const handleToggleWishlist = async (e) => {
-  e.stopPropagation();
-  setIsLoading(true);
+  const handleToggleWishlist = async (e) => {
+    e.stopPropagation();
+    setIsLoading(true);
 
-  try {
-    if (isInWishlistState) {
-      await removeFromWishlist(product.id);
-      setIsInWishlistState(false);
-      if (onToggleFavorite) {
-        onToggleFavorite(product.id, false);
-      }
-    } else {
-      const productData = {
-        name: product.title || product.name || 'Untitled Product',
-        price: product.price || 0,
-        image: product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls[0] : null,
-        ...(product.fabric && { fabric: product.fabric }),
-        ...(product.craft && { craft: product.craft }),
-        ...(product.rating && { rating: product.rating }),
-        ...(product.discount && { discount: product.discount }),
-        ...(product.selectedColors && { selectedColors: product.selectedColors })
-      };
+    try {
+      if (isInWishlistState) {
+        await removeFromWishlist(product.id);
+        setIsInWishlistState(false);
+        if (onToggleFavorite) {
+          onToggleFavorite(product.id, false);
+        }
+      } else {
+        const productData = {
+          name: product.title || product.name || 'Untitled Product',
+          price: product.price || 0,
+          image: product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls[0] : null,
+          ...(product.fabric && { fabric: product.fabric }),
+          ...(product.craft && { craft: product.craft }),
+          ...(product.rating && { rating: product.rating }),
+          ...(product.discount && { discount: product.discount }),
+          ...(product.selectedColors && { selectedColors: product.selectedColors })
+        };
 
-      await addToWishlist(product.id, productData);
-      setIsInWishlistState(true);
-      if (onToggleFavorite) {
-        onToggleFavorite(product.id, true);
+        await addToWishlist(product.id, productData);
+        setIsInWishlistState(true);
+        if (onToggleFavorite) {
+          onToggleFavorite(product.id, true);
+        }
       }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+      alert('Failed to update wishlist. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error('Error toggling wishlist:', error);
-    alert('Failed to update wishlist. Please try again.');
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <div
@@ -82,23 +82,27 @@ const handleToggleWishlist = async (e) => {
             <Package className="w-8 h-8 text-gray-400" />
           </div>
         )}
-        
+
         {/* Overlay Actions */}
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+        <div className=" absolute inset-0 
+  bg-black/0 group-hover:bg-black/20 
+  backdrop-blur-0 group-hover:backdrop-blur-sm 
+  transition-all duration-300 
+  flex items-center justify-center 
+  opacity-0 group-hover:opacity-100">
           <div className="flex space-x-2">
             <button
               onClick={handleToggleWishlist}
               disabled={isLoading}
-              className={`p-2 rounded-full transition-colors ${
-                isInWishlistState
+              className={`p-2 rounded-full transition-colors ${isInWishlistState
                   ? 'bg-red-500 text-white'
                   : 'bg-white text-gray-700'
-              } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
+                } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
               title={isInWishlistState ? 'Remove from wishlist' : 'Add to wishlist'}
             >
               <Heart className={`w-4 h-4 ${isInWishlistState ? 'fill-current' : ''}`} />
             </button>
-             
+
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -129,7 +133,7 @@ const handleToggleWishlist = async (e) => {
         <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">
           {product.title || product.name || 'Untitled Product'}
         </h3>
-        
+
         {/* Product Details */}
         <div className="text-xs text-gray-500 mb-2 space-y-1">
           {product.fabric && (
@@ -139,22 +143,22 @@ const handleToggleWishlist = async (e) => {
             <div>Craft: {product.craft}</div>
           )}
         </div>
-        
+
         {/* Rating */}
         {product.rating && (
           <div className="flex items-center mb-2">
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  className={`w-3 h-3 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                <Star
+                  key={i}
+                  className={`w-3 h-3 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
                 />
               ))}
             </div>
             <span className="text-xs text-gray-500 ml-1">{product.rating}</span>
           </div>
         )}
-        
+
         {/* Price */}
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -177,7 +181,7 @@ const handleToggleWishlist = async (e) => {
             View
           </button>
         </div>
-        
+
         {/* Colors */}
         {product.selectedColors && product.selectedColors.length > 0 && (
           <div className="flex items-center space-x-1">

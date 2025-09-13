@@ -3,7 +3,6 @@ import { AlertCircle, RefreshCw, Database, Plus, Filter, X, Package } from 'luci
 import { useNavigate } from 'react-router-dom'; 
 import { productService, debugService } from '../../../services/firebaseServices';
 
-
 // Import utils
 import { 
   FILTER_OPTIONS, 
@@ -19,7 +18,6 @@ import FilterSidebar from '../../Components/products/FiltersBar';
 import ProductDetailPage from './ProductDetails';
 
 const B2BBulkOdersProductsPage = () => {
-
   const navigate = useNavigate(); 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,8 +31,9 @@ const B2BBulkOdersProductsPage = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const handleNavigateToTryOn = ({ garmentImage }) => {
-  navigate('/TryYourOutfit', { state: { garmentImage } });
-};
+    navigate('/TryYourOutfit', { state: { garmentImage } });
+  };
+
   // Filter states
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [filterSections, setFilterSections] = useState(DEFAULT_FILTER_SECTIONS);
@@ -149,14 +148,27 @@ const B2BBulkOdersProductsPage = () => {
     });
   };
 
+  // Prevent body scroll when mobile filters are open
+  useEffect(() => {
+    if (showMobileFilters) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showMobileFilters]);
+
   // Product Detail View
   if (selectedProduct) {
     return (
       <ProductDetailPage 
         product={selectedProduct} 
         onBackClick={() => setSelectedProduct(null)}
-
-        allProducts={products} // Make sure this line is included
+        allProducts={products}
         onNavigateToTryOn={handleNavigateToTryOn}
         onProductClick={setSelectedProduct}
       />
@@ -193,11 +205,7 @@ const B2BBulkOdersProductsPage = () => {
               <RefreshCw className="w-4 h-4 inline mr-2" />
               Retry
             </button>
-            
-         
           </div>
-          
-        
         </div>
       </div>
     );
@@ -236,16 +244,28 @@ const B2BBulkOdersProductsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white ">
-        
+      {/* Header - Fixed */}
+      <div className="bg-white sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6">
-         
-          
+          {/* Mobile Filter Toggle */}
+          <div className="lg:hidden mb-4">
+            <button
+              onClick={() => setShowMobileFilters(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+            >
+              <Filter className="w-4 h-4" />
+              <span>Filters</span>
+              {activeFiltersCount > 0 && (
+                <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
+          </div>
 
           {/* Active Filters Display */}
           {activeFiltersCount > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2">
               {activeFilterChips.map((chip, index) => (
                 <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
                   {chip.displayValue}
@@ -269,45 +289,14 @@ const B2BBulkOdersProductsPage = () => {
         </div>
       </div>
 
-      {/* Debug Panel */}
-      {/* {showDebug && (
-        <div className="bg-white border-b">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-semibold mb-3 flex items-center">
-                <Database className="w-4 h-4 mr-2" />
-                Debug Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-                <div className="p-3 bg-blue-50 rounded">
-                  <div className="font-medium text-blue-800">Total Products</div>
-                  <div className="text-blue-600">{products.length}</div>
-                </div>
-                <div className="p-3 bg-green-50 rounded">
-                  <div className="font-medium text-green-800">Filtered Results</div>
-                  <div className="text-green-600">{filteredProducts.length}</div>
-                </div>
-                <div className="p-3 bg-purple-50 rounded">
-                  <div className="font-medium text-purple-800">Active Filters</div>
-                  <div className="text-purple-600">{activeFiltersCount}</div>
-                </div>
-                <div className="p-3 bg-yellow-50 rounded">
-                  <div className="font-medium text-yellow-800">Firestore Status</div>
-                  <div className="text-yellow-600">
-                    {debugInfo.firebaseConnected ? 'Connected' : 'Error'}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
-
       {/* Mobile Filter Overlay */}
       {showMobileFilters && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowMobileFilters(false)} />
-          <div className="fixed right-0 top-0 h-full w-80 max-w-full bg-white shadow-xl overflow-y-auto">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50" 
+            onClick={() => setShowMobileFilters(false)} 
+          />
+          <div className="fixed right-0 top-0 h-full w-80 max-w-full bg-white shadow-xl">
             <FilterSidebar 
               isMobile={true}
               filters={filters}
@@ -327,7 +316,7 @@ const B2BBulkOdersProductsPage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex gap-6">
-          {/* Desktop Filter Sidebar */}
+          {/* Desktop Filter Sidebar - Sticky */}
           <div className="hidden lg:block w-64 flex-shrink-0">
             <FilterSidebar 
               filters={filters}
@@ -341,16 +330,14 @@ const B2BBulkOdersProductsPage = () => {
             />
           </div>
 
-          {/* Products Grid */}
-          <div className="flex-1">
+          {/* Products Grid - Scrollable */}
+          <div className="flex-1 min-w-0">
             {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
-            //         onProductClick={handleProductClick}
-            // onToggleFavorite={handleWishlistToggle}
                     onProductClick={setSelectedProduct}
                     onToggleFavorite={toggleFavorite}
                     isFavorite={favorites.has(product.id)}

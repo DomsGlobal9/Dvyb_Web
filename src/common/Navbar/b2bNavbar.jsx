@@ -20,6 +20,7 @@ const B2bnavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+  const { user, userData } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event) => {

@@ -15,8 +15,9 @@ const FilterSidebar = ({
   onCloseMobile,
 }) => {
   return (
-    <div className={`bg-white ${isMobile ? 'p-4' : 'p-6'} ${!isMobile ? 'sticky top-4' : ''}`}>
-      <div className="flex items-center justify-between mb-6">
+    <div className={`bg-white ${isMobile ? 'p-4 h-full flex flex-col' : 'p-6'} ${!isMobile ? 'sticky top-4 max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col' : ''}`}>
+      {/* Header - Fixed */}
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <Filter className="w-5 h-5 mr-2" />
           FILTER
@@ -35,97 +36,108 @@ const FilterSidebar = ({
           </button>
         )}
       </div>
+
+      {/* Clear All Button - Fixed */}
       {activeFiltersCount > 0 && (
         <button
           onClick={onClearAllFilters}
-          className="w-full text-sm text-blue-600 hover:text-blue-800 mb-4 py-2 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+          className="w-full text-sm text-blue-600 hover:text-blue-800 mb-4 py-2 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors flex-shrink-0"
         >
           Clear All Filters
         </button>
       )}
-      <div className="mb-6">
-        <button
-          onClick={() => onToggleFilterSection('price')}
-          className="w-full flex items-center justify-between py-3 border-b border-gray-200"
-        >
-          <span className="font-medium text-gray-900">PRICE RANGE</span>
-          {filterSections.price ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
-        {filterSections.price && (
-          <div className="py-4 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sort by:</label>
-              <select
-                value={filters.priceSort}
-                onChange={(e) => onFilterChange('priceSort', e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-              >
-                {filterOptions.priceSort.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">Min Price</label>
-                <input
-                  type="number"
-                  placeholder="₹ Min"
-                  value={filters.priceRange.min}
-                  onChange={(e) => onFilterChange('priceRange', { min: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">Max Price</label>
-                <input
-                  type="number"
-                  placeholder="₹ Max"
-                  value={filters.priceRange.max}
-                  onChange={(e) => onFilterChange('priceRange', { max: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded text-sm"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-      {Object.entries(filterOptions).filter(([key]) => key !== 'priceSort').map(([filterType, options]) => (
-        <div key={filterType} className="mb-6">
+
+      {/* Scrollable Content */}
+      <div className="flex-1  overflow-y-auto scrollbar-hide scrollbar-thumb-gray-300 scrollbar-track-gray-100 pr-2">
+        {/* Price Range Section */}
+        <div className="mb-6">
           <button
-            onClick={() => onToggleFilterSection(filterType)}
-            className="w-full flex items-center justify-between py-3 border-b border-gray-200"
+            onClick={() => onToggleFilterSection('price')}
+            className="w-full flex items-center justify-between py-3 border-b  border-gray-200"
           >
-            <span className="font-medium text-gray-900">{filterType.toUpperCase()}</span>
-            {filterSections[filterType] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="font-medium text-gray-900">PRICE RANGE</span>
+            {filterSections.price ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
-          {filterSections[filterType] && (
-            <div className="py-4 space-y-2 max-h-64 overflow-y-auto">
-              {options.map((option) => {
-                const count = filterUtils.getFilterCount(products, filterType, option);
-                const isSelected = filters[filterType]?.includes(option);
-                return (
-                  <label
-                    key={option}
-                    className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded"
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => onFilterChange(filterType, option)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                      />
-                      <span className="ml-3 text-sm text-gray-700">{option}</span>
-                    </div>
-                    <span className="text-xs text-gray-500">({count})</span>
-                  </label>
-                );
-              })}
+          {filterSections.price && (
+            <div className="py-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Sort by:</label>
+                <select
+                  value={filters.priceSort}
+                  onChange={(e) => onFilterChange('priceSort', e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                >
+                  {filterOptions.priceSort.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Min Price</label>
+                  <input
+                    type="number"
+                    placeholder="₹ Min"
+                    value={filters.priceRange.min}
+                    onChange={(e) => onFilterChange('priceRange', { min: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Max Price</label>
+                  <input
+                    type="number"
+                    placeholder="₹ Max"
+                    value={filters.priceRange.max}
+                    onChange={(e) => onFilterChange('priceRange', { max: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>
-      ))}
+
+        {/* Other Filter Sections */}
+        {Object.entries(filterOptions).filter(([key]) => key !== 'priceSort').map(([filterType, options]) => (
+          <div key={filterType} className="mb-6">
+            <button
+              onClick={() => onToggleFilterSection(filterType)}
+              className="w-full flex items-center justify-between py-3 border-b border-gray-200"
+            >
+              <span className="font-medium text-gray-900">{filterType.toUpperCase()}</span>
+              {filterSections[filterType] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+            {filterSections[filterType] && (
+              <div className="py-4">
+                <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hide">
+                  {options.map((option) => {
+                    const count = filterUtils.getFilterCount(products, filterType, option);
+                    const isSelected = filters[filterType]?.includes(option);
+                    return (
+                      <label
+                        key={option}
+                        className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded"
+                      >
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => onFilterChange(filterType, option)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span className="ml-3 text-sm text-gray-700">{option}</span>
+                        </div>
+                        <span className="text-xs text-gray-500">({count})</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

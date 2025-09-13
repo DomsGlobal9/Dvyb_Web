@@ -182,7 +182,7 @@ function CartPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm mb-6 p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold text-gray-900">Lasya's Cart</h1>
+        <h1></h1>
           <button 
             onClick={() => setShowShareModal(true)}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"

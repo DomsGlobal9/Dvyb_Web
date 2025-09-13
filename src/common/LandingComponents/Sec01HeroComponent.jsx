@@ -3,8 +3,10 @@ import img01 from '../../assets/B2Bassets/HomePageAssets/heroImage01.png';
 import img02 from '../../assets/B2Bassets/HomePageAssets/heroImage02.png'
 import img03 from '../../assets/B2Bassets/HomePageAssets/heroImage03.png'
 import longStar from '../../assets/B2Bassets/HomePageAssets/long_star.png'
+import { useNavigate } from 'react-router-dom';
 
 const HeroComponent = () => {
+  const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-[#D3DDE5] relative overflow-hidden">
       {/* Decorative stars */}
@@ -31,7 +33,9 @@ const HeroComponent = () => {
             from anywhere
           </p>
           
-          <button className="bg-[#1C4C74] text-white px-12 pt-4 sm:px-10 lg:px-12 py-3 sm:py-4 rounded-full text-sm sm:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg ">
+          <button 
+          onClick={()=> navigate("/products")}
+          className="bg-[#1C4C74] text-white px-12 pt-4 sm:px-10 lg:px-12 py-3 sm:py-4 rounded-full text-sm sm:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg ">
             Shop Collection
           </button>
         </div>

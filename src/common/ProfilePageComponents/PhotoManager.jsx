@@ -240,7 +240,7 @@ const PhotoManager = () => {
 
 
   return (
-<div className=" bg-white rounded-lg h-screen overflow-hidden ">
+<div className=" bg-white rounded-lg h-screen overflow-hidden">
       {/* Header */}
       <div className="  ">
         <h1 className="text-xl md:text-2xl font-bold text-gray-900">My Model</h1>
