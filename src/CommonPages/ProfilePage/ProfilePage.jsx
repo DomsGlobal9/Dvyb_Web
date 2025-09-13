@@ -20,7 +20,7 @@ const ProfilePage = () => {
   }, [activeTab]);
 
   return (
-    <div className="relative flex min-h-screen  overflow-hidden ">
+    <div className="relative flex min-h-screen  ">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="absolute left-64 w-250 flex-1 p-6 ">
         {activeTab === "my-info" && <MyInfo userId={userId} />}
