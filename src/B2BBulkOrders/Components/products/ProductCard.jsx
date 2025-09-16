@@ -2,6 +2,8 @@ import React from 'react';
 import { Package, Heart, Eye, Star } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { addToWishlist, removeFromWishlist, isInWishlist } from '../../../services/WishlistService';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const ProductCard = ({
@@ -58,7 +60,8 @@ const ProductCard = ({
       }
     } catch (error) {
       console.error('Error toggling wishlist:', error);
-      alert('Failed to update wishlist. Please try again.');
+      // alert('Failed to update wishlist. Please try again.');
+       toast.error("Please log in to continue!");
     } finally {
       setIsLoading(false);
     }

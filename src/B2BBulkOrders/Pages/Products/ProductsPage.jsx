@@ -17,7 +17,7 @@ import ProductCard from '../../Components/products/ProductCard';
 import FilterSidebar from '../../Components/products/FiltersBar';
 import ProductDetailPage from './ProductDetails';
 
-const B2BBulkOdersProductsPage = () => {
+const ProductsPage = () => {
   const navigate = useNavigate(); 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -370,4 +370,4 @@ const B2BBulkOdersProductsPage = () => {
   );
 };
 
-export default B2BBulkOdersProductsPage;
+export default ProductsPage;

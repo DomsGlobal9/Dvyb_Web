@@ -1,5 +1,5 @@
 import { Routes , Route} from "react-router-dom";
-
+import ProtectedRoute from "../utils/ProtectedRoute"
 import TryOnCart from "../B2BBulkOrders/Pages/TryonCard/TryOnCart";
 import TryOnPreview from "../B2BBulkOrders/Pages/TryOnPreview/TryOnPreview";
 import HomePages from "../B2BBulkOrders/Pages/HomePages/HomePages";
@@ -8,7 +8,6 @@ import ResetPasswordRequest from "../B2BBulkOrders/Pages/AuthPage/ResetPasswordR
 import ResetPasswordConfirm from "../B2BBulkOrders/Pages/AuthPage/ResetPasswordConfirm";
 import TryYourOutfit from "../B2BBulkOrders/Pages/TryYourOutfit/2DTryOn/TryYourOutfit";
 import UploadSelfie from "../B2BBulkOrders/Components/TryYourOutfit/UploadSelfie";
-import B2BBulkOdersProductsPage from "../B2BBulkOrders/Pages/Products/B2BBulkOrdersProductsPage";
 import AboutPage from "../CommonPages/AboutPage";
 import FAQPage from "../CommonPages/FAQPage";
 import B2cLoginPage from "../B2C/B2CPages/B2cAuth/B2cLogin";
@@ -19,6 +18,7 @@ import ProfilePage from "../CommonPages/ProfilePage/ProfilePage";
 import B2cProductsPage from "../B2C/B2CPages/B2cProductsPage/B2cProductsPage";
 import CartPage from "../CommonPages/CartPage/Cartpage";
 import { WishlistPage } from "../CommonPages/WishlistPage/WishlistPage";
+import ProductsPage from "../B2BBulkOrders/Pages/Products/ProductsPage";
 
 
 
@@ -46,10 +46,31 @@ const WebRoutes = () => {
           {/* <Route path="/b2c-products" element = {<B2cProductsPage/>}/> */}
 
     {/*COMMON PAGE ROUTES*/}
-            <Route path="/products" element = {<B2BBulkOdersProductsPage/>}/>
-            <Route path="/mywishlist" element={<WishlistPage/>}/>
-            <Route path="/mycart" element={<CartPage/>}/>
-            <Route path = "/your-profile" element ={<ProfilePage/>}/>
+            <Route path="/products" element = {<ProductsPage/>}/>
+            <Route
+        path="/mywishlist"
+        element={
+          <ProtectedRoute>
+            <WishlistPage />
+          </ProtectedRoute>
+        }
+      />
+             <Route
+        path="/mycart"
+        element={
+          <ProtectedRoute>
+            <CartPage />
+          </ProtectedRoute>
+        }
+      />
+              <Route
+        path="/your-profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
             <Route path="/aboutUs" element = {<AboutPage/>}/>
             <Route path="/faq" element = {<FAQPage/>}/>
             <Route path= '/PrivacyPolicy' element={<PrivacyPolicy/>}/>
