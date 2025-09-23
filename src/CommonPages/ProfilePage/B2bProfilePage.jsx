@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Info, LogOut, Package, User } from "lucide-react";
 import B2bMyInfo from "../../common/ProfilePageComponents/B2bMyInfo";
-import B2bMyOrdersPage from "../../common/ProfilePageComponents/B2bMyOrdersPage";
+import B2bMyOrdersPage from "../../common/ProfilePageComponents/B2bMyOrders";
  
 const B2bProfilePage = () => {
   const [currentView, setCurrentView] = useState('orders');
