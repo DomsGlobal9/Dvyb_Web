@@ -10,7 +10,7 @@ import {
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { womenCategories } from "./navCatData";
-import logo from "../../assets/Navbar/DVYB_Enterprise_Logo.png";
+// import logo from "../../assets/Navbar/DVYB_Enterprise_Logo.png";
 import b2clogo from "../../assets/Navbar/B2cLogo.png";
 import fav from "../../assets/B2Bassets/NavbarImages/heart.png";
 import cart from "../../assets/B2Bassets/NavbarImages/cart.png";

@@ -144,7 +144,7 @@ const B2bnavbar = () => {
                   className="cursor-pointer w-5 h-5"
                   src={profile}
                   alt="profile"
-                  onClick={() => requireAuth(() => navigate('/your-profile'))}
+                  onClick={() => requireAuth(() => navigate('/b2buser-profile'))}
                 />
               </div>
             </div>
@@ -157,7 +157,7 @@ const B2bnavbar = () => {
                 onClick={toggleWomenCategories}
                 className="text-blue-900 font-semibold hover:text-blue-700"
               >
-                WOMEN
+                WOMENnnn
               </button>
               {showWomenCategories && (
                 <div className="absolute left-0 right-0 top-full bg-gray-100 border-t shadow-md z-50">

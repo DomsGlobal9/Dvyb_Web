@@ -1,6 +1,6 @@
 // // AccountPage.js
 import React, { useState } from "react";
-import Sidebar from '../../common/ProfilePageComponents/Sidebar'
+import Sidebar from '../../common/ProfilePageComponents/Sidebar';
 import MyInfo from "../../common/ProfilePageComponents/MyInfo";
 import ProfileImage from "../../common/ProfilePageComponents/PhotoManager";
 import MyOrders from "../../common/ProfilePageComponents/Orders";
