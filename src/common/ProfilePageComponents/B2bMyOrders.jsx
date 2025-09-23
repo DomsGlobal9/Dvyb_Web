@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { Filter } from 'lucide-react';
 
-const B2bMyOrders = () => {
+const B2bMyOrdersPage = () => {
   const [activeTab, setActiveTab] = useState('Active');
 
   const orders = [
@@ -149,4 +149,4 @@ const B2bMyOrders = () => {
   );
 };
 
-export default B2bMyOrders;
+export default B2bMyOrdersPage;
