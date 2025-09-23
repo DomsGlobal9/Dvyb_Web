@@ -72,7 +72,7 @@ const B2bProfilePage = () => {
       </div>
 
       {/* Main Content */}
-      {currentView === 'orders' && <B2bMyOrders />}
+      {currentView === 'orders' && <B2bMyOrders/>}
       {currentView === 'info' && <B2bMyInfo/>}
     </div>
   );
