@@ -15,7 +15,7 @@ const FilterSidebar = ({
   onCloseMobile,
 }) => {
   return (
-    <div className={`bg-white ${isMobile ? 'p-4 h-full flex flex-col' : 'p-6'} ${!isMobile ? 'sticky top-4 max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col' : ''}`}>
+    <div className={`bg-white overflow-y-scroll scrollbar ${isMobile ? 'p-4 h-full flex flex-col w-3/4' : 'p-6'} ${!isMobile ? 'sticky top-4 max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col' : ''}`}>
       {/* Header - Fixed */}
       <div className="flex items-center justify-between mb-6 flex-shrink-0">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -48,7 +48,7 @@ const FilterSidebar = ({
       )}
 
       {/* Scrollable Content */}
-      <div className="flex-1  overflow-y-auto scrollbar-hide scrollbar-thumb-gray-300 scrollbar-track-gray-100 pr-2">
+      <div className="flex-1  overflow-y-scroll scrollbar pr-2">
         {/* Price Range Section */}
         <div className="mb-6">
           <button
@@ -110,7 +110,7 @@ const FilterSidebar = ({
             </button>
             {filterSections[filterType] && (
               <div className="py-4">
-                <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hide">
+                <div className="space-y-2 max-h-48 overflow-y-auto overflow-y-scroll scrollbar">
                   {options.map((option) => {
                     const count = filterUtils.getFilterCount(products, filterType, option);
                     const isSelected = filters[filterType]?.includes(option);

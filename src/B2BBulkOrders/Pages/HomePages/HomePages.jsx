@@ -30,16 +30,11 @@ import LandingPage from "../../Pages/LandingPage/LandingPage";
 import B2BNavbar from "../../../common/Navbar/b2bNavbar";
 import B2CNavbar from "../../../common/Navbar/b2cNavbar";
 
-const HomePages = ({ role }) => {
-  console.log(role, "role in HomePages");
-
-  // if (role !== "B2B") {
-  //   return <Navigate to={role === "B2C" ? "/" : "/B2BBulkOrders-login"} />;
-  // }
+const HomePages = () => {
 
   return (
     <>
-      {role === "B2C" ? <B2CNavbar /> : <B2BNavbar />}
+      <B2BNavbar />
       <LandingPage />
       <Footer />
     </>

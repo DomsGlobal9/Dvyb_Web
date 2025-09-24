@@ -61,7 +61,7 @@ const ProductCard = ({
     } catch (error) {
       console.error('Error toggling wishlist:', error);
       // alert('Failed to update wishlist. Please try again.');
-       toast.error("Please log in to continue!");
+      toast.error("Please log in to continue!");
     } finally {
       setIsLoading(false);
     }
@@ -98,8 +98,8 @@ const ProductCard = ({
               onClick={handleToggleWishlist}
               disabled={isLoading}
               className={`p-2 rounded-full transition-colors ${isInWishlistState
-                  ? 'bg-red-500 text-white'
-                  : 'bg-white text-gray-700'
+                ? 'bg-red-500 text-white'
+                : 'bg-white text-gray-700'
                 } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
               title={isInWishlistState ? 'Remove from wishlist' : 'Add to wishlist'}
             >
@@ -175,14 +175,12 @@ const ProductCard = ({
             )}
           </div>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onProductClick(product);
-            }}
-            className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+            onClick={() => navigate(`/products/${item.id}`)}
+            className="text-xs bg-blue-600 text-white px-2 py-1 rounded"
           >
             View
           </button>
+
         </div>
 
         {/* Colors */}

@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, RefreshCw, Database, Plus, Filter, X, Package } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { productService, debugService } from '../../../services/firebaseServices';
 
 // Import utils
-import { 
-  FILTER_OPTIONS, 
-  CATEGORIES, 
-  DEFAULT_FILTERS, 
+import {
+  FILTER_OPTIONS,
+  CATEGORIES,
+  DEFAULT_FILTERS,
   DEFAULT_FILTER_SECTIONS,
-  filterUtils 
+  filterUtils
 } from '../../../utils/filterUtils';
 
 // Import components
@@ -18,14 +18,13 @@ import FilterSidebar from '../../Components/products/FiltersBar';
 import ProductDetailPage from './ProductDetails';
 
 const ProductsPage = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [debugInfo, setDebugInfo] = useState({});
   const [creatingTestData, setCreatingTestData] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [favorites, setFavorites] = useState(new Set());
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -107,15 +106,15 @@ const ProductsPage = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         console.log('🚀 Starting product fetch...');
         const debugResults = await debugService.runDebugTests();
         setDebugInfo(debugResults);
-        
+
         const fetchedProducts = await productService.fetchAllProducts();
         setProducts(fetchedProducts);
         console.log('✅ Products state updated successfully');
-        
+
       } catch (error) {
         console.error('💥 Error in fetchAllProducts:', error);
         setError(error.message);
@@ -155,25 +154,13 @@ const ProductsPage = () => {
     } else {
       document.body.style.overflow = 'unset';
     }
-    
+
     // Cleanup on unmount
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [showMobileFilters]);
 
-  // Product Detail View
-  if (selectedProduct) {
-    return (
-      <ProductDetailPage 
-        product={selectedProduct} 
-        onBackClick={() => setSelectedProduct(null)}
-        allProducts={products}
-        onNavigateToTryOn={handleNavigateToTryOn}
-        onProductClick={setSelectedProduct}
-      />
-    );
-  }
 
   // Loading state
   if (loading) {
@@ -196,7 +183,7 @@ const ProductsPage = () => {
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Products</h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          
+
           <div className="space-y-3">
             <button
               onClick={() => window.location.reload()}
@@ -222,7 +209,7 @@ const ProductsPage = () => {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No products available</h3>
             <p className="text-gray-600 mb-6">No vendors have created products yet</p>
-            
+
             <div className="mb-6">
               <button
                 onClick={createTestData}
@@ -292,12 +279,12 @@ const ProductsPage = () => {
       {/* Mobile Filter Overlay */}
       {showMobileFilters && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50" 
-            onClick={() => setShowMobileFilters(false)} 
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50"
+            onClick={() => setShowMobileFilters(false)}
           />
           <div className="fixed right-0 top-0 h-full w-80 max-w-full bg-white shadow-xl">
-            <FilterSidebar 
+            <FilterSidebar
               isMobile={true}
               filters={filters}
               filterSections={filterSections}
@@ -318,7 +305,7 @@ const ProductsPage = () => {
         <div className="flex gap-6">
           {/* Desktop Filter Sidebar - Sticky */}
           <div className="hidden lg:block w-64 flex-shrink-0">
-            <FilterSidebar 
+            <FilterSidebar
               filters={filters}
               filterSections={filterSections}
               filterOptions={FILTER_OPTIONS}
@@ -338,10 +325,11 @@ const ProductsPage = () => {
                   <ProductCard
                     key={product.id}
                     product={product}
-                    onProductClick={setSelectedProduct}
+                    onProductClick={(p) => navigate(`/products/${p.id}`)} // 👈 navigate instead of setSelectedProduct
                     onToggleFavorite={toggleFavorite}
                     isFavorite={favorites.has(product.id)}
                   />
+
                 ))}
               </div>
             ) : (
@@ -349,8 +337,8 @@ const ProductsPage = () => {
                 <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
                 <p className="text-gray-600 mb-4">
-                  {products.length === 0 
-                    ? "No products are available" 
+                  {products.length === 0
+                    ? "No products are available"
                     : "No products match your current filters"}
                 </p>
                 {activeFiltersCount > 0 && (
