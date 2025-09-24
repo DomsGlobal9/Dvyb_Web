@@ -1,5 +1,5 @@
-import { Routes , Route} from "react-router-dom";
-
+import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "../utils/ProtectedRoute";
 import TryOnCart from "../B2BBulkOrders/Pages/TryonCard/TryOnCart";
 import TryOnPreview from "../B2BBulkOrders/Pages/TryOnPreview/TryOnPreview";
 import HomePages from "../B2BBulkOrders/Pages/HomePages/HomePages";
@@ -8,7 +8,6 @@ import ResetPasswordRequest from "../B2BBulkOrders/Pages/AuthPage/ResetPasswordR
 import ResetPasswordConfirm from "../B2BBulkOrders/Pages/AuthPage/ResetPasswordConfirm";
 import TryYourOutfit from "../B2BBulkOrders/Pages/TryYourOutfit/2DTryOn/TryYourOutfit";
 import UploadSelfie from "../B2BBulkOrders/Components/TryYourOutfit/UploadSelfie";
-import B2BBulkOdersProductsPage from "../B2BBulkOrders/Pages/Products/B2BBulkOrdersProductsPage";
 import AboutPage from "../CommonPages/AboutPage";
 import FAQPage from "../CommonPages/FAQPage";
 import B2cLoginPage from "../B2C/B2CPages/B2cAuth/B2cLogin";
@@ -19,50 +18,82 @@ import ProfilePage from "../CommonPages/ProfilePage/ProfilePage";
 import B2cProductsPage from "../B2C/B2CPages/B2cProductsPage/B2cProductsPage";
 import CartPage from "../CommonPages/CartPage/Cartpage";
 import { WishlistPage } from "../CommonPages/WishlistPage/WishlistPage";
-
-
+import ProductsPage from "../B2BBulkOrders/Pages/Products/ProductsPage";
+import { AuthProvider, useAuth } from "../context/AuthContext";
+import B2bProfilePage from "../CommonPages/ProfilePage/B2bProfilePage";
+import ProductDetailWrapper from "../B2BBulkOrders/Pages/Products/ProductDetailWrapper";
+// import Navbar from "../common/Navbar/b2cNavbar";
 
 const WebRoutes = () => {
-    return (
-        <Routes>
+  const{userRole}=useAuth();
+  console.log(userRole,"userRole");
+
+  return (
+    <AuthProvider>
+    <Routes>
       {/* B2B bulk routes */}
-            <Route path="/B2BBulkOrders-home" element={<HomePages/>} />
-            <Route path="/B2BBulkOrders-login" element={<LoginPage/>} />
-            <Route path="/reset-password" element={<ResetPasswordRequest />} />
-            <Route path="/reset-password/confirm" element={<ResetPasswordConfirm />} />
-    {/* B2B PRODUCTS ROUTES */}
-            <Route path="/TryOnCart" element = {<TryOnCart />}/>
-            <Route path="/TryYourOutfit" element = {<TryYourOutfit />}/>
-            <Route path="/upload-selfie" element = {<UploadSelfie />}/>
-            <Route path="/preview" element = {<TryOnPreview/>}/>
-            {/* <Route path="/upload-selfie" element = {<UploadSelfie/>}/>
+      <Route path="/B2BBulkOrders-home" element={<HomePages/>} />
+      <Route path="/B2BBulkOrders-login" element={<LoginPage />} />
+      <Route path="/reset-password" element={<ResetPasswordRequest />} />
+      <Route
+        path="/reset-password/confirm"
+        element={<ResetPasswordConfirm />}
+      />
+      {/* B2B PRODUCTS ROUTES */}
+      <Route path="/TryOnCart" element={<TryOnCart />} />
+      <Route path="/TryYourOutfit" element={<TryYourOutfit />} />
+      <Route path="/upload-selfie" element={<UploadSelfie />} />
+      <Route path="/preview" element={<TryOnPreview />} />
+
+      {/* <Route path="/upload-selfie" element = {<UploadSelfie/>}/>
             <Route path="/preview" element = {<TryOnPreview/>}/> */}
 
-    {/* B2c PRODUCTS ROUTES */}
-          <Route path="/" element = {<B2cHomePages/>}/>
-          <Route path="B2c-login" element={<B2cLoginPage/>}/>
-        
-          
-          {/* <Route path="/b2c-products" element = {<B2cProductsPage/>}/> */}
+      {/* B2c PRODUCTS ROUTES */}
+      <Route path="/" element={<B2cHomePages />} />
+      <Route path="B2c-login" element={<B2cLoginPage />} />
+      {/* <Route path="/b2c-navbar" element={<Navbar/>}/> */}
 
-    {/*COMMON PAGE ROUTES*/}
-            <Route path="/products" element = {<B2BBulkOdersProductsPage/>}/>
-            <Route path="/mywishlist" element={<WishlistPage/>}/>
-            <Route path="/mycart" element={<CartPage/>}/>
-            <Route path = "/your-profile" element ={<ProfilePage/>}/>
-            <Route path="/aboutUs" element = {<AboutPage/>}/>
-            <Route path="/faq" element = {<FAQPage/>}/>
-            <Route path= '/PrivacyPolicy' element={<PrivacyPolicy/>}/>
-            <Route path= '/TermsAndConditions' element={<TermsAndConditions/>}/>
-    
-          {/* <Route path="/orders" element={<Orders />} /> */}
-         
+      {/* <Route path="/b2c-products" element = {<B2cProductsPage/>}/> */}
 
-        </Routes>
-    )
-}
+      {/*COMMON PAGE ROUTES*/}
+      <Route path="/products" element={<ProductsPage />} />
+      <Route path="/products/:id" element={<ProductDetailWrapper />} />
+      <Route
+        path="/mywishlist"
+        element={
+          <ProtectedRoute>
+            <WishlistPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mycart"
+        element={
+          <ProtectedRoute>
+            <CartPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/your-profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/b2buser-profile" element={<B2bProfilePage/>} />
+      <Route path="/aboutUs" element={<AboutPage />} />
+      <Route path="/faq" element={<FAQPage />} />
+      <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+      <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
 
-// FASHN_API_KEY=fa-jCmx621bg3ye-0kZFcMHh0PgG3YWC38Pl2zbl   
+      {/* <Route path="/orders" element={<Orders />} /> */}
+    </Routes>
+    </AuthProvider>
+  );
+};
 
+// FASHN_API_KEY=fa-jCmx621bg3ye-0kZFcMHh0PgG3YWC38Pl2zbl
 
 export default WebRoutes;

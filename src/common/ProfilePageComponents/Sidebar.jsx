@@ -66,7 +66,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
     try {
       await signOut(auth);
       localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
+      localStorage.removeItem("user");
       window.location.href = "/B2c-login"; // Redirect to login
     } catch (error) {
       console.error("Logout error:", error);
@@ -74,10 +74,9 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   };
 
   return (
-    <div className=" fixed">
+    <>
       {/* Sidebar */}
-<div className="w-64 h-screen bg-gray-50 p-4 ">
-
+      <div className="w-64 h-screen bg-gray-50 p-4 fixed left-0 top-0">
         <h2 className="text-lg font-bold mb-6">
           Hello {data?.name || "User"}
         </h2>
@@ -108,23 +107,23 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         </ul>
       </div>
 
-      {/* ✅ Logout Confirmation Modal */}
+      {/* ✅ Logout Confirmation Modal - Moved outside and with higher z-index */}
       {showLogoutModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm  z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
-            <h3 className="text-lg font-semibold mb-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-[9999]">
+          <div className="bg-white rounded-lg shadow-2xl p-6 w-80 text-center mx-4">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">
               Are you sure you want to Log Out?
             </h3>
             <div className="flex justify-center gap-4">
               <button
                 onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200"
               >
                 Yes
               </button>
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors duration-200"
               >
                 No
               </button>
@@ -132,7 +131,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

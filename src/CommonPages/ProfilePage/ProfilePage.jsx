@@ -1,11 +1,15 @@
 // // AccountPage.js
 import React, { useState } from "react";
-import Sidebar from '../../common/ProfilePageComponents/Sidebar'
+import Sidebar from '../../common/ProfilePageComponents/Sidebar';
 import MyInfo from "../../common/ProfilePageComponents/MyInfo";
 import ProfileImage from "../../common/ProfilePageComponents/PhotoManager";
 import MyOrders from "../../common/ProfilePageComponents/Orders";
 import { WishlistPage } from "../WishlistPage/WishlistPage";
 import TryOnGallery from "../../common/ProfilePageComponents/TryOnGallery";
+import RewardsRedemption from "../../B2C/B2CComponents/RewardsRedemption";
+import ReferEarn from "../../B2C/B2CComponents/ReferEarn";
+import SubscriptionFlow from "../../B2C/B2CComponents/SubscriptionFlow";
+
 
 
 const ProfilePage = () => {
@@ -28,7 +32,11 @@ const ProfilePage = () => {
         {activeTab === "my-model" && <ProfileImage />}
         {activeTab === "wishlist" && <WishlistPage />}
         {activeTab === "my-tryon-gallery" && <TryOnGallery/>}
-        {/* {activeTab === "wishlist" && <p>Wishlist Section</p>} */}
+        {activeTab === "rewards" && <RewardsRedemption />}
+        {activeTab === "refer-earn" && <ReferEarn />}
+        {activeTab === "subscriptions" && <SubscriptionFlow />}
+        
+     
       </div>
     </div>
   );

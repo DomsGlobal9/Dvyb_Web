@@ -3,8 +3,9 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "../../firebase";
 import { useAuth } from "../../context/AuthContext";
-import { Camera, Upload, Trash2, User, X, CheckCircle, AlertCircle, ChevronDown,ChevronUp ,Loader2 } from "lucide-react";
+import { Camera, Upload, Trash2, User, X, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import MultiStepQuestionnaire from '../../common/ProfilePageComponents/Questionaries'
+
 const PhotoManager = () => {
   const { user } = useAuth();
   const [data, setData] = useState({
@@ -15,13 +16,15 @@ const PhotoManager = () => {
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [processingImage, setProcessingImage] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showFullPhoto, setShowFullPhoto] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [currentPhotoPath, setCurrentPhotoPath] = useState(""); // Store the file path separately
 
   // Remove.bg API Key - Replace with your actual API key
-  const REMOVE_BG_API_KEY = 'Fz856UNUgtdj2LgpFjd1PXMz'; // Get from https://www.remove.bg/api
+  const REMOVE_BG_API_KEY = 'Fz856UNUgtdj2LgpFjd1PXMz';
 
   useEffect(() => {
     if (!user) return;
@@ -34,20 +37,30 @@ const PhotoManager = () => {
 
         if (snap.exists()) {
           setCollectionName("b2c_users");
+          const userData = snap.data();
           setData({ 
             profilePhoto: "",
-            ...snap.data() 
+            ...userData 
           });
+          // Store the photo path if it exists
+          if (userData.profilePhotoPath) {
+            setCurrentPhotoPath(userData.profilePhotoPath);
+          }
         } else {
           // If not found, try B2BBulkOrders_users
           ref = doc(db, "B2BBulkOrders_users", user.uid);
           snap = await getDoc(ref);
           if (snap.exists()) {
             setCollectionName("B2BBulkOrders_users");
+            const userData = snap.data();
             setData({ 
               profilePhoto: "",
-              ...snap.data() 
+              ...userData 
             });
+            // Store the photo path if it exists
+            if (userData.profilePhotoPath) {
+              setCurrentPhotoPath(userData.profilePhotoPath);
+            }
           }
         }
       } catch (error) {
@@ -121,73 +134,109 @@ const PhotoManager = () => {
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const error = validateFile(file);
-      if (error) {
-        return;
-      }
-      
-      setSelectedFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      
+    if (!file) return;
+
+    // Clear any previous errors
+    setUploadError("");
+
+    const error = validateFile(file);
+    if (error) {
+      setUploadError(error);
+      return;
+    }
+    
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    
+    try {
       // Automatically remove background
       const processedFile = await removeBackgroundAutomatically(file);
       
-      // If background removal was successful, automatically upload the processed image
-      if (processedFile) {
-        await uploadPhotoWithFile(processedFile);
-      } else {
-        // If background removal failed, upload the original image
-        await uploadPhotoWithFile(file);
-      }
+      // Upload the processed file or original file
+      const fileToUpload = processedFile || file;
+      await uploadPhotoWithFile(fileToUpload);
+      
+    } catch (error) {
+      console.error("Error in file processing:", error);
+      setUploadError("Failed to process the image. Please try again.");
+      setUploading(false);
+      setProcessingImage(false);
     }
   };
 
   const uploadPhotoWithFile = async (fileToUpload) => {
-    if (!fileToUpload || !collectionName) return;
-    
+    if (!fileToUpload || !collectionName) {
+      setUploadError("Missing file or collection information");
+      return;
+    }
+
+    console.log("Starting upload process...", {
+      fileName: fileToUpload.name,
+      fileSize: fileToUpload.size,
+      collectionName,
+      userId: user.uid
+    });
+
     setUploading(true);
-    
+    setUploadError("");
+
     try {
       const timestamp = Date.now();
       const fileName = `profile_${timestamp}_${fileToUpload.name}`;
-      const storageRef = ref(storage, `users/${user.uid}/photos/${fileName}`);
-      
-      // Upload file to Firebase Storage
-      const snapshot = await uploadBytes(storageRef, fileToUpload);
+      const filePath = `users/${user.uid}/photos/${fileName}`;
+      const photoRef = ref(storage, filePath);
+
+      console.log("Uploading to Firebase Storage...");
+      // Upload file
+      const snapshot = await uploadBytes(photoRef, fileToUpload);
       const downloadURL = await getDownloadURL(snapshot.ref);
-      
-      // Delete old profile photo if exists
-      if (data.profilePhoto) {
+
+      console.log("File uploaded successfully, download URL:", downloadURL);
+
+      // Delete old photo if exists using stored path
+      if (currentPhotoPath) {
         try {
-          const oldPhotoRef = ref(storage, data.profilePhoto);
+          console.log("Deleting old photo...");
+          const oldPhotoRef = ref(storage, currentPhotoPath);
           await deleteObject(oldPhotoRef);
+          console.log("Old photo deleted successfully");
         } catch (error) {
-          console.log("Old photo not found or already deleted");
+          console.log("Old photo not found or already deleted", error);
         }
       }
-      
-      // Update Firestore document
+
+      // Update Firestore with both URL and path
+      console.log("Updating Firestore document...");
       const docRef = doc(db, collectionName, user.uid);
-      await updateDoc(docRef, {
-        profilePhoto: downloadURL
+      await updateDoc(docRef, { 
+        profilePhoto: downloadURL,
+        profilePhotoPath: filePath // Store the path for easier deletion
       });
-      
-      setData(prev => ({
-        ...prev,
-        profilePhoto: downloadURL
-      }));
-      
-      // Reset form
+
+      console.log("Firestore updated successfully");
+
+      // Update local state
+      setData(prev => ({ ...prev, profilePhoto: downloadURL }));
+      setCurrentPhotoPath(filePath);
+
+      // Reset form state
       setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
       setPreviewUrl("");
       setShowUploadModal(false);
-      
+
+      console.log("Upload completed successfully");
+
     } catch (error) {
       console.error("Error uploading photo:", error);
+      setUploadError(`Upload failed: ${error.message}`);
+    } finally {
+      setUploading(false);
+      setProcessingImage(false);
     }
-    setUploading(false);
   };
 
   const deletePhoto = async () => {
@@ -197,23 +246,28 @@ const PhotoManager = () => {
     if (!confirmDelete) return;
     
     try {
-      // Delete from Firebase Storage
-      const photoRef = ref(storage, data.profilePhoto);
-      await deleteObject(photoRef);
+      // Delete from Firebase Storage using stored path
+      if (currentPhotoPath) {
+        const photoRef = ref(storage, currentPhotoPath);
+        await deleteObject(photoRef);
+      }
       
       // Update Firestore document
       const docRef = doc(db, collectionName, user.uid);
       await updateDoc(docRef, {
-        profilePhoto: ""
+        profilePhoto: "",
+        profilePhotoPath: ""
       });
       
       setData(prev => ({
         ...prev,
         profilePhoto: ""
       }));
+      setCurrentPhotoPath("");
       
     } catch (error) {
       console.error("Error deleting photo:", error);
+      setUploadError(`Delete failed: ${error.message}`);
     }
   };
 
@@ -221,145 +275,124 @@ const PhotoManager = () => {
     setShowUploadModal(true);
     setSelectedFile(null);
     setPreviewUrl("");
+    setUploadError("");
   };
 
   const closeUploadModal = () => {
+    // Only allow closing if not currently uploading
+    if (uploading || processingImage) {
+      return;
+    }
+
     setShowUploadModal(false);
     setSelectedFile(null);
-    setPreviewUrl("");
+    setUploadError("");
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
+    setPreviewUrl("");
   };
 
   if (loading) return (
-    <div className="flex items-center  justify-center h-64">
-      <div className="animate-spin  rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
     </div>
   );
 
-
   return (
-<div className=" bg-white rounded-lg h-screen overflow-hidden">
+    <div className="bg-white rounded-lg h-screen overflow-hidden">
       {/* Header */}
-      <div className="  ">
+      <div className="">
         <h1 className="text-xl md:text-2xl font-bold text-gray-900">My Model</h1>
-        {/* <p className="text-sm text-gray-600 mt-1">Upload your photo to create your personal model</p> */}
       </div>
 
       <div className="">
         {/* Instructions Section */}
-         <div className="">
-      {/* Toggle Button */}
-      <div className="justify-end flex">
-      {/* <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2  bg-blue-100 text-blue-900 border border-blue-200 px-4 py-2 rounded-lg font-medium hover:bg-blue-200 transition"
-      >
-        <AlertCircle size={18} />
-        {open ? "Hide Photo Guidelines" : "Show Photo Guidelines"}
-        {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-      </button> */}
-
-      </div>
-
-      {/* Collapsible Content */}
-      {/* {open && (
-      
-      )} */}
-    </div>
+        <div className="">
+          {/* Toggle Button */}
+          <div className="justify-end flex">
+          </div>
+        </div>
 
         {/* Profile Photo Section */}
         <div className="">
+          <div className="flex justify-between ml-28 mt-9">
+            <div className="">
+              {data.profilePhoto ? (
+                <div className="relative inline-block">
+                  <div 
+                    className="w-48 h-64 md:w-56 md:h-72 shadow-[0_4px_12px_rgba(0,0,0,0.08)] lg:w-56 lg:h-[440px]
+                    rounded-[9999px] overflow-hidden bg-white 
+                     flex items-center justify-center mx-auto cursor-pointer"
+                    onClick={() => setShowFullPhoto(true)}
+                  >
+                    <img 
+                      src={data.profilePhoto} 
+                      alt="My Model" 
+                      className="w-full object-cover h-full hover:scale-105 transition-transform duration-200"
+                      onError={(e) => {
+                        e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300' viewBox='0 0 200 300'%3E%3Crect width='200' height='300' fill='%23f3f4f6'/%3E%3Ctext x='100' y='150' text-anchor='middle' dy='.3em' font-family='Arial' font-size='16' fill='%236b7280'%3EError Loading%3C/text%3E%3C/svg%3E";
+                      }}
+                    />
+                  </div>
 
-<div className="flex justify-between ml-28 mt-9">
-
-          <div className="">
-            {data.profilePhoto ? (
-              <div className="relative inline-block">
-                <div 
-                  // className="w-48 h-64 md:w-56 md:h-72 lg:w-64  lg:h-80 rounded-lg overflow-hidden border border-gray-400  cursor-pointer mx-auto"
-                className="w-48 h-64 md:w-56 md:h-72  shadow-[0_4px_12px_rgba(0,0,0,0.08)] lg:w-56 lg:h-[440px]
-                rounded-[9999px] overflow-hidden bg-white 
-                 flex items-center justify-center mx-auto  "
-                  onClick={() => setShowFullPhoto(true)}
-
-                >
-                  <img 
-                    src={data.profilePhoto} 
-                    alt="My Model" 
-                    className=" object-cover h-full hover:scale-105 transition-transform duration-200"
-                    onError={(e) => {
-                      e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='300' viewBox='0 0 200 300'%3E%3Crect width='200' height='300' fill='%23f3f4f6'/%3E%3Ctext x='100' y='150' text-anchor='middle' dy='.3em' font-family='Arial' font-size='16' fill='%236b7280'%3EError Loading%3C/text%3E%3C/svg%3E";
-                    }}
-                  />
-
-                  
+                  {/* Delete button */}
+                  <button
+                    onClick={deletePhoto}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg"
+                    title="Delete photo"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
-                
-                {/* <button
-                  onClick={deletePhoto}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors shadow-lg"
-                  title="Delete photo"
-                >
-                  <Trash2 size={16} />
-                </button> */}
-
-                
-              </div>
-            ) : (
-              <div className="w-48 h-64 md:w-56 md:h-72 lg:w-64 lg:h-80 rounded-lg bg-gray-100 border-4 border-white shadow-xl mx-auto flex items-center justify-center">
-                <div className="text-center">
-                  <User size={60} className="text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-sm">No photo uploaded</p>
-                </div>
-              </div>
-            )}
-         
-           <button
-              onClick={openUploadModal}
-              disabled={uploading || processingImage}
-              className="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors mx-auto"
-            >
-              {uploading || processingImage ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" />
-                  Uploading...
-                </>
               ) : (
-                <>
-                  <Camera size={20} />
-                  {data.profilePhoto ? 'Change Photo' : 'Upload Photo'}
-                </>
+                <div className="w-48 h-64 md:w-56 md:h-72 lg:w-64 lg:h-80 rounded-lg bg-gray-100 border-4 border-white shadow-xl mx-auto flex items-center justify-center">
+                  <div className="text-center">
+                    <User size={60} className="text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 text-sm">No photo uploaded</p>
+                  </div>
+                </div>
               )}
-            </button>
-          </div>
          
-<div className="w-full ">
+              <button
+                onClick={openUploadModal}
+                disabled={uploading || processingImage}
+                className="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors mx-auto mt-4"
+              >
+                {uploading || processingImage ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    {processingImage ? 'Processing...' : 'Uploading...'}
+                  </>
+                ) : (
+                  <>
+                    <Camera size={20} />
+                    {data.profilePhoto ? 'Change Photo' : 'Upload Photo'}
+                  </>
+                )}
+              </button>
+            </div>
+         
+            <div className="w-full">
+              <MultiStepQuestionnaire />
+            </div>
+          </div>
 
-<MultiStepQuestionnaire />
-</div>
-
-</div>
           <div className="">
-          
-            
-            {/* {data.profilePhoto && (
-              <p className="text-sm text-gray-500">
-                Click on the photo to view full size
-              </p>
+            {/* Error Display */}
+            {uploadError && (
+              <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg mx-4">
+                {uploadError}
+              </div>
             )}
-   */}
-
-            
           </div>
         </div>
       </div>
 
       {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 backdrop-blur bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden ">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full my-8">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h3 className="text-lg font-medium text-gray-900">Upload Your Photo</h3>
               <button
@@ -377,55 +410,55 @@ const PhotoManager = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Choose Full Body Photo
                 </label>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-3 animate-fadeIn">
-          <h3 className="text-lg font-medium text-blue-900 mb-3 flex items-center gap-2">
-            <AlertCircle size={20} />
-            Photo Guidelines
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-600" />
-                <span className="text-gray-700">Full body photo required</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-600" />
-                <span className="text-gray-700">Stand straight facing camera</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-600" />
-                <span className="text-gray-700">Good lighting, clear image</span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-600" />
-                <span className="text-gray-700">Maximum file size: 5MB</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-600" />
-                <span className="text-gray-700">Formats: JPG, PNG, GIF</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-600" />
-                <span className="text-gray-700">Auto background removal</span>
-              </div>
-            </div>
-          </div>
-        </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-3">
+                  <h3 className="text-lg font-medium text-blue-900 mb-3 flex items-center gap-2">
+                    <AlertCircle size={20} />
+                    Photo Guidelines
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle size={16} className="text-green-600" />
+                        <span className="text-gray-700">Full body photo required</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle size={16} className="text-green-600" />
+                        <span className="text-gray-700">Stand straight facing camera</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle size={16} className="text-green-600" />
+                        <span className="text-gray-700">Good lighting, clear image</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle size={16} className="text-green-600" />
+                        <span className="text-gray-700">Maximum file size: 5MB</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle size={16} className="text-green-600" />
+                        <span className="text-gray-700">Formats: JPG, PNG, GIF</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle size={16} className="text-green-600" />
+                        <span className="text-gray-700">Auto background removal</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex items-center mt-7 justify-center w-full">
                   <label className={`flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors ${
                     uploading || processingImage ? 'opacity-50 cursor-not-allowed' : ''
                   }`}>
-
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       {uploading || processingImage ? (
                         <>
                           <Loader2 className="w-10 h-10 mb-3 text-blue-600 animate-spin" />
                           <p className="text-sm text-blue-700 text-center font-medium">
-                            Uploading...
+                            {processingImage ? 'Processing image...' : 'Uploading...'}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">Please wait</p>
+                          <p className="text-xs text-gray-500 mt-1">Please wait, do not close this window</p>
                         </>
                       ) : (
                         <>
@@ -448,6 +481,13 @@ const PhotoManager = () => {
                     />
                   </label>
                 </div>
+
+                {/* Error Display in Modal */}
+                {uploadError && (
+                  <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    {uploadError}
+                  </div>
+                )}
               </div>
 
               {/* Preview Section */}
@@ -471,7 +511,7 @@ const PhotoManager = () => {
                   disabled={uploading || processingImage}
                   className="px-4 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                 >
-                  {(uploading || processingImage) ? 'Uploading...' : 'Close'}
+                  {(uploading || processingImage) ? 'Please wait...' : 'Close'}
                 </button>
               </div>
             </div>
