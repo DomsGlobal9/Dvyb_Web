@@ -111,7 +111,7 @@ const NewCollectionPage = () => {
                     
                     <button 
                       // onClick={() => navigate(`/products/${product.id}`)}
-                      className="bg-[#789CB8] hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      className="bg-primary-blue text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                       View
                     </button>
@@ -138,7 +138,7 @@ const NewCollectionPage = () => {
           <div className="text-center mt-8 sm:mt-12 lg:mt-16">
             <button 
               onClick={() => navigate("/products")}
-              className="bg-gray-900 hover:bg-gray-800 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="bg-primary-blue hover:bg-gray-800 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               View All Collection
             </button>

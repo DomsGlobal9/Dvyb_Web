@@ -80,7 +80,7 @@ const TopPicks = () => {
             {/* View Button */}
             <div>
 
-            <button className=" w-24 bg-[#789CBB] text-white py-2 rounded-lg hover:bg-blue-500">
+            <button className=" w-24 bg-primary-blue text-white py-2 rounded-lg hover:bg-blue-500">
               View
             </button>
             </div>

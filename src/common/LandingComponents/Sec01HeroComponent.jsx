@@ -35,7 +35,7 @@ const HeroComponent = () => {
           
           <button 
           onClick={()=> navigate("/products")}
-          className="bg-[#1C4C74] text-white px-12 pt-4 sm:px-10 lg:px-12 py-3 sm:py-4 rounded-full text-sm sm:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg ">
+          className="bg-primary-blue text-white px-12 pt-4 sm:px-10 lg:px-12 py-3 sm:py-4 rounded-full text-sm sm:text-base lg:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg ">
             Shop Collection
           </button>
         </div>
