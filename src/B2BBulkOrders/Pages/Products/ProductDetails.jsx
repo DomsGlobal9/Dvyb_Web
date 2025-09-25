@@ -175,7 +175,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
        // toast.error("Please log in to continue!");
       // return;
     }
-    handleAddToCart();
+    {/* handleAddToCart(); */}
                 setShowAddToCartModal(false);
                 alert('Added to cart!');
               }}
