@@ -68,6 +68,13 @@ const Navbar = () => {
     setActiveCategory(null);
   };
 
+  const handleSubcategoryClick = (subcategoryName) => {
+    navigate(`/products?category=${encodeURIComponent(subcategoryName)}`);
+    setShowWomenCategories(false);
+    setActiveCategory(null);
+    setMobileMenuOpen(false);
+  };
+
   // Render
   return (
     <header className="border-b relative bg-white sticky top-0 z-50">
@@ -198,12 +205,13 @@ const Navbar = () => {
                       {womenCategories[activeCategory].map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex flex-col items-center w-32"
+                          className="flex flex-col items-center w-32 cursor-pointer"
+                          onClick={() => handleSubcategoryClick(item.name)}
                         >
                           <img
                             src={item.img}
                             alt={item.name}
-                            className="h-32 w-24 object-cover rounded shadow-sm hover:scale-105 transition cursor-pointer"
+                            className="h-32 w-24 object-cover rounded shadow-sm hover:scale-105 transition"
                           />
                           <span className="mt-2 text-xs font-medium text-gray-700">
                             {item.name}
@@ -288,7 +296,8 @@ const Navbar = () => {
                                 {womenCategories[cat].map((item, idx) => (
                                   <div
                                     key={idx}
-                                    className="flex flex-col items-center"
+                                    className="flex flex-col items-center cursor-pointer"
+                                    onClick={() => handleSubcategoryClick(item.name)}
                                   >
                                     <img
                                       src={item.img}

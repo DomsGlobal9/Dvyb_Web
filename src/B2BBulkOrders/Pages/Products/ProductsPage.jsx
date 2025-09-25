@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, RefreshCw, Database, Plus, Filter, X, Package } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { productService, debugService } from '../../../services/firebaseServices';
 
 // Import utils
@@ -19,6 +19,7 @@ import ProductDetailPage from './ProductDetails';
 
 const ProductsPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -126,10 +127,22 @@ const ProductsPage = () => {
     fetchAllProducts();
   }, []);
 
+  // Handle query params for category filtering from navbar
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const category = params.get('category');
+    if (category) {
+      const decodedCategory = decodeURIComponent(category);
+      // Assuming CATEGORIES includes possible values; you can add validation if needed
+      setSelectedCategory(decodedCategory);
+    }
+  }, [location.search]);
+
   // Apply filters and search
   const filteredProducts = useMemo(() => {
     return filterUtils.applyFilters(products, filters, selectedCategory, searchTerm);
   }, [products, searchTerm, selectedCategory, filters]);
+  console.log("selected products", selectedCategory)
 
   // Count active filters
   const activeFiltersCount = filterUtils.countActiveFilters(filters, selectedCategory);

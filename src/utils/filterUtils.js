@@ -1,5 +1,26 @@
-// filterUtils.js
-export const CATEGORIES = ['ALL', 'WOMEN', 'MEN', 'KIDS'];
+export const CATEGORIES = [
+  'ALL',
+  'SAREE',
+  'SALWAR SUITS',
+  'LEHENGAS',
+  'ANARKALI',
+  'DUPATTAS',
+  'ETHNIC JACKET',
+  'T-SHIRTS',
+  'SHIRTS',
+  'BLOUSES',
+  'JEANS',
+  'TROUSERS',
+  'SKIRTS',
+  'MAXI DRESSES',
+  'JUMPSUITS',
+  'NIGHT SUITS',
+  'PAJAMAS',
+  'SPORTS BRAS',
+  'LEGGINGS',
+  'SWEATERS',
+  'JACKETS',
+];
 
 export const FILTER_OPTIONS = {
   priceSort: ['Low to High', 'High to Low'],
@@ -50,9 +71,12 @@ export const filterUtils = {
   applyFilters(products, filters, selectedCategory, searchTerm) {
     let filtered = [...products];
 
-    // Apply category filter
+    // Case-insensitive category filtering based on dressType
     if (selectedCategory !== 'ALL') {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+      const normalizedSelected = selectedCategory.toLowerCase().replace(/s$/, ''); // Remove 's' for plural handling
+      filtered = filtered.filter(product =>
+        product.dressType?.toLowerCase().replace(/s$/, '') === normalizedSelected
+      );
     }
 
     // Apply search term
@@ -103,7 +127,7 @@ export const filterUtils = {
   getFilterCount(products, filterType, filterValue) {
     return products.filter(product => {
       if (filterType === 'category') {
-        return product.category === filterValue;
+        return product.dressType === filterValue; // Changed from product.category
       } else if (Array.isArray(product[filterType])) {
         return product[filterType].includes(filterValue);
       }
