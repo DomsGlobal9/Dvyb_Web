@@ -154,13 +154,13 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
           <div className="flex gap-3">
             <button 
-              // onClick={handleTryOnClick}
+              onClick={handleTryOnClick}
                 onClick={() => {
-    // if (!userData) {
+    if (userData) {
       // alert('Please log in to try on.');
        // toast.error("Please log in to continue!");
-      // return;
-    // }
+      return;
+    }
     handleTryOnClick();
   }}
               className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center"
@@ -170,12 +170,12 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
             </button>
             <button 
               onClick={() => {
-                 // if (!userData) {
+                 if (userData) {
       // alert('Please log in to use cart.');
        // toast.error("Please log in to continue!");
-      // return;
+      return;
     }
-    // handleAddToCart();
+     // handleAddToCart();
                 setShowAddToCartModal(false);
                 alert('Added to cart!');
               }}
