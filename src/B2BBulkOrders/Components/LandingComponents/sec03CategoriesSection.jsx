@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
-import categoriesBanner from '../../assets/B2Bassets/Banners/CategoriesBanner.png';
+import categoriesBanner from '../../../assets/B2Bassets/Banners/CategoriesBanner.png';
 
 const FashionCategories = () => {
   const categories = [

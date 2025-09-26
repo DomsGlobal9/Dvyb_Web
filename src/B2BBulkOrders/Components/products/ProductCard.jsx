@@ -188,16 +188,23 @@ const ProductCard = ({
           <div className="flex items-center space-x-1">
             <span className="text-xs text-gray-500">Colors:</span>
             <div className="flex space-x-1">
-              {product.selectedColors.slice(0, 4).map((color, index) => (
-                <div
-                  key={index}
-                  className="w-3 h-3 rounded-full  border-gray-300"
-                  style={{ backgroundColor: color.toLowerCase() }}
-                  title={color}
-                />
-              ))}
+              {product.selectedColors.slice(0, 4).map((color, index) => {
+                // Split the string: "orange_#FFA500"
+                const [name, hex] = color.split("_");
+                return (
+                  <div
+                    key={index}
+                    className="w-3 h-3 rounded-full border border-gray-300"
+                    style={{ backgroundColor: hex }} // ✅ use hex code
+                    title={name} // ✅ show name on hover
+                  />
+                );
+              })}
+
               {product.selectedColors.length > 4 && (
-                <span className="text-xs text-gray-500">+{product.selectedColors.length - 4}</span>
+                <span className="text-xs text-gray-500">
+                  +{product.selectedColors.length - 4}
+                </span>
               )}
             </div>
           </div>

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import banner01 from '../../assets/B2Bassets/Banners/newCollectionBanner.png'
-import slide01 from  '../../assets/B2Bassets/HomePageAssets/slide01.png'
-import slide02 from  '../../assets/B2Bassets/HomePageAssets/slide02.png'
-import slide03 from  '../../assets/B2Bassets/HomePageAssets/slide03.png'
+import banner01 from '../../../assets/B2Bassets/Banners/newCollectionBanner.png'
+import slide01 from  '../../../assets/B2Bassets/HomePageAssets/slide01.png'
+import slide02 from  '../../../assets/B2Bassets/HomePageAssets/slide02.png'
+import slide03 from  '../../../assets/B2Bassets/HomePageAssets/slide03.png'
 import { useNavigate } from 'react-router-dom';
-import { products } from '../../../StaticData/newCollectionData'
+import { products } from '../../../../StaticData/newCollectionData'
 
 const NewCollectionPage = () => {
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import React from 'react';
-import img01 from '../../assets/B2Bassets/HomePageAssets/heroImage01.png';
-import img02 from '../../assets/B2Bassets/HomePageAssets/heroImage02.png'
-import img03 from '../../assets/B2Bassets/HomePageAssets/heroImage03.png'
-import longStar from '../../assets/B2Bassets/HomePageAssets/long_star.png'
+import img01 from '../../../assets/B2Bassets/HomePageAssets/heroImage01.png';
+import img02 from '../../../assets/B2Bassets/HomePageAssets/heroImage02.png'
+import img03 from '../../../assets/B2Bassets/HomePageAssets/heroImage03.png'
+import longStar from '../../../assets/B2Bassets/HomePageAssets/long_star.png'
 import { useNavigate } from 'react-router-dom';
 
 const HeroComponent = () => {

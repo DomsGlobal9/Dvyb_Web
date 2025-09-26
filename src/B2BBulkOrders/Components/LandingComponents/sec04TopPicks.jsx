@@ -1,5 +1,5 @@
 import React from "react";
-import TopPicksBanner from '../../assets/B2Bassets/Banners/TopPicksBanner.png'
+import TopPicksBanner from '../../../assets/B2Bassets/Banners/TopPicksBanner.png'
 
 const products = [
   {

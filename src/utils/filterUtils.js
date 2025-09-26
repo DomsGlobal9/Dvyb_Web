@@ -25,9 +25,19 @@ export const CATEGORIES = [
 export const FILTER_OPTIONS = {
   priceSort: ['Low to High', 'High to Low'],
   category: ['WOMEN', 'MEN', 'KIDS'],
-  selectedColors: [
-    'red', 'pink', 'blue', 'green', 'orange', 'purple', 'black',
-    'pink_#FF1493',
+   selectedColors: [
+    { name: 'red', hex: '#FF0000' },
+    { name: 'pink', hex: '#FFC0CB' },
+    { name: 'blue', hex: '#0000FF' },
+    { name: 'green', hex: '#008000' },
+    { name: 'orange', hex: '#FFA500' },
+    { name: 'purple', hex: '#800080' },
+    { name: 'black', hex: '#000000' },
+    { name: 'white', hex: '#FFFFFF' },
+    { name: 'yellow', hex: '#FFFF00' },
+    { name: 'brown', hex: '#8B4513' },
+    { name: 'gray', hex: '#808080' },
+    { name: 'navy', hex: '#000080' },
   ],
   selectedSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
   fabric: [

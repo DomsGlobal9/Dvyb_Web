@@ -1,4 +1,4 @@
-import React, { useState, useMemo,useEffect  } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Package, ArrowLeft, ShoppingCart, Star, Heart, Shield, Truck, X, Eye } from 'lucide-react';
 import TryYourOutfitModal from './Models/TryYourOutfitModal';
 import UploadSelfieModal from './Models/UploadSelfieModal';
@@ -6,6 +6,8 @@ import TryOnPreviewModal from './Models/TryOnPreviewModal';
 import { useAuth } from '../../../context/AuthContext';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {colorUtils}  from '../../../utils/colorUtils'
+
 
 
 const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateToTryOn, onProductClick }) => {
@@ -13,15 +15,17 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
   const [showAddToCartModal, setShowAddToCartModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { userData } = useAuth();
-  
+  const { user, userRole, loading  } = useAuth();
+
+  console.log(user, "UaerData", userRole, loading )
+
   // Modal states
   const [showTryYourOutfitModal, setShowTryYourOutfitModal] = useState(false);
   const [showUploadSelfieModal, setShowUploadSelfieModal] = useState(false);
   const [showTryOnPreviewModal, setShowTryOnPreviewModal] = useState(false);
   const [tryOnData, setTryOnData] = useState({});
 
-   useEffect(() => {
+  useEffect(() => {
     const isAnyModalOpen =
       showTryYourOutfitModal || showUploadSelfieModal || showTryOnPreviewModal || showAddToCartModal;
 
@@ -49,47 +53,47 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
     console.log('Total products:', allProducts.length);
     console.log('Current product ID:', product.id);
     console.log('Current product colors:', product.selectedColors);
-    
+
     if (!allProducts.length) {
       console.log('No products available');
       return [];
     }
-    
+
     if (!product.selectedColors || product.selectedColors.length === 0) {
       console.log('Current product has no colors, showing random products');
       const randomProducts = allProducts.filter(p => p.id !== product.id).slice(0, 8);
       console.log('Random products count:', randomProducts.length);
       return randomProducts;
     }
-    
+
     // Match products that have at least one common color
     const currentColors = product.selectedColors.map(c => c.toUpperCase().trim());
     console.log('Normalized current colors:', currentColors);
-    
+
     const filtered = allProducts.filter(p => {
       if (p.id === product.id) return false; // Exclude current product
-      
+
       if (!p.selectedColors || p.selectedColors.length === 0) return false;
-      
+
       const productColors = p.selectedColors.map(c => c.toUpperCase().trim());
-      const hasCommonColor = currentColors.some(currentColor => 
-        productColors.some(productColor => 
-          currentColor === productColor || 
-          currentColor.includes(productColor) || 
+      const hasCommonColor = currentColors.some(currentColor =>
+        productColors.some(productColor =>
+          currentColor === productColor ||
+          currentColor.includes(productColor) ||
           productColor.includes(currentColor)
         )
       );
-      
+
       if (hasCommonColor) {
         console.log(`Match found: ${p.title} - Colors: ${p.selectedColors.join(', ')}`);
       }
-      
+
       return hasCommonColor;
     });
-    
+
     console.log('Filtered similar products:', filtered.length);
     console.log('Similar products:', filtered.map(p => ({ title: p.title, colors: p.selectedColors })));
-    
+
     return filtered.slice(0, 8);
   }, [product, allProducts]);
 
@@ -103,7 +107,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
       alert('No image available for try-on');
       return;
     }
-    
+
     setTryOnData({ garmentImage });
     setShowTryYourOutfitModal(true);
   };
@@ -140,8 +144,8 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
               <X className="w-5 h-5" />
             </button>
           </div>
-          
-          <select 
+
+          <select
             value={selectedSize}
             onChange={(e) => setSelectedSize(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg mb-4"
@@ -153,35 +157,32 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
           </select>
 
           <div className="flex gap-3">
-            <button 
-              onClick={handleTryOnClick}
-                onClick={() => {
-    if (userData) {
-      // alert('Please log in to try on.');
-       // toast.error("Please log in to continue!");
-      return;
-    }
-    handleTryOnClick();
-  }}
+            <button
+              // onClick={handleTryOnClick}
+              onClick={() => {
+                if (!user) {
+                  alert('Please log in to try on.');
+                  toast.error("Please log in to continue!");
+                  return;
+                }
+                handleTryOnClick();
+              }}
               className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center"
             >
               <ShoppingCart className="w-4 h-4 mr-2" />
               TRY ON
             </button>
-            <button 
+            <button
               onClick={() => {
-                 if (userData) {
-      // alert('Please log in to use cart.');
-       // toast.error("Please log in to continue!");
-      return;
-    }
-     // handleAddToCart();
+                if (!user) {
+                  toast.error("Please log in to continue!");
+                  return;
+                }
+
                 setShowAddToCartModal(false);
                 alert('Added to cart!');
               }}
-             
-   
-  
+
               className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium flex items-center justify-center"
             >
               <ShoppingCart className="w-4 h-4 mr-2" />
@@ -210,7 +211,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                   <Heart className={`w-5 h-5 ${isFavorite ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
                 </button>
               </div>
-              
+
               <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden">
                 {product.imageUrls?.length > 0 ? (
                   <img
@@ -224,15 +225,14 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                   </div>
                 )}
               </div>
-              
+
               {product.imageUrls?.length > 1 && (
                 <div className="grid grid-cols-3 gap-2">
                   {product.imageUrls.slice(0, 3).map((url, index) => (
-                    <div 
-                      key={index} 
-                      className={`aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden cursor-pointer border-2 ${
-                        selectedImageIndex === index ? 'border-blue-500' : 'border-transparent'
-                      }`}
+                    <div
+                      key={index}
+                      className={`aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden cursor-pointer border-2 ${selectedImageIndex === index ? 'border-blue-500' : 'border-transparent'
+                        }`}
                       onClick={() => setSelectedImageIndex(index)}
                     >
                       <img src={url} alt="" className="w-full h-full object-cover" />
@@ -246,7 +246,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
             <div className="space-y-6">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title || product.name}</h1>
-                
+
                 <div className="flex items-center space-x-2 mb-4">
                   <div className="flex items-center">
                     {[...Array(5)].map((_, i) => (
@@ -261,14 +261,14 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                     <span className="text-3xl font-bold text-blue-600">₹{Math.round(discountedPrice)}/</span>
                     <span className="text-lg text-gray-500">Piece</span>
                   </div>
-                  
+
                   {discountPercent > 0 && (
                     <div className="flex items-center space-x-2 mt-1">
                       <span className="text-lg text-gray-500 line-through">M.R.P ₹{Math.round(originalPrice)}</span>
                       <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-sm">({discountPercent}% OFF)</span>
                     </div>
                   )}
-                  
+
                   <p className="text-sm text-gray-600 mt-1">Tax included. Shipping calculated at checkout.</p>
                 </div>
               </div>
@@ -277,14 +277,21 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 mb-3">Colours Available</h3>
                   <div className="flex space-x-2">
-                    {product.selectedColors.map((color, index) => (
-                      <div
-                        key={index}
-                        className="w-8 h-8 rounded-full border-2 border-gray-300"
-                        style={{ backgroundColor: color.toLowerCase() }}
-                        title={color}
-                      />
-                    ))}
+                      {product.selectedColors.map((colorString, index) => {
+                      const { name, hex } = colorUtils.parseColor(colorString);
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2 border border-gray-200 rounded-full px-3 py-1"
+                        >
+                          <div
+                            className="w-4 h-4 rounded-full border border-gray-300"
+                            style={{ backgroundColor: hex }}
+                          />
+                          <span className="text-xs capitalize text-gray-700">{name}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -303,11 +310,11 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                 <div className="flex items-center text-gray-600 ">
                   <Shield className="w-4 h-4 mr-3" />
                   Secure payment
-                
-                <div className="flex pl-12 items-center text-gray-600">
-                  <Package className="w-4 h-4 mr-3" />
-                  Free Size
-                </div>
+
+                  <div className="flex pl-12 items-center text-gray-600">
+                    <Package className="w-4 h-4 mr-3" />
+                    Free Size
+                  </div>
                 </div>
                 <div className="flex items-center pt-5 text-gray-600">
                   <Truck className="w-4 h-4 mr-3" />
@@ -325,7 +332,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                 <h4 className="font-semibold mb-2">Description</h4>
                 <p className="text-gray-600 text-sm mb-4">{product.description}</p>
                 <p className="text-gray-600 text-sm">Crafted with intricate  embroidery. Perfect for any occasion. Comfortable fit and vibrant colors.</p>
-                
+
                 <div className="mt-4 grid bg-blue-100 h-26 items-center p-7 grid-cols-3 gap-4 text-sm">
                   <div>
                     <div className="font-medium">Fabric:</div>
@@ -341,7 +348,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex justify-center">
                 <div className="w-48 h-64 bg-gray-100 rounded-lg overflow-hidden">
                   {product.imageUrls?.[0] ? (
@@ -359,7 +366,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
           {/* Similar Products */}
           <div className=" p-6">
             <h3 className="text-lg font-semibold mb-6">Similar Products</h3>
-            
+
             {similarProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {similarProducts.map((item) => (
@@ -370,7 +377,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                           -{item.discount}%
                         </span>
                       )}
-                      
+
                       {item.imageUrls?.[0] ? (
                         <img src={item.imageUrls[0]} alt={item.title} className="w-full h-full object-cover" />
                       ) : (
@@ -378,7 +385,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                           <Package className="w-8 h-8 text-gray-400" />
                         </div>
                       )}
-                      
+
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <div className="flex space-x-2">
                           <button className="p-2 bg-white rounded-full">
@@ -393,14 +400,14 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="p-3">
                       <h4 className="font-medium text-sm truncate mb-1">{item.title || item.name}</h4>
                       <div className="text-xs text-gray-500 mb-2">{item.fabric} • {item.craft}</div>
-                      
+
                       <div className="flex items-center justify-between">
                         <span className="font-semibold text-blue-600">₹{Math.round(item.price - (item.price * (item.discount || 0) / 100))}</span>
-                        <button 
+                        <button
                           onClick={() => {
                             if (onProductClick) {
                               onProductClick(item);
@@ -412,7 +419,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                           View
                         </button>
                       </div>
-                      
+
                       {item.selectedColors && (
                         <div className="flex items-center mt-2">
                           <span className="text-xs text-gray-500 mr-2">Colors:</span>
@@ -437,23 +444,23 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
       </div>
 
       <AddToCartModal />
-      
+
       {/* Try-On Modals */}
-      <TryYourOutfitModal 
+      <TryYourOutfitModal
         isOpen={showTryYourOutfitModal}
         onClose={handleModalClose}
         onNext={handleTryYourOutfitNext}
         garmentImage={tryOnData.garmentImage}
       />
-      
-      <UploadSelfieModal 
+
+      <UploadSelfieModal
         isOpen={showUploadSelfieModal}
         onClose={handleModalClose}
         onNext={handleUploadSelfieNext}
         garmentImage={tryOnData.garmentImage}
       />
-      
-      <TryOnPreviewModal 
+
+      <TryOnPreviewModal
         isOpen={showTryOnPreviewModal}
         onClose={handleModalClose}
         tryOnData={tryOnData}
@@ -463,7 +470,6 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 };
 
 export default ProductDetailPage;
-
 
 
 
