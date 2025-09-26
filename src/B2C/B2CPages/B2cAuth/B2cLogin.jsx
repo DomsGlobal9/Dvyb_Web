@@ -62,8 +62,9 @@ const B2cLoginPage = () => {
     }
   };
 
-  const handleGoogleSignUp = async () => {
+  const handleGoogleSignUpB2C = async () => {
     try {
+      localStorage.removeItem('intendedRole');
       const user = await registerWithGoogle("b2c");
       const userDoc = await getDoc(doc(db, "b2c_users", user.uid));
       if (userDoc.exists() && userDoc.data().role === "B2C") {
@@ -98,7 +99,7 @@ const B2cLoginPage = () => {
 
 
             <button
-              onClick={handleGoogleSignUp}
+              onClick={handleGoogleSignUpB2C}
               className="w-full flex items-center justify-center gap-3  rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors "
             >
               <div className="w-7 h-8 ">

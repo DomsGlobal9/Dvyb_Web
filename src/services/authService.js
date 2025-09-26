@@ -108,8 +108,8 @@ export const registerWithGoogle = async (type = "b2c", extraData = {}) => {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    const collectionName = type === "b2b" ? "B2BBulkOrders_users" : "b2c_users";
-    const role = type === "b2b" ? "B2B" : "B2C";
+    const collectionName = type === "b2c" ? "b2c_users" : "B2BBulkOrders_users";
+    const role = type === "b2c" ?  "B2C" : "B2B";
 
     await setDoc(doc(db, collectionName, user.uid), {
       uid: user.uid,
@@ -119,7 +119,11 @@ export const registerWithGoogle = async (type = "b2c", extraData = {}) => {
       role,
       ...extraData,
       createdAt: new Date(),
+       lastLoginAs: role,           
+      lastLoginTime: new Date()
     }, { merge: true });
+
+     localStorage.setItem('intendedRole', role);
 
     console.log("Google sign-in user:", user);
     await saveAuthToken(user); // 🔥 Save token
