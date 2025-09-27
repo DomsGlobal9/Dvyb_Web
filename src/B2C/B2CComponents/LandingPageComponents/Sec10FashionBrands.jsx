@@ -48,13 +48,14 @@ const FashionBrandsSection = () => {
           {brandData.map((brand) => (
             <div key={brand.id} className="bg-white  shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
               {/* Image Container */}
-              <div className="relative bg-gradient-to-br from-amber-50 to-orange-100 p-8 h-80">
-              <img src={brand.image} alt="" />
-             
-                
-          
-               
-              </div>
+             <div className="relative bg-gradient-to-br from-amber-50 to-orange-100 h-auto w-full overflow-hidden">
+  <img
+    src={brand.image}
+    alt=""
+    className="h-full w-full object-center"
+  />
+</div>
+
               
               {/* Content */}
               <div className="p-6">

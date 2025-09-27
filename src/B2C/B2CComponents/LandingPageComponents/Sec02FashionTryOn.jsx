@@ -1,7 +1,9 @@
 import React from 'react';
 import { ArrowRight, Users, Target, Award } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const FashionTryOnSection = () => {
+  const navigate = useNavigate('')
   return (
     <div className="min-h-screen">
       {/* Main Hero Section */}
@@ -9,11 +11,14 @@ const FashionTryOnSection = () => {
 
         {/* Top Row: Badge Left + Excellence Right */}
         
-          <div>
-            <div className="flex justify-between items-center">
+          <div className=' '>
+            <div className="flex justify-evenly items-center">
             {/* Headings Left-Aligned */}
-            <div className="mt-8 space-y-2 text-left">
-              <h1 className="text-3xl lg:text-5xl font-bold text-gray-900 leading-tight">
+            <div>
+  
+           <div className='flex items-center gap-16 md:gap-36 lg:gap-64'>       
+            <div className="mt-8 space-y-2  text-left">
+              <h1 className="text-3xl sm:text-sm lg:text-5xl font-bold text-gray-900 leading-tight">
                 EXPERIENCE FASHION<br />
                 LIKE NEVER BEFORE
               </h1>
@@ -36,9 +41,8 @@ const FashionTryOnSection = () => {
                 <span className="text-3xl font-bold tracking-wide">EXCELLENCE</span>
               </div>
             </div>
-  </div>
-            {/* Subtitle and CTA Buttons in Column */}
-            <div className="mt-6 space-y-4 max-w-md">
+            </div>  
+            <div className="mt-12 space-y-4   max-w-md">
               {/* Subtitle */}
               <p className="text-lg text-gray-800 text-400">
                 Step into the future of shopping – try outfits on your 3D avatar before you buy.
@@ -50,12 +54,15 @@ const FashionTryOnSection = () => {
                   Try It Now
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button className="border-1 border-gray-300 text-gray-900 hover:bg-gray-900 hover:text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 group">
+                <button onClick={()=>navigate('/products')} className="border-1 border-gray-300 text-gray-900 hover:bg-gray-900 hover:text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 group">
                   EXPLORE COLLECTIONS
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
+  </div>
+  </div>
+            {/* Subtitle and CTA Buttons in Column */}
           </div>
 
       

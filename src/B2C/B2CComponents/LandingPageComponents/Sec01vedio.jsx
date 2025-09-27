@@ -40,7 +40,7 @@ const VideoSection = () => {
         <div className="">
             <div>
                 <section className="relative">
-                    <div className="relative max-w-4xl mx-auto">
+                    <div className="relative max-w-full mx-auto " >
                         <video
                             ref={videoRef}
                             className="w-full h-full object-cover rounded-lg shadow-xl"

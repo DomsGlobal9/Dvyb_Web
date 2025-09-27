@@ -9,3 +9,13 @@
   --color-bg-light-blue: #DEF2FF;
   --color-bg-primary-white : #FFFFFF
 }
+
+body {
+  overflow-y: auto;              /* allow vertical scrolling */
+  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none;      /* IE/Edge */
+}
+
+body::-webkit-scrollbar {
+  display: none;                 /* Chrome, Safari */
+}

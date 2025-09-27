@@ -8,7 +8,7 @@ function TechnologySection04() {
     <div className="min-h-screen bg-white" style={{ fontFamily: "Outfit" }}>
       {/* Header Tag */}
       <div className="flex justify-center pt-8">
-        <div className="bg-white border border-gray-200 rounded-full px-4 py-2">
+        <div className="bg-white border border-gray-200  px-4 py-2">
           <span className="text-xs font-medium text-gray-600 tracking-wider">TECHNOLOGY DEEP DIVE</span>
         </div>
       </div>

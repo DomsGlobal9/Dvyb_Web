@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
+import Priya from '../../../assets/B2cAssets/LandingPageImges/Priya.png'
+
+import Rajesh from '../../../assets/B2cAssets/LandingPageImges/Rajesh.jpg'
+import Anitha from '../../../assets/B2cAssets/LandingPageImges/anitha.jpg'
 
 const ClientTestimonials = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -11,7 +15,7 @@ const ClientTestimonials = () => {
       name: "PRIYA SHARMA",
       position: "CHIEF EXECUTIVE, LUXURY BRAND",
       location: "MUMBAI",
-      image: "/api/placeholder/120/120",
+      image: Priya,
       rating: 5,
       category: "EXECUTIVE COLLECTION",
       quote: "The precision is extraordinary. 3D fitting algorithms captured my exact measurements with surgical accuracy. No alterations needed whatsoever.",
@@ -23,7 +27,7 @@ const ClientTestimonials = () => {
       name: "RAJESH KUMAR",
       position: "CREATIVE DIRECTOR, TECH STARTUP",
       location: "BANGALORE",
-      image: "/api/placeholder/120/120",
+      image: Rajesh,
       rating: 5,
       category: "PREMIUM COLLECTION",
       quote: "Revolutionary experience! The AI-powered fitting technology eliminated all guesswork. Perfect fit delivered exactly as promised.",
@@ -35,7 +39,7 @@ const ClientTestimonials = () => {
       name: "ANITA MENON",
       position: "FASHION ENTREPRENEUR",
       location: "DELHI",
-      image: "/api/placeholder/120/120",
+      image: Anitha,
       rating: 5,
       category: "DESIGNER COLLECTION",
       quote: "Absolutely phenomenal precision. The virtual measurements were more accurate than traditional tailoring. Game-changing technology.",

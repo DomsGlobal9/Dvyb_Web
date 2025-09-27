@@ -93,7 +93,7 @@ const Navbar = () => {
 
   // Render
   return (
-    <header className="border-b relative bg-white sticky top-0 z-50">
+<header className="border-b relative bg-white sticky top-0 z-50 shadow-md">
       {/* Search View */}
       {searchOpen ? (
         <div className="flex justify-between items-start px-4 sm:px-6 py-4 bg-white">

@@ -1,12 +1,28 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import RigthImg from "../../../assets/B2cAssets/LandingPageImges/CuratedCollectionImg.png"
+import Sareeblack from "../../../assets/B2cAssets/LandingPageImges/Sareeblack.png"
+
+import Sareepink from "../../../assets/B2cAssets/LandingPageImges/sareepink.png"
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function CuratedCollectionSection6() {
   const collections = [
     {
       id: 1,
-      image: "https://images.pexels.com/photos/8832879/pexels-photo-8832879.jpeg?auto=compress&cs=tinysrgb&w=100",
+      image: Sareepink ,
       title: "SAREES & BLOUSES",
       description: "Traditional elegance for every occasion",
       items: "2,467 ITEMS",
@@ -22,7 +38,7 @@ function CuratedCollectionSection6() {
     },
     {
       id: 3,
-      image: "https://images.pexels.com/photos/8832879/pexels-photo-8832879.jpeg?auto=compress&cs=tinysrgb&w=100",
+      image: Sareeblack,
       title: "ETHNIC COLLECTION",
       description: "Heritage craftsmanship meets modern comfort",
       items: "3,891 ITEMS",
@@ -30,7 +46,7 @@ function CuratedCollectionSection6() {
     },
     {
       id: 4,
-      image: "https://images.pexels.com/photos/8832879/pexels-photo-8832879.jpeg?auto=compress&cs=tinysrgb&w=100",
+      image: Sareepink,
       title: "PREMIUM FABRICS",
       description: "Finest materials for timeless creations",
       items: "567 ITEMS",
@@ -38,7 +54,7 @@ function CuratedCollectionSection6() {
     },
     {
       id: 5,
-      image: "https://images.pexels.com/photos/8832879/pexels-photo-8832879.jpeg?auto=compress&cs=tinysrgb&w=100",
+      image: Sareepink,
       title: "LUXURY ACCESSORIES",
       description: "Perfect finishing touches for complete elegance",
       items: "2,945 ITEMS",
