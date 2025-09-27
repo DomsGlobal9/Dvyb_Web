@@ -24,7 +24,7 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
     setTryOnResult(null);
 
     try {
-      const response = await fetch("api/tryon", {
+      const response = await fetch("/api/tryon", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ modelImage, garmentImage }),

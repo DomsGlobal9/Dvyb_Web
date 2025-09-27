@@ -6,12 +6,12 @@
 // import OffersZone from "../../Components/LandingComponents/sec05OfferSection"
 // import ImpactStories from "../../Components/LandingComponents/sec06ImpactStories"
 
-import HeroComponent from "../../../common/LandingComponents/Sec01HeroComponent"
-import NewCollectionPage from "../../../common/LandingComponents/Sec02NewCollection"
-import FashionCategories from "../../../common/LandingComponents/sec03CategoriesSection"
-import TopPicks from "../../../common/LandingComponents/sec04TopPicks"
-import OffersZone from "../../../common/LandingComponents/sec05OfferSection"
-import ImpactStories from "../../../common/LandingComponents/sec06ImpactStories"
+import HeroComponent from "../../../B2BBulkOrders/Components/LandingComponents/Sec01HeroComponent"
+import NewCollectionPage from "../../../B2BBulkOrders/Components/LandingComponents/Sec02NewCollection"
+import FashionCategories from "../../../B2BBulkOrders/Components/LandingComponents/sec03CategoriesSection"
+import TopPicks from "../../../B2BBulkOrders/Components/LandingComponents/sec04TopPicks"
+import OffersZone from "../../../B2BBulkOrders/Components/LandingComponents/sec05OfferSection"
+import ImpactStories from "../../../B2BBulkOrders/Components/LandingComponents/sec06ImpactStories"
 
 
 

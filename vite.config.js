@@ -9,5 +9,10 @@ export default defineConfig({
   ],
    build: {
     outDir: 'dist'
-  }
+  },
+  // server: {
+  //   proxy: {
+  //     "/api": "http://localhost:5000", // proxy API calls to backend
+  //   },
+  // },
 })
