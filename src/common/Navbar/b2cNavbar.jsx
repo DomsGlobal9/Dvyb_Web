@@ -382,7 +382,7 @@ const Navbar = () => {
           )}
 
           {showModal && (
-            <div className="fixed inset-0 flex items-center justify-center  bg-opacity-50">
+            <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm ">
               <div className="bg-white rounded-lg shadow-lg p-6 w-80">
                 <p className="text-gray-800 mb-4 text-center">
                   For try-on you need to select a product. <br />
@@ -391,7 +391,7 @@ const Navbar = () => {
                 <div className="flex justify-center gap-4">
                   <button
                     onClick={handleYes}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-4 py-2 bg-[#5B9BA5] text-white rounded-lg hover:bg-blue-950"
                   >
                     Yes
                   </button>
