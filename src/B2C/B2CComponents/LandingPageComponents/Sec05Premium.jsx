@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Heart, Star, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { productService } from "../../../services/firebaseServices";
-import { addToCart } from "../../../services/cartService";
+import { addToCart } from "../../../services/CartService";
 import { toggleWishlist, isInWishlist } from "../../../services/wishlistService";
 import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-toastify";
