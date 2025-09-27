@@ -1,5 +1,7 @@
 import React from 'react';
 import { Camera, Cog, Smartphone, Zap, ArrowRight } from 'lucide-react';
+import avatarLeftImg from "../../../assets/B2cAssets/LandingPageImges/sec04/3DAvatarImage.png"
+
 
 function TechnologySection04() {
   return (
@@ -126,7 +128,7 @@ function TechnologySection04() {
             {/* Main Image */}
             <div className="relative">
               <img 
-                src="https://images.pexels.com/photos/5816299/pexels-photo-5816299.jpeg?auto=compress&cs=tinysrgb&w=800"
+                src={avatarLeftImg}
                 alt="Woman in traditional Indian dress"
                 className="w-full h-[500px] object-cover rounded-lg shadow-lg"
               />

@@ -1,6 +1,7 @@
 
 import VideoSection from "../../B2CComponents/LandingPageComponents/Sec01vedio"
 import FashionTryOnSection from "../../B2CComponents/LandingPageComponents/Sec02FashionTryOn"
+import PrecisionTryOnSection from "../../B2CComponents/LandingPageComponents/Sec03PrecisionTryOnWorks"
 import TechnologySection04 from "../../B2CComponents/LandingPageComponents/Sec04Technology"
 import PremiumSection05 from "../../B2CComponents/LandingPageComponents/Sec05Premium"
 import ClientTestimonials from "../../B2CComponents/LandingPageComponents/Sec09ClientTestimonials"
@@ -19,6 +20,7 @@ const B2cLandingPage = () => {
     <>
       <VideoSection />
       <FashionTryOnSection/>
+      <PrecisionTryOnSection/>
       <TechnologySection04 />
       <PremiumSection05 />
       <CuratedCollectionSection6 />

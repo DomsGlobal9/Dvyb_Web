@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import fashion from "../../../assets/B2cAssets/LandingPageImges/fastionBreand.png"
 
 const FashionBrandsSection = () => {
   const brandData = [
@@ -9,7 +10,7 @@ const FashionBrandsSection = () => {
       description: "Precision technology that transforms luxury fashion selection.",
       status: "Industry Leader",
       precision: "99.8%",
-      image: "/api/placeholder/280/400"
+      image: fashion
     },
     {
       id: 2,
@@ -17,7 +18,7 @@ const FashionBrandsSection = () => {
       description: "Revolutionary approach to personalised fashion intelligence.",
       status: "Innovation Award",
       precision: "99.9%",
-      image: "/api/placeholder/280/400"
+      image: fashion
     },
     {
       id: 3,
@@ -25,7 +26,7 @@ const FashionBrandsSection = () => {
       description: "Precision technology that transforms luxury fashion selection.",
       status: "Industry Leader", 
       precision: "99.8%",
-      image: "/api/placeholder/280/400"
+      image: fashion
     }
   ];
 
@@ -48,18 +49,11 @@ const FashionBrandsSection = () => {
             <div key={brand.id} className="bg-white  shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
               {/* Image Container */}
               <div className="relative bg-gradient-to-br from-amber-50 to-orange-100 p-8 h-80">
-                {/* Precision Client Badge */}
-                <div className="absolute top-4 right-4 bg-gray-900 text-white px-3 py-1 text-xs font-medium rounded">
-                  PRECISION CLIENT
-                </div>
+              <img src={brand.image} alt="" />
+             
                 
-                {/* Model Image Placeholder */}
-                <div className="relative h-full w-full bg-gradient-to-b from-amber-100 to-amber-200 rounded-xl flex items-center justify-center">
-                  <div className="text-amber-600 text-sm font-medium">Fashion Model</div>
-                  {/* Decorative elements */}
-                  <div className="absolute bottom-4 right-4 w-12 h-12 bg-white/20 rounded-full"></div>
-                  <div className="absolute top-1/3 left-4 w-8 h-8 bg-white/30 rounded-full"></div>
-                </div>
+          
+               
               </div>
               
               {/* Content */}

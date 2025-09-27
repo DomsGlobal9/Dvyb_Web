@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
+import RigthImg from "../../../assets/B2cAssets/LandingPageImges/CuratedCollectionImg.png"
 
 function CuratedCollectionSection6() {
   const collections = [
@@ -13,7 +14,7 @@ function CuratedCollectionSection6() {
     },
     {
       id: 2,
-      image: "https://images.pexels.com/photos/8832879/pexels-photo-8832879.jpeg?auto=compress&cs=tinysrgb&w=100",
+      image: RigthImg,
       title: "EVENING WEAR",
       description: "Contemporary sophistication for special occasions",
       items: "1,823 ITEMS",
@@ -105,7 +106,7 @@ function CuratedCollectionSection6() {
             {/* Featured Image */}
             <div className="aspect-[4/5] rounded-lg overflow-hidden">
               <img 
-                src="https://images.pexels.com/photos/8832879/pexels-photo-8832879.jpeg?auto=compress&cs=tinysrgb&w=600"
+                src={RigthImg}
                 alt="Featured Collection"
                 className="w-full h-full object-cover"
               />

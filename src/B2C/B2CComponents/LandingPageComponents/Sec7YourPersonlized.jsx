@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { User, Ruler, Settings, Sparkles, Save, Download } from 'lucide-react';
+import avatarLeftImg from "../../../assets/B2cAssets/LandingPageImges/sec07/YourPersonalizedAvatarImg.png"
+import BodyType01 from "../../../assets/B2cAssets/LandingPageImges/sec07/BodyType01.png"
+import BodyType02 from "../../../assets/B2cAssets/LandingPageImges/sec07/BodyType02.png"
+import BodyType03 from "../../../assets/B2cAssets/LandingPageImges/sec07/BodyType03.png"
+import BodyType04 from "../../../assets/B2cAssets/LandingPageImges/sec07/BodyType04.png"
+// import BodyType04 from "../../../assets/B2cAssets/LandingPageImges/sec07/BodyType04.png"
 
 function YourPersonlizedSection7() {
   const [selectedBodyType, setSelectedBodyType] = useState('HOURGLASS');
 
   const bodyTypes = [
-    { id: 'HOURGLASS', label: 'HOURGLASS', img: 'https://via.placeholder.com/60x80?text=Hourglass' },
-    { id: 'PEAR', label: 'PEAR', img: 'https://via.placeholder.com/60x80?text=Pear' },
-    { id: 'APPLE', label: 'APPLE', img: 'https://via.placeholder.com/60x80?text=Apple' },
-    { id: 'RECTANGLE', label: 'RECTANGLE', img: 'https://via.placeholder.com/60x80?text=Rectangle' },
-    { id: 'TRIANGLE', label: 'TRIANGLE', img: 'https://via.placeholder.com/60x80?text=Triangle' }
+    { id: 'HOURGLASS', label: 'HOURGLASS', img: BodyType01 },
+    { id: 'PEAR', label: 'PEAR', img: BodyType02 },
+    { id: 'APPLE', label: 'APPLE', img: BodyType03 },
+    { id: 'RECTANGLE', label: 'RECTANGLE', img: BodyType04},
+    { id: 'TRIANGLE', label: 'TRIANGLE', img: BodyType04 }
   ];
 
   const tabs = [
@@ -68,17 +74,17 @@ function YourPersonlizedSection7() {
                   <button
                     key={type.id}
                     onClick={() => setSelectedBodyType(type.id)}
-                    className={`flex flex-col items-center p-3 border-2 rounded-lg transition-colors ${
+                    className={`flex flex-col items-center transition-colors ${
                       selectedBodyType === type.id
                         ? 'border-red-400 bg-red-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <div className="w-16 h-20 mb-2 relative">
+                    <div className="w-18 h-22 mb-1 m-2 relative">
                       <img 
                         src={type.img} 
                         alt={type.label} 
-                        className="w-full h-full object-contain rounded-lg border"
+                        className="w-full h-full object-contain rounded-lg "
                       />
                       {selectedBodyType === type.id && (
                         <div className="absolute -top-1 -right-1 w-6 h-6 bg-red-400 rounded-full border-2 border-white flex items-center justify-center">
@@ -119,18 +125,11 @@ function YourPersonlizedSection7() {
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <div className="aspect-[3/4] bg-gray-100 relative">
                 <img 
-                  src="https://images.pexels.com/photos/8832879/pexels-photo-8832879.jpeg?auto=compress&cs=tinysrgb&w=600"
+                  src={avatarLeftImg}
                   alt="Avatar Preview"
                   className="w-full h-full object-cover"
                 />
-                
-                {/* Avatar Status Overlay */}
-                <div className="absolute bottom-4 left-4 right-4 bg-black bg-opacity-75 text-white p-3 rounded-lg">
-                  <div className="font-bold text-sm mb-1">AVATAR STATUS: ACTIVE</div>
-                  <div className="text-xs text-gray-300">
-                    Type: {selectedBodyType} • Measurements: synchronized • AI: Optimized
-                  </div>
-                </div>
+               
               </div>
             </div>
 

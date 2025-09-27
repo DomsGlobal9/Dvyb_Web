@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { Heart, Star, ShoppingCart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { productService } from "../../../services/firebaseServices";
+import { addToCart } from "../../../services/cartService";
+import { toggleWishlist, isInWishlist } from "../../../services/wishlistService";
+import { useAuth } from "../../../context/AuthContext";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function PremiumSection05() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [wishlistItems, setWishlistItems] = useState(new Set());
+  const [addingToCart, setAddingToCart] = useState(new Set());
+  const [togglingWishlist, setTogglingWishlist] = useState(new Set());
+  
+  const { user, userRole, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
+  // Fetch products on component mount
   useEffect(() => {
     const fetchPremiumProducts = async () => {
       try {
@@ -24,6 +37,132 @@ function PremiumSection05() {
 
     fetchPremiumProducts();
   }, []);
+
+  // Check wishlist status for all products when user is authenticated
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      if (!user || products.length === 0) return;
+
+      try {
+        const wishlistChecks = await Promise.all(
+          products.map(product => isInWishlist(product.id))
+        );
+        
+        const wishlistSet = new Set();
+        products.forEach((product, index) => {
+          if (wishlistChecks[index]) {
+            wishlistSet.add(product.id);
+          }
+        });
+        
+        setWishlistItems(wishlistSet);
+      } catch (error) {
+        console.error("Error checking wishlist status:", error);
+      }
+    };
+
+    checkWishlistStatus();
+  }, [user, products]);
+
+  // Handle adding product to cart
+  const handleAddToCart = async (product, event) => {
+    event.stopPropagation(); // Prevent product click navigation
+    
+    if (!user) {
+      toast.error("Please log in to add items to cart!");
+      return;
+    }
+
+    if (addingToCart.has(product.id)) return; // Prevent double clicks
+
+    try {
+      setAddingToCart(prev => new Set([...prev, product.id]));
+
+      const productData = {
+        name: product.name || product.title,
+        title: product.title || product.name,
+        price: parseFloat(product.price) || 0,
+        imageUrls: product.imageUrls || [],
+        selectedColors: product.selectedColors || [],
+        selectedSizes: product.selectedSizes || [],
+        fabric: product.fabric || '',
+        craft: product.craft || '',
+        description: product.description || ''
+      };
+
+      await addToCart(product.id, productData, 1);
+      toast.success(`${productData.name} added to cart!`);
+      
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add item to cart. Please try again.");
+    } finally {
+      setAddingToCart(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(product.id);
+        return newSet;
+      });
+    }
+  };
+
+  // Handle wishlist toggle
+  const handleWishlistToggle = async (product, event) => {
+    event.stopPropagation(); // Prevent product click navigation
+    
+    if (!user) {
+      toast.error("Please log in to manage your wishlist!");
+      return;
+    }
+
+    if (togglingWishlist.has(product.id)) return; // Prevent double clicks
+
+    try {
+      setTogglingWishlist(prev => new Set([...prev, product.id]));
+
+      const productData = {
+        name: product.name || product.title,
+        title: product.title || product.name,
+        price: parseFloat(product.price) || 0,
+        imageUrls: product.imageUrls || [],
+        selectedColors: product.selectedColors || [],
+        selectedSizes: product.selectedSizes || [],
+        fabric: product.fabric || '',
+        craft: product.craft || '',
+        description: product.description || ''
+      };
+
+      const result = await toggleWishlist(product.id, productData);
+      
+      // Update local wishlist state
+      setWishlistItems(prev => {
+        const newSet = new Set(prev);
+        if (result.inWishlist) {
+          newSet.add(product.id);
+          toast.success(`${productData.name} added to wishlist!`);
+        } else {
+          newSet.delete(product.id);
+          toast.success(`${productData.name} removed from wishlist!`);
+        }
+        return newSet;
+      });
+
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+      toast.error("Failed to update wishlist. Please try again.");
+    } finally {
+      setTogglingWishlist(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(product.id);
+        return newSet;
+      });
+    }
+  };
+
+  // Handle product click navigation - navigate to separate product detail page
+  const handleProductClick = (product) => {
+    // Navigate to product detail page using your existing route pattern
+    navigate(`/products/${product.id}`);
+  };
 
   if (loading) {
     return (
@@ -79,28 +218,32 @@ function PremiumSection05() {
             products.map((product) => (
               <div
                 key={product.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow w-80" // fixed width
+                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow w-80 cursor-pointer"
+                onClick={() => handleProductClick(product)}
               >
                 {/* Product Image */}
                 <div className="relative aspect-[4/5] overflow-hidden">
-                  {" "}
-                  {/* control height */}
                   <img
                     src={
                       product.imageUrls && product.imageUrls.length > 0
                         ? product.imageUrls[0]
                         : "https://via.placeholder.com/400"
                     }
-                    alt={product.name}
+                    alt={product.name || product.title}
                     className="w-full h-full object-cover"
                   />
+                  
+                  {/* Discount Badge */}
+                  {product.discount && product.discount > 0 && (
+                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded-md font-medium">
+                      -{product.discount}% OFF
+                    </div>
+                  )}
                 </div>
 
                 {/* Product Info */}
                 <div className="p-4">
-                  {" "}
-                  {/* reduce padding */}
-                  {/* Rating */}
+                  {/* Rating and Fit Accuracy */}
                   <div className="flex items-center mb-2 justify-between space-x-2">
                     {/* Rating */}
                     <div className="flex items-center">
@@ -123,40 +266,69 @@ function PremiumSection05() {
 
                     {/* Accuracy */}
                     <div>
-                    <span className="text-xs text-gray-500 font-medium  text-end">
-                      95% FIT ACCURACY
-                    </span>
+                      <span className="text-xs text-gray-500 font-medium text-end">
+                        95% FIT ACCURACY
+                      </span>
                     </div>
                   </div>
+
                   {/* Product Name */}
                   <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">
-                    {product.name}
+                    {product.name || product.title}
                   </h3>
+
                   {/* Pricing */}
                   <div className="mb-1">
                     <span className="font-bold text-gray-900 text-base mr-2">
                       ₹{product.price}
                     </span>
                     <span className="text-xs text-gray-400 line-through">
-                      ₹{product.price + 100}
+                      ₹{parseFloat(product.price) + 100}
                     </span>
                   </div>
+
                   {/* Savings */}
                   <div className="mb-3">
                     <span className="text-xs text-green-600 font-medium">
                       Save ₹100
                     </span>
                   </div>
-                  {/* Buttons */}
+
+                  {/* Action Buttons */}
                   <div className="flex items-center space-x-2">
-                    <button className="flex-1 bg-[#3C8E9A] cursor-pointer text-start hover:bg-teal-700 text-white text-xs font-medium py-2 px-3 rounded flex items-center justify-center space-x-1">
+                    {/* Add to Cart Button */}
+                    <button 
+                      className={`flex-1 bg-[#3C8E9A] hover:bg-teal-700 text-white text-xs font-medium py-2 px-3 rounded flex items-center justify-center space-x-1 transition-colors ${
+                        addingToCart.has(product.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                      }`}
+                      onClick={(e) => handleAddToCart(product, e)}
+                      disabled={addingToCart.has(product.id)}
+                    >
                       <ShoppingCart className="w-5 h-5 me-4" />
                       <p>
-                        ADD TO <br></br> COLLECTION
+                        {addingToCart.has(product.id) ? (
+                          <>ADDING...</>
+                        ) : (
+                          <>ADD TO <br />COLLECTION</>
+                        )}
                       </p>
                     </button>
-                    <button className="p-1 border border-gray-200 cursor-pointer rounded hover:bg-gray-50">
-                      <Heart className="w-5 h-5 m-2 text-gray-600" />
+
+                    {/* Wishlist Button */}
+                    <button 
+                      className={`p-1 border border-gray-200 rounded hover:bg-gray-50 transition-colors ${
+                        togglingWishlist.has(product.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                      }`}
+                      onClick={(e) => handleWishlistToggle(product, e)}
+                      disabled={togglingWishlist.has(product.id)}
+                    >
+                      <Heart 
+                        className={`w-5 h-5 m-2 transition-colors ${
+                          wishlistItems.has(product.id) 
+                            ? 'text-red-500 fill-current' 
+                            : 'text-gray-600'
+                        }`} 
+                      />
                     </button>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Star, ArrowRight } from "lucide-react";
+import saree from "../../../assets/B2cAssets/LandingPageImges/sareepink.png"
 
 const StatsCard = ({ value, label, sublabel }) => (
   <div className=" p-4 text-center">
@@ -90,7 +91,7 @@ function VirtualTryonSection8() {
   const products = [
     {
       image:
-        "https://images.pexels.com/photos/8839887/pexels-photo-8839887.jpeg?auto=compress&cs=tinysrgb&w=800",
+        saree,
       rating: 4,
       reviews: 9,
       fitted: 1967,
@@ -103,7 +104,7 @@ function VirtualTryonSection8() {
     },
     {
       image:
-        "https://images.pexels.com/photos/8839887/pexels-photo-8839887.jpeg?auto=compress&cs=tinysrgb&w=800",
+        saree,
       rating: 4,
       reviews: 9,
       fitted: 1967,
@@ -116,7 +117,7 @@ function VirtualTryonSection8() {
     },
     {
       image:
-        "https://images.pexels.com/photos/8839887/pexels-photo-8839887.jpeg?auto=compress&cs=tinysrgb&w=800",
+        saree,
       rating: 4,
       reviews: 9,
       fitted: 1967,
@@ -129,7 +130,7 @@ function VirtualTryonSection8() {
     },
     {
       image:
-        "https://images.pexels.com/photos/8839887/pexels-photo-8839887.jpeg?auto=compress&cs=tinysrgb&w=800",
+        saree,
       rating: 4,
       reviews: 9,
       fitted: 1967,
@@ -142,7 +143,7 @@ function VirtualTryonSection8() {
     },
     {
       image:
-        "https://images.pexels.com/photos/8839887/pexels-photo-8839887.jpeg?auto=compress&cs=tinysrgb&w=800",
+        saree,
       rating: 4,
       reviews: 9,
       fitted: 1967,

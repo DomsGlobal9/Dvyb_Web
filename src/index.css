@@ -3,7 +3,9 @@
 
 
 @theme {
-  --color-primary-blue: #1C4C74; 
+  --color-landingpage-bg-blue :  #5B9BA5;
+  --color-primary-blue: #1C4C74;
+
   --color-bg-light-blue: #DEF2FF;
   --color-bg-primary-white : #FFFFFF
 }
