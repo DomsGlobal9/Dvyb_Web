@@ -3,7 +3,7 @@ import { Heart, Star, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { productService } from "../../../services/firebaseServices";
 import { addToCart } from "../../../services/CartService";
-import { toggleWishlist, isInWishlist } from "../../../services/wishlistService";
+import { toggleWishlist, isInWishlist } from "../../../services/WishlistService";
 import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
