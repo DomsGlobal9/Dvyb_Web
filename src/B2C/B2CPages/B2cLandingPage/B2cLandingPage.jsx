@@ -1,3 +1,6 @@
+
+import VideoSection from "../../B2CComponents/LandingPageComponents/Sec01vedio"
+import FashionTryOnSection from "../../B2CComponents/LandingPageComponents/Sec02FashionTryOn"
 import TechnologySection04 from "../../B2CComponents/LandingPageComponents/Sec04Technology"
 import PremiumSection05 from "../../B2CComponents/LandingPageComponents/Sec05Premium"
 import ClientTestimonials from "../../B2CComponents/LandingPageComponents/Sec09ClientTestimonials"
@@ -12,17 +15,20 @@ import VirtualTryonSection8 from "../../B2CComponents/LandingPageComponents/Sec8
 
 
 const B2cLandingPage = () => {
-    return (
-        <>
-       <TechnologySection04/>
-         <PremiumSection05/>
-         <CuratedCollectionSection6/>
-          <YourPersonlizedSection7/>
-        <VirtualTryonSection8/>
-        <ClientTestimonials/>
-        <FashionBrandsSection/>
-        </>
-    )
+  return (
+    <>
+      <VideoSection />
+      <FashionTryOnSection/>
+      <TechnologySection04 />
+      <PremiumSection05 />
+      <CuratedCollectionSection6 />
+      <YourPersonlizedSection7 />
+      <VirtualTryonSection8 />
+      <ClientTestimonials />
+      <FashionBrandsSection />
+
+    </>
+  )
 }
 
 export default B2cLandingPage

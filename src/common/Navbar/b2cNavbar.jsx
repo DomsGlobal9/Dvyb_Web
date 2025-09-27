@@ -24,7 +24,9 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  
 
   // Auth check (from localStorage or context/provider if used)
   const isLoggedIn = !!localStorage.getItem("authToken");
@@ -73,6 +75,20 @@ const Navbar = () => {
     setShowWomenCategories(false);
     setActiveCategory(null);
     setMobileMenuOpen(false);
+  };
+
+  const handleTryOnClick = () => {
+    setShowModal(true); // open modal
+  };
+
+  const handleYes = () => {
+    setShowModal(false);
+    navigate("/products"); // go to products
+  };
+
+  const handleNo = () => {
+    setShowModal(false);
+    navigate("/"); // stay on same page or navigate home
   };
 
   // Render
@@ -167,6 +183,7 @@ const Navbar = () => {
               </div>
             </div>
           </div>
+
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex justify-center items-center space-x-8 py-2 text-sm font-medium text-gray-700 relative">
             <div className="relative" ref={dropdownRef}>
@@ -190,11 +207,10 @@ const Navbar = () => {
                       <button
                         key={index}
                         onClick={() => setActiveCategory(cat)}
-                        className={`transition ${
-                          activeCategory === cat
-                            ? "text-blue-900 border-b-2 border-blue-900"
-                            : "hover:text-blue-900"
-                        }`}
+                        className={`transition ${activeCategory === cat
+                          ? "text-blue-900 border-b-2 border-blue-900"
+                          : "hover:text-blue-900"
+                          }`}
                       >
                         {cat}
                       </button>
@@ -230,14 +246,17 @@ const Navbar = () => {
             <span className="text-gray-500 hover:text-gray-700 cursor-default">
               KIDS <span className="text-xs">(coming soon)</span>
             </span>
-            <a href="#" className="text-gray-700 hover:text-blue-900">
+            <button
+              onClick={handleTryOnClick}
+            >
               2D TRY ON
-            </a>
+            </button>
             <FaSearch
               className="ml-6 cursor-pointer text-gray-600 hover:text-blue-900"
               onClick={() => setSearchOpen(true)}
             />
           </nav>
+
           {/* MOBILE OVERLAY MENU */}
           {mobileMenuOpen && (
             <div className="fixed inset-0 z-50 lg:hidden">
@@ -266,9 +285,8 @@ const Navbar = () => {
                     >
                       WOMEN
                       <span
-                        className={`transform transition-transform ${
-                          showWomenCategories ? "rotate-180" : ""
-                        }`}
+                        className={`transform transition-transform ${showWomenCategories ? "rotate-180" : ""
+                          }`}
                       >
                         ▼
                       </span>
@@ -278,11 +296,10 @@ const Navbar = () => {
                         {Object.keys(womenCategories).map((cat, index) => (
                           <div key={index} className="mb-3">
                             <button
-                              className={`block w-full text-left py-2 px-2 text-sm font-medium transition ${
-                                activeCategory === cat
-                                  ? "text-blue-900 bg-blue-50 rounded"
-                                  : "text-gray-700 hover:text-blue-900"
-                              }`}
+                              className={`block w-full text-left py-2 px-2 text-sm font-medium transition ${activeCategory === cat
+                                ? "text-blue-900 bg-blue-50 rounded"
+                                : "text-gray-700 hover:text-blue-900"
+                                }`}
                               onClick={() =>
                                 setActiveCategory(
                                   activeCategory === cat ? null : cat
@@ -323,7 +340,10 @@ const Navbar = () => {
                   <span className="block py-3 text-gray-500 border-t cursor-default">
                     KIDS <span className="text-xs">(coming soon)</span>
                   </span>
-                  <span className="block py-3 text-gray-700 border-t cursor-default">
+                  <span className="block py-3 text-gray-700 border-t cursor-default"
+                    onClick={handleTryOnClick}
+
+                  >
                     2D TRY ON
                   </span>
                   {/* Mobile bottom icons */}
@@ -356,6 +376,31 @@ const Navbar = () => {
                       <span className="text-xs text-gray-600">Profile</span>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showModal && (
+            <div className="fixed inset-0 flex items-center justify-center  bg-opacity-50">
+              <div className="bg-white rounded-lg shadow-lg p-6 w-80">
+                <p className="text-gray-800 mb-4 text-center">
+                  For try-on you need to select a product. <br />
+                  Would you like to try?
+                </p>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={handleYes}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={handleNo}
+                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
+                  >
+                    No
+                  </button>
                 </div>
               </div>
             </div>
