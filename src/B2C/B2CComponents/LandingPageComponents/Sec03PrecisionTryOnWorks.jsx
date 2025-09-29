@@ -5,15 +5,15 @@ import FashionSelector from './FashionSelectors';
 const PrecisionTryOnSection = () => {
   return (
     <div className="bg-white">
-      <div className="container mx-auto px-6 ">
+      <div className="container mx-auto px-6 mt-4 lg:mt-0 ">
         {/* Section Header */}
         <div className="text-center space-y-4 mb-12">
-          <div className="inline-flex border  items-center gap-2 bg-white px-4 py-2 ">
+          <div className="inline-flex border  items-center gap-2 bg-white px-4 p-2  ">
             <span className="text-sm font-medium text-gray-600 tracking-wide">
               INTERACTIVE EXPERIENCE
             </span>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900">
+          <h2 className="text-4xl py-3 lg:text-5xl font-bold text-gray-900">
             See How Precision Try-On Works
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">

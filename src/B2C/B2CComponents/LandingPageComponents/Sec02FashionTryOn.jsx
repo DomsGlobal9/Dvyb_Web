@@ -86,7 +86,7 @@ const FashionTryOnSection = () => {
 
 
         {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-9 lg:mt-16">
           {/* Stat 1 */}
           <div className="text-center space-y-2">
             <div className="text-5xl lg:text-6xl font-bold text-gray-900">
