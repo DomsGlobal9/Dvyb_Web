@@ -182,7 +182,7 @@ function PremiumSection05() {
 
   return (
     <div
-      className="min-h-screen bg-white py-8 px-4 "
+      className="min-h-screen bg-white lg:py-5 px-4 "
       style={{ fontFamily: "Outfit" }}
     >
       <div className="max-w-7xl mx-auto">

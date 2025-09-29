@@ -27,7 +27,7 @@ function YourPersonlizedSection7() {
 
   return (
     <div className="min-h-screen  bg-white" style={{ fontFamily: "Outfit" }}> 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-2 lg:py-7">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-block bg-white border border-gray-200 rounded-full px-4 py-2 mb-6">
