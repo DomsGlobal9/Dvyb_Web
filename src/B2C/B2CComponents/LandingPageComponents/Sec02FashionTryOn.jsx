@@ -7,11 +7,11 @@ const FashionTryOnSection = () => {
   return (
     <div className="min-h-screen">
       {/* Main Hero Section */}
-      <div className="container mx-auto px-6 py-16">
+      <div className="container mx-auto px-6 py-8">
 
         {/* Top Row: Badge Left + Excellence Right */}
         <div className='w-full'>
-  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-8 lg:py-12">
+  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 ">
     
     {/* Left Section - Main Content */}
     <div className="w-full lg:w-auto">
