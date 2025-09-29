@@ -182,7 +182,7 @@ function PremiumSection05() {
 
   return (
     <div
-      className="min-h-screen bg-white py-8 px-4"
+      className="min-h-screen bg-white py-8 px-4 "
       style={{ fontFamily: "Outfit" }}
     >
       <div className="max-w-7xl mx-auto">
@@ -209,133 +209,133 @@ function PremiumSection05() {
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.length === 0 ? (
-            <p className="text-gray-600 text-center col-span-full">
-              No premium products available at the moment.
-            </p>
-          ) : (
-            products.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow w-80 cursor-pointer"
-                onClick={() => handleProductClick(product)}
-              >
-                {/* Product Image */}
-                <div className="relative aspect-[4/5] overflow-hidden">
-                  <img
-                    src={
-                      product.imageUrls && product.imageUrls.length > 0
-                        ? product.imageUrls[0]
-                        : "https://via.placeholder.com/400"
-                    }
-                    alt={product.name || product.title}
-                    className="w-full h-full object-cover"
-                  />
-                  
-                  {/* Discount Badge */}
-                  {product.discount && product.discount > 0 && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded-md font-medium">
-                      -{product.discount}% OFF
-                    </div>
-                  )}
-                </div>
-
-                {/* Product Info */}
-                <div className="p-4">
-                  {/* Rating and Fit Accuracy */}
-                  <div className="flex items-center mb-2 justify-between space-x-2">
-                    {/* Rating */}
-                    <div className="flex items-center">
-                      <div className="flex items-center space-x-0.5 mr-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-3 h-3 ${
-                              i < 4
-                                ? "text-yellow-400 fill-current"
-                                : "text-gray-300"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-gray-700 font-medium">
-                        (4.0)
-                      </span>
-                    </div>
-
-                    {/* Accuracy */}
-                    <div>
-                      <span className="text-xs text-gray-500 font-medium text-end">
-                        95% FIT ACCURACY
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Name */}
-                  <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">
-                    {product.name || product.title}
-                  </h3>
-
-                  {/* Pricing */}
-                  <div className="mb-1">
-                    <span className="font-bold text-gray-900 text-base mr-2">
-                      ₹{product.price}
-                    </span>
-                    <span className="text-xs text-gray-400 line-through">
-                      ₹{parseFloat(product.price) + 100}
-                    </span>
-                  </div>
-
-                  {/* Savings */}
-                  <div className="mb-3">
-                    <span className="text-xs text-green-600 font-medium">
-                      Save ₹100
-                    </span>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center space-x-2">
-                    {/* Add to Cart Button */}
-                    <button 
-                      className={`flex-1 bg-[#3C8E9A] hover:bg-teal-700 text-white text-xs font-medium py-2 px-3 rounded flex items-center justify-center space-x-1 transition-colors ${
-                        addingToCart.has(product.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                      }`}
-                      onClick={(e) => handleAddToCart(product, e)}
-                      disabled={addingToCart.has(product.id)}
-                    >
-                      <ShoppingCart className="w-5 h-5 me-4" />
-                      <p>
-                        {addingToCart.has(product.id) ? (
-                          <>ADDING...</>
-                        ) : (
-                          <>ADD TO <br />COLLECTION</>
-                        )}
-                      </p>
-                    </button>
-
-                    {/* Wishlist Button */}
-                    <button 
-                      className={`p-1 border border-gray-200 rounded hover:bg-gray-50 transition-colors ${
-                        togglingWishlist.has(product.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                      }`}
-                      onClick={(e) => handleWishlistToggle(product, e)}
-                      disabled={togglingWishlist.has(product.id)}
-                    >
-                      <Heart 
-                        className={`w-5 h-5 m-2 transition-colors ${
-                          wishlistItems.has(product.id) 
-                            ? 'text-red-500 fill-current' 
-                            : 'text-gray-600'
-                        }`} 
-                      />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
+     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+  {products.length === 0 ? (
+    <p className="text-gray-600 text-center col-span-full">
+      No premium products available at the moment.
+    </p>
+  ) : (
+    products.map((product) => (
+      <div
+        key={product.id}
+        className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow w-full max-w-[320px] md:max-w-[340px] lg:max-w-[360px] xl:w-80 cursor-pointer"
+        onClick={() => handleProductClick(product)}
+      >
+        {/* Product Image */}
+        <div className="relative aspect-[4/5] overflow-hidden">
+          <img
+            src={
+              product.imageUrls && product.imageUrls.length > 0
+                ? product.imageUrls[0]
+                : "https://via.placeholder.com/400"
+            }
+            alt={product.name || product.title}
+            className="w-full h-full object-cover"
+          />
+          
+          {/* Discount Badge */}
+          {product.discount && product.discount > 0 && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded-md font-medium">
+              -{product.discount}% OFF
+            </div>
           )}
         </div>
+
+        {/* Product Info */}
+        <div className="p-4">
+          {/* Rating and Fit Accuracy */}
+          <div className="flex items-center mb-2 justify-between space-x-2">
+            {/* Rating */}
+            <div className="flex items-center">
+              <div className="flex items-center space-x-0.5 mr-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-3 h-3 ${
+                      i < 4
+                        ? "text-yellow-400 fill-current"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-gray-700 font-medium">
+                (4.0)
+              </span>
+            </div>
+
+            {/* Accuracy */}
+            <div>
+              <span className="text-xs text-gray-500 font-medium text-end">
+                95% FIT ACCURACY
+              </span>
+            </div>
+          </div>
+
+          {/* Product Name */}
+          <h3 className="font-semibold text-gray-900 mb-2 text-sm line-clamp-2">
+            {product.name || product.title}
+          </h3>
+
+          {/* Pricing */}
+          <div className="mb-1">
+            <span className="font-bold text-gray-900 text-base mr-2">
+              ₹{product.price}
+            </span>
+            <span className="text-xs text-gray-400 line-through">
+              ₹{parseFloat(product.price) + 100}
+            </span>
+          </div>
+
+          {/* Savings */}
+          <div className="mb-3">
+            <span className="text-xs text-green-600 font-medium">
+              Save ₹100
+            </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-2">
+            {/* Add to Cart Button */}
+            <button 
+              className={`flex-1 bg-[#3C8E9A] hover:bg-teal-700 text-white text-xs font-medium py-2 px-3 rounded flex items-center justify-center space-x-1 transition-colors ${
+                addingToCart.has(product.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              }`}
+              onClick={(e) => handleAddToCart(product, e)}
+              disabled={addingToCart.has(product.id)}
+            >
+              <ShoppingCart className="w-5 h-5 me-4" />
+              <p>
+                {addingToCart.has(product.id) ? (
+                  <>ADDING...</>
+                ) : (
+                  <>ADD TO <br />COLLECTION</>
+                )}
+              </p>
+            </button>
+
+            {/* Wishlist Button */}
+            <button 
+              className={`p-1 border border-gray-200 rounded hover:bg-gray-50 transition-colors ${
+                togglingWishlist.has(product.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              }`}
+              onClick={(e) => handleWishlistToggle(product, e)}
+              disabled={togglingWishlist.has(product.id)}
+            >
+              <Heart 
+                className={`w-5 h-5 m-2 transition-colors ${
+                  wishlistItems.has(product.id) 
+                    ? 'text-red-500 fill-current' 
+                    : 'text-gray-600'
+                }`} 
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+    ))
+  )}
+</div>
       </div>
     </div>
   );
