@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const FashionTryOnSection = () => {
   const navigate = useNavigate('')
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-8 lg:pb-12">
       {/* Main Hero Section */}
       <div className="container mx-auto px-6 py-8">
 

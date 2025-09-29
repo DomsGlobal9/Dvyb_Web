@@ -4,7 +4,7 @@ import FashionSelector from './FashionSelectors';
 
 const PrecisionTryOnSection = () => {
   return (
-    <div className="bg-white">
+    <div className="bg-white pt-8 lg:pt-12">
       <div className="container mx-auto px-6 mt-4 lg:mt-0 ">
         {/* Section Header */}
         <div className="text-center space-y-4 mb-12">
