@@ -304,7 +304,7 @@ function PremiumSection05() {
               onClick={(e) => handleAddToCart(product, e)}
               disabled={addingToCart.has(product.id)}
             >
-              <ShoppingCart className="w-3 h-3 me-0.5 md:h-5 md:w-5 md:me-4" />
+              <ShoppingCart className="w-3 h-3 me-1 md:h-5 md:w-5 md:me-4" />
               <p >
                 {addingToCart.has(product.id) ? (
                   <>ADDING...</>
