@@ -6,24 +6,30 @@ import TryOnPreviewModal from './Models/TryOnPreviewModal';
 import { useAuth } from '../../../context/AuthContext';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {colorUtils}  from '../../../utils/colorUtils'
-
-
+import { colorUtils } from '../../../utils/colorUtils';
+import { addToCart } from '../../../services/CartService';
 
 const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateToTryOn, onProductClick }) => {
   const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
   const [showAddToCartModal, setShowAddToCartModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { user, userRole, loading  } = useAuth();
-
-  console.log(user, "UaerData", userRole, loading )
+  const [addingToCart, setAddingToCart] = useState(false);
+  const { user } = useAuth();
 
   // Modal states
   const [showTryYourOutfitModal, setShowTryYourOutfitModal] = useState(false);
   const [showUploadSelfieModal, setShowUploadSelfieModal] = useState(false);
   const [showTryOnPreviewModal, setShowTryOnPreviewModal] = useState(false);
   const [tryOnData, setTryOnData] = useState({});
+
+  // Set default color when component loads
+  useEffect(() => {
+    if (product?.selectedColors?.length > 0 && !selectedColor) {
+      setSelectedColor(product.selectedColors[0]);
+    }
+  }, [product, selectedColor]);
 
   useEffect(() => {
     const isAnyModalOpen =
@@ -35,10 +41,8 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
       document.body.classList.remove("overflow-hidden");
     }
 
-    // cleanup on unmount
     return () => document.body.classList.remove("overflow-hidden");
   }, [showTryYourOutfitModal, showUploadSelfieModal, showTryOnPreviewModal, showAddToCartModal]);
-
 
   if (!product) return null;
 
@@ -49,62 +53,128 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
   // Get similar products based on exact color matching
   const similarProducts = useMemo(() => {
-    console.log('=== SIMILAR PRODUCTS DEBUG ===');
-    console.log('Total products:', allProducts.length);
-    console.log('Current product ID:', product.id);
-    console.log('Current product colors:', product.selectedColors);
-
-    if (!allProducts.length) {
-      console.log('No products available');
-      return [];
-    }
+    if (!allProducts.length) return [];
 
     if (!product.selectedColors || product.selectedColors.length === 0) {
-      console.log('Current product has no colors, showing random products');
-      const randomProducts = allProducts.filter(p => p.id !== product.id).slice(0, 8);
-      console.log('Random products count:', randomProducts.length);
-      return randomProducts;
+      return allProducts.filter(p => p.id !== product.id).slice(0, 8);
     }
 
-    // Match products that have at least one common color
     const currentColors = product.selectedColors.map(c => c.toUpperCase().trim());
-    console.log('Normalized current colors:', currentColors);
 
     const filtered = allProducts.filter(p => {
-      if (p.id === product.id) return false; // Exclude current product
-
+      if (p.id === product.id) return false;
       if (!p.selectedColors || p.selectedColors.length === 0) return false;
 
       const productColors = p.selectedColors.map(c => c.toUpperCase().trim());
-      const hasCommonColor = currentColors.some(currentColor =>
+      return currentColors.some(currentColor =>
         productColors.some(productColor =>
           currentColor === productColor ||
           currentColor.includes(productColor) ||
           productColor.includes(currentColor)
         )
       );
-
-      if (hasCommonColor) {
-        console.log(`Match found: ${p.title} - Colors: ${p.selectedColors.join(', ')}`);
-      }
-
-      return hasCommonColor;
     });
-
-    console.log('Filtered similar products:', filtered.length);
-    console.log('Similar products:', filtered.map(p => ({ title: p.title, colors: p.selectedColors })));
 
     return filtered.slice(0, 8);
   }, [product, allProducts]);
 
   const handleAddToCart = () => {
+    if (!user) {
+      toast.error("Please log in to add items to cart!");
+      return;
+    }
     setShowAddToCartModal(true);
+  };
+
+  // MAIN FIX: Properly add item to cart with correct data structure
+  // Check if product is a saree (case-insensitive)
+  const isSaree = (product.title || product.name || '').toLowerCase().includes('saree') ||
+                  (product.fabric || '').toLowerCase().includes('saree') ||
+                  (product.craft || '').toLowerCase().includes('saree');
+
+  const handleConfirmAddToCart = async () => {
+    if (!user) {
+      toast.error("Please log in to continue!");
+      return;
+    }
+
+    // Only require size selection if product is not a saree
+    if (!isSaree && !selectedSize) {
+      toast.warning("Please select a size first!");
+      return;
+    }
+
+    if (addingToCart) return;
+
+    try {
+      setAddingToCart(true);
+
+      // Prepare product data matching CartService expectations
+      const productData = {
+        // Basic product info
+        name: product.name || product.title,
+        title: product.title || product.name,
+        price: parseFloat(product.price) || 0,
+        
+        // Selected attributes
+        size: isSaree ? 'Free Size' : selectedSize,
+        color: selectedColor || (product.selectedColors?.[0] || ''),
+        
+        // Image for cart display (single image, not array)
+        image: product.imageUrls?.[0] || '',
+        
+        // All available options (keep as arrays)
+        imageUrls: product.imageUrls || [],
+        selectedColors: product.selectedColors || [],
+        selectedSizes: product.selectedSizes || [],
+        
+        // Product details
+        fabric: product.fabric || '',
+        craft: product.craft || '',
+        description: product.description || '',
+        
+        // Calculate subtotal (price * quantity)
+        subtotal: parseFloat(product.price) || 0,
+        
+        // Shipping info
+        freeShipping: parseFloat(product.price) > 500,
+        shippingMessage: parseFloat(product.price) > 500 
+          ? null 
+          : 'Add ₹' + (500 - parseFloat(product.price)) + ' more for free shipping',
+        
+        // Discount info (optional)
+        discount: product.discount || 0,
+        originalPrice: originalPrice
+      };
+
+      // Call the cart service - it handles quantity and final calculations
+      await addToCart(product.id, productData, 1);
+      
+      const sizeDisplay = isSaree ? '' : ` (${selectedSize})`;
+      toast.success(`${productData.name}${sizeDisplay} (${selectedColor}) added to cart!`);
+      setShowAddToCartModal(false);
+      setSelectedSize('');
+      
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      
+      // More specific error messages
+      if (error.message.includes("User not found")) {
+        toast.error("User account not found. Please log in again.");
+      } else if (error.message.includes("authenticated")) {
+        toast.error("Please log in to add items to cart.");
+      } else {
+        toast.error("Failed to add item to cart. Please try again.");
+      }
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
   const handleTryOnClick = () => {
     const garmentImage = product.imageUrls?.[0];
     if (!garmentImage) {
-      alert('No image available for try-on');
+      toast.error('No image available for try-on');
       return;
     }
 
@@ -112,7 +182,6 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
     setShowTryYourOutfitModal(true);
   };
 
-  // Modal flow handlers
   const handleTryYourOutfitNext = (data) => {
     setShowTryYourOutfitModal(false);
     setTryOnData(prev => ({ ...prev, ...data }));
@@ -136,59 +205,104 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
     if (!showAddToCartModal) return null;
 
     return (
-      <div className="fixed inset-0 backdrop-blur bg-opacity-50 bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div className="bg-white border rounded-lg max-w-md w-full p-6">
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Select Size</h3>
-            <button onClick={() => setShowAddToCartModal(false)}>
+            <h3 className="text-lg font-semibold">Select Options</h3>
+            <button 
+              onClick={() => setShowAddToCartModal(false)}
+              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <select
-            value={selectedSize}
-            onChange={(e) => setSelectedSize(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg mb-4"
-          >
-            <option value="">Select Any</option>
-            {product.selectedSizes?.map((size, index) => (
-              <option key={index} value={size}>{size}</option>
-            ))}
-          </select>
+          {/* Size Selection - Only show if NOT a saree */}
+          {!isSaree && product.selectedSizes?.length > 0 && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Size <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={selectedSize}
+                onChange={(e) => setSelectedSize(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              >
+                <option value="">Select Size</option>
+                {product.selectedSizes?.map((size, index) => (
+                  <option key={index} value={size}>{size}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
+          {/* Color Selection */}
+          {product.selectedColors?.length > 0 && (
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Color
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {product.selectedColors.map((colorString, index) => {
+                  const { name, hex } = colorUtils.parseColor(colorString);
+                  const isSelected = selectedColor === colorString;
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedColor(colorString)}
+                      className={`flex items-center space-x-2 border-2 rounded-lg px-3 py-2 transition-all ${
+                        isSelected 
+                          ? 'border-blue-500 bg-blue-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div
+                        className="w-5 h-5 rounded-full border border-gray-300"
+                        style={{ backgroundColor: hex }}
+                      />
+                      <span className="text-sm capitalize">{name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
           <div className="flex gap-3">
             <button
-              // onClick={handleTryOnClick}
               onClick={() => {
                 if (!user) {
-                  alert('Please log in to try on.');
-                  toast.error("Please log in to continue!");
+                  toast.error("Please log in to try on!");
                   return;
                 }
+                setShowAddToCartModal(false);
                 handleTryOnClick();
               }}
-              className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center"
+              className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center hover:bg-blue-700 transition-colors"
             >
-              <ShoppingCart className="w-4 h-4 mr-2" />
+              <Eye className="w-4 h-4 mr-2" />
               TRY ON
             </button>
             <button
-              onClick={() => {
-                if (!user) {
-                  toast.error("Please log in to continue!");
-                  return;
-                }
-
-                setShowAddToCartModal(false);
-                alert('Added to cart!');
-              }}
-
-              className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium flex items-center justify-center"
+              onClick={handleConfirmAddToCart}
+              disabled={addingToCart || (!isSaree && !selectedSize)}
+              className={`flex-1 border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium flex items-center justify-center transition-all ${
+                addingToCart || (!isSaree && !selectedSize)
+                  ? 'opacity-50 cursor-not-allowed bg-gray-50' 
+                  : 'hover:bg-gray-50 hover:border-gray-400'
+              }`}
             >
               <ShoppingCart className="w-4 h-4 mr-2" />
-              Add to cart
+              {addingToCart ? 'Adding...' : 'Add to Cart'}
             </button>
           </div>
+
+          {!isSaree && !selectedSize && (
+            <p className="text-xs text-amber-600 mt-2 text-center">
+              Please select a size to continue
+            </p>
+          )}
         </div>
       </div>
     );
@@ -197,7 +311,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <button onClick={onBackClick} className="flex items-center text-blue-600 hover:text-blue-800 mb-6">
+        <button onClick={onBackClick} className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Products
         </button>
@@ -207,8 +321,11 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
             {/* Images Section */}
             <div className="space-y-4">
               <div className="flex justify-end">
-                <button onClick={() => setIsFavorite(!isFavorite)} className="p-2 rounded-full bg-gray-50">
-                  <Heart className={`w-5 h-5 ${isFavorite ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
+                <button 
+                  onClick={() => setIsFavorite(!isFavorite)} 
+                  className="p-2 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <Heart className={`w-5 h-5 transition-colors ${isFavorite ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
                 </button>
               </div>
 
@@ -231,8 +348,9 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                   {product.imageUrls.slice(0, 3).map((url, index) => (
                     <div
                       key={index}
-                      className={`aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden cursor-pointer border-2 ${selectedImageIndex === index ? 'border-blue-500' : 'border-transparent'
-                        }`}
+                      className={`aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
+                        selectedImageIndex === index ? 'border-blue-500 shadow-md' : 'border-transparent hover:border-gray-300'
+                      }`}
                       onClick={() => setSelectedImageIndex(index)}
                     >
                       <img src={url} alt="" className="w-full h-full object-cover" />
@@ -258,14 +376,14 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
                 <div className="mb-6">
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl font-bold text-blue-600">₹{Math.round(discountedPrice)}/</span>
-                    <span className="text-lg text-gray-500">Piece</span>
+                    <span className="text-3xl font-bold text-blue-600">₹{Math.round(discountedPrice)}</span>
+                    <span className="text-lg text-gray-500">/Piece</span>
                   </div>
 
                   {discountPercent > 0 && (
                     <div className="flex items-center space-x-2 mt-1">
                       <span className="text-lg text-gray-500 line-through">M.R.P ₹{Math.round(originalPrice)}</span>
-                      <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-sm">({discountPercent}% OFF)</span>
+                      <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-medium">({discountPercent}% OFF)</span>
                     </div>
                   )}
 
@@ -276,8 +394,8 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
               {product.selectedColors?.length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 mb-3">Colours Available</h3>
-                  <div className="flex space-x-2">
-                      {product.selectedColors.map((colorString, index) => {
+                  <div className="flex flex-wrap gap-2">
+                    {product.selectedColors.map((colorString, index) => {
                       const { name, hex } = colorUtils.parseColor(colorString);
                       return (
                         <div
@@ -296,21 +414,23 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                 </div>
               )}
 
-              <div className="space-y-3 flex gap-5" >
-                <button onClick={handleAddToCart} className="w-auto bg-white text-black py-3 px-6 rounded-lg shadow-2xs font-medium flex items-center justify-center">
-                  <ShoppingCart className=" h-5 mr-2" />
+              <div className="space-y-3 flex gap-5">
+                <button 
+                  onClick={handleAddToCart} 
+                  className="w-auto bg-white text-black py-3 px-6 rounded-lg shadow-sm border font-medium flex items-center justify-center hover:shadow-md transition-all"
+                >
+                  <ShoppingCart className="h-5 mr-2" />
                   Add to cart
                 </button>
-                <button className="w-42 h-12  bg-[#1C4C74] shadow-2xs text-white py-3 px-6 rounded-lg hover:bg-orange-600 font-medium">
+                <button className="w-42 h-12 bg-[#1C4C74] shadow-sm text-white py-3 px-6 rounded-lg hover:bg-[#163d5d] font-medium transition-colors">
                   Buy Now
                 </button>
               </div>
 
-              <div className="space-y-3 text-sm  pt-6">
-                <div className="flex items-center text-gray-600 ">
+              <div className="space-y-3 text-sm pt-6">
+                <div className="flex items-center text-gray-600">
                   <Shield className="w-4 h-4 mr-3" />
                   Secure payment
-
                   <div className="flex pl-12 items-center text-gray-600">
                     <Package className="w-4 h-4 mr-3" />
                     Free Size
@@ -325,13 +445,13 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
           </div>
 
           {/* Product Description */}
-          <div className=" p-6">
+          <div className="p-6">
             <h3 className="text-lg font-semibold mb-4">Product Description</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div>
                 <h4 className="font-semibold mb-2">Description</h4>
                 <p className="text-gray-600 text-sm mb-4">{product.description}</p>
-                <p className="text-gray-600 text-sm">Crafted with intricate  embroidery. Perfect for any occasion. Comfortable fit and vibrant colors.</p>
+                <p className="text-gray-600 text-sm">Crafted with intricate embroidery. Perfect for any occasion. Comfortable fit and vibrant colors.</p>
 
                 <div className="mt-4 grid bg-blue-100 h-26 items-center p-7 grid-cols-3 gap-4 text-sm">
                   <div>
@@ -364,13 +484,13 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
           </div>
 
           {/* Similar Products */}
-          <div className=" p-6">
+          <div className="p-6">
             <h3 className="text-lg font-semibold mb-6">Similar Products</h3>
 
             {similarProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {similarProducts.map((item) => (
-                  <div key={item.id} className="bg-white  rounded-lg overflow-hidden hover:shadow-md transition-shadow ">
+                  <div key={item.id} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-shadow group cursor-pointer">
                     <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
                       {item.discount > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded z-10">
@@ -388,13 +508,13 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <div className="flex space-x-2">
-                          <button className="p-2 bg-white rounded-full">
+                          <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors">
                             <Heart className="w-4 h-4" />
                           </button>
-                          <button className="p-2 bg-white rounded-full">
+                          <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors">
                             <ShoppingCart className="w-4 h-4" />
                           </button>
-                          <button className="p-2 bg-white rounded-full">
+                          <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors">
                             <Eye className="w-4 h-4" />
                           </button>
                         </div>
@@ -411,10 +531,10 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                           onClick={() => {
                             if (onProductClick) {
                               onProductClick(item);
-                              window.scrollTo(0, 0); // Scroll to top for better UX
+                              window.scrollTo(0, 0);
                             }
                           }}
-                          className="text-xs bg-blue-600 text-white px-2 py-1 rounded"
+                          className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
                         >
                           View
                         </button>
@@ -436,7 +556,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <p>No similar products found. Total products available: {allProducts.length}</p>
+                <p>No similar products found.</p>
               </div>
             )}
           </div>
@@ -470,9 +590,3 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 };
 
 export default ProductDetailPage;
-
-
-
-
-
-
