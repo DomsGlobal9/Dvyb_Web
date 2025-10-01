@@ -182,15 +182,15 @@ function PremiumSection05() {
 
   return (
     <div
-      className="min-h-screen bg-white lg:py-5 px-4 "
+      className="min-h-screen bg-white lg:py-12 py-8 px-4 "
       style={{ fontFamily: "Outfit" }}
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-block bg-gray-100 rounded-full px-4 py-2 mb-6">
+          <div className="inline-block border border-black px-4 p-1 mb-6">
             <span className="text-xs font-medium text-gray-600 tracking-wider">
-              CURATED COLLECTION
+             DVYB COLLECTION
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -201,10 +201,10 @@ function PremiumSection05() {
             culture.
           </p>
           <div className="flex items-center justify-center text-sm text-gray-600">
-            <div className="w-2 h-2 bg-teal-600 rounded-full mr-2"></div>
+            {/* <div className="w-2 h-2 bg-teal-600 rounded-full mr-2"></div>
             <span className="font-medium">
               32,817 PRECISION FITTINGS COMPLETED TODAY
-            </span>
+            </span> */}
           </div>
         </div>
 

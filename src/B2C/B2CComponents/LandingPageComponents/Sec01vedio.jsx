@@ -1,61 +1,60 @@
 import React, { useEffect, useRef } from 'react';
+import B2c_HeroImage from '../../../assets/B2cAssets/LandingPageImges/B2c_HeroImage.png';
+import FashionTryOnSection from './Sec02FashionTryOn';
 
 const VideoSection = () => {
-    const videoRef = useRef(null);
+  const videoRef = useRef(null);
 
-    useEffect(() => {
-        const video = videoRef.current;
+  useEffect(() => {
+    const video = videoRef.current;
 
-        if (video) {
-            // Try to play the video
-            const playPromise = video.play();
+    if (video) {
+      const playPromise = video.play();
 
-            // Autoplay and mute are needed for autoplay to work
-            video.muted = true;
-            video.loop = true;
+      video.muted = true;
+      video.loop = true;
 
-            // Request fullscreen after a slight delay
-            setTimeout(() => {
-                if (video.requestFullscreen) {
-                    video.requestFullscreen().catch(err => {
-                        console.error('Fullscreen request failed:', err);
-                    });
-                }
-            }, 500);
-
-            // Handle autoplay errors
-            if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
-                        console.log('Video is playing');
-                    })
-                    .catch(error => {
-                        console.error('Autoplay error:', error);
-                    });
-            }
+      setTimeout(() => {
+        if (video.requestFullscreen) {
+          video.requestFullscreen().catch(err => {
+            console.error('Fullscreen request failed:', err);
+          });
         }
-    }, []);
+      }, 500);
 
-    return (
-        <div className="">
-            <div>
-                <section className="relative">
-                    <div className="relative max-w-full mx-auto " >
-                        <video
-                            ref={videoRef}
-                            className="w-full h-full object-cover rounded-lg shadow-xl"
-                            autoPlay
-                            muted
-                            loop
-                        >
-                            <source src="https://res.cloudinary.com/doiezptnn/video/upload/v1758891452/WhatsApp_Video_2025-09-26_at_5.21.36_PM_ncpdtg.mp4" type="video/mp4" />
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                </section>
-            </div>
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Video is playing');
+          })
+          .catch(error => {
+            console.error('Autoplay error:', error);
+          });
+      }
+    }
+  }, []);
+
+  return (
+    <div className="relative w-full h-1/2">
+      <section className="relative w-full h-1/2">
+        <div className="relative w-full h-1/2">
+        <img
+            src={
+              window.innerWidth < 768
+                ? 'https://res.cloudinary.com/doiezptnn/image/upload/v1759315075/Rectangle_34624281_e5ipdm.png'
+                : B2c_HeroImage
+            }
+            className="w-full h-auto lg:h-full object-cover"
+            alt="Background Image"
+          />
+          {/* Overlay the FashionTryOnSection */}
+          <div className="absolute inset-0 flex items-center justify-center pt-96 md:pt-16 lg:items-start lg:justify-start lg:pl-12 lg:pt-16">
+            <FashionTryOnSection />
+          </div>
         </div>
-    );
+      </section>
+    </div>
+  );
 };
 
 export default VideoSection;

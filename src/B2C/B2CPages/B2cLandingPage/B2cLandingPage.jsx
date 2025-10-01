@@ -19,15 +19,16 @@ const B2cLandingPage = () => {
   return (
     <>
       <VideoSection />
-      <FashionTryOnSection/>
-      <PrecisionTryOnSection/>
-      <TechnologySection04 />
+      {/* <FashionTryOnSection/> */}
+      
+      {/* <TechnologySection04 /> */}
       <PremiumSection05 />
       <CuratedCollectionSection6 />
-      <YourPersonlizedSection7 />
+      <PrecisionTryOnSection/>
+      {/* <YourPersonlizedSection7 /> */}
       <VirtualTryonSection8 />
       <ClientTestimonials />
-      <FashionBrandsSection />
+      {/* <FashionBrandsSection /> */}
 
     </>
   )

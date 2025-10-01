@@ -1,9 +1,9 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
-import RigthImg from "../../../assets/B2cAssets/LandingPageImges/CuratedCollectionImg.png"
+// import RigthImg from "../../../assets/B2cAssets/LandingPageImges/CuratedCollectionImg.png"
 import Sareeblack from "../../../assets/B2cAssets/LandingPageImges/Sareeblack.png"
 
-import Sareepink from "../../../assets/B2cAssets/LandingPageImges/sareepink.png"
+// import Sareepink from "../../../assets/B2cAssets/LandingPageImges/sareepink.png"
 
 
 
@@ -19,7 +19,15 @@ import Sareepink from "../../../assets/B2cAssets/LandingPageImges/sareepink.png"
 
 
 function CuratedCollectionSection6() {
-  const collections = [
+
+  const  Sareepink = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311389/Frame_1984078362_mrvcto.png'
+  const BlueHalfSaree = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311251/Frame_1984078362_pybd6d.png'
+const EthnicColl = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311096/imgs1_esjlgs.png'
+const PremiumFabrics = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311253/pentaloons_fmedex.png' 
+const RigthImg = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311210/Rectangle_34624274_kv5dgp.png'
+
+
+const collections = [
     {
       id: 1,
       image: Sareepink ,
@@ -30,7 +38,7 @@ function CuratedCollectionSection6() {
     },
     {
       id: 2,
-      image: RigthImg,
+      image: BlueHalfSaree,
       title: "EVENING WEAR",
       description: "Contemporary sophistication for special occasions",
       items: "1,823 ITEMS",
@@ -38,7 +46,7 @@ function CuratedCollectionSection6() {
     },
     {
       id: 3,
-      image: Sareeblack,
+      image: EthnicColl,
       title: "ETHNIC COLLECTION",
       description: "Heritage craftsmanship meets modern comfort",
       items: "3,891 ITEMS",
@@ -46,7 +54,7 @@ function CuratedCollectionSection6() {
     },
     {
       id: 4,
-      image: Sareepink,
+      image: PremiumFabrics,
       title: "PREMIUM FABRICS",
       description: "Finest materials for timeless creations",
       items: "567 ITEMS",
@@ -67,14 +75,14 @@ function CuratedCollectionSection6() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-block bg-gray-100 rounded-full px-4 py-2 mb-6">
-            <span className="text-xs font-medium text-gray-600 tracking-wider">PRODUCT CATEGORIES</span>
+          <div className="inline-block border border-black  px-4 p-1 mb-6">
+            <span className="text-xs font-medium text-[#09545F] tracking-wider">PRODUCT CATEGORIES</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             CURATED COLLECTIONS
           </h1>
           <p className="text-gray-600">
-            Discover our exclusive collections, designed to suit every style and occasion.
+Discover our exclusive collections, designed to suit every style <br /> and occasion.
           </p>
         </div>
 
@@ -120,7 +128,7 @@ function CuratedCollectionSection6() {
           {/* Right Column - Featured Image and Stats */}
           <div className="space-y-6">
             {/* Featured Image */}
-            <div className="aspect-[4/5] rounded-lg overflow-hidden">
+            <div className=" rounded-lg overflow-hidden">
               <img 
                 src={RigthImg}
                 alt="Featured Collection"
@@ -129,7 +137,7 @@ function CuratedCollectionSection6() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-3 gap-4">
               <div className="text-center bg-white border border-gray-200 rounded-lg p-6">
                 <div className="text-3xl font-bold text-gray-900 mb-2">99.8%</div>
                 <div className="text-sm text-gray-600 mb-1">FIT</div>
@@ -148,7 +156,7 @@ function CuratedCollectionSection6() {
                 <div className="text-sm text-gray-600 mb-3">RATE</div>
                 <div className="text-xs text-teal-600 font-medium">with 3D</div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

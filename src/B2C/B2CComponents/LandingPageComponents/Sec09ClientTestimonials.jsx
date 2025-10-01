@@ -83,10 +83,10 @@ const ClientTestimonials = () => {
     <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Stats Section */}
-       
+
+{/*        
         <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-4">
             <span className="uppercase tracking-wider">CLIENT INTELLIGENCE</span>
-            {/* <div className="w-1 h-1 bg-gray-400 rounded-full"></div> */}
         <div className="text-center ">
           
           <div className=" mb-2 border flex p-5">
@@ -98,32 +98,30 @@ const ClientTestimonials = () => {
             <p> PRECISION FITTINGS COMPLETED</p>
                </div>
           </div>
-          {/* <div className="text-sm text-gray-600 uppercase tracking-wider mb-2"> */}
-          {/* </div> */}
           <div className="text-xs text-start -ml-12 text-gray-500">
             Be part of the fashion community
             </div>
           </div>
-        </div>
+        </div> */}
 
 
         {/* Main Testimonials Section */}
-        <div className="text-center mt-14 mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            CLIENT TESTIMONIALS
+        <div className="text-start mt-14 mb-12">
+          <div className='border border-black text-center p-2 w-2/12'><h3 className='text-[#09545F] font-semibold'>HEAR OUR VOICES</h3></div>
+          <h2 className="text-3xl mt-4 sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          WHAT OUR USER SAYS
           </h2>
           <p className="text-lg text-gray-600">
-            Industry executives who trust Us<br />
-            for fashion
+         hear it straight from our customers!
           </p>
         </div>
 
         {/* Testimonial Card */}
-        <div className="relative max-w-4xl  mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="relative w-auto  ">
+          <div className="bg-white rounded-2xl  lg:h-80  shadow-xl overflow-hidden">
             <div className="flex flex-col lg:flex-row">
               {/* Left Side - Profile */}
-              <div className="lg:w-1/3  text-white p-8 flex flex-col items-center justify-center">
+              <div className="  text-white p-8 flex flex-col items-center justify-center">
                 <div className="relative mb-6">
                   <div className="w-24 h-24  overflow-hidden bg-gray-700">
                     <img 
