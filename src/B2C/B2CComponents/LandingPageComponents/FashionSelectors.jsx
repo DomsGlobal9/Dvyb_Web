@@ -97,13 +97,13 @@ const FashionSelector = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-2">
-          <button className="flex-1 bg-[#5B9BA5] hover:bg-[#4A8A94] text-white px-6 py-3.5 rounded font-semibold text-sm uppercase tracking-wide transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+        <div className="flex flex-col justify-center  sm:flex-row gap-3 pt-2">
+          <button className="flex-1  bg-[#5B9BA5] hover:bg-[#4A8A94] text-white px-6 py-3.5 rounded font-semibold text-sm uppercase tracking-wide transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
           <img src={Bag} alt="" className='h-4' />  ADD TO BAG
           </button>
-          <button className=" text-gray-700 px-5 py-3.5 rounded border-2 border-gray-300 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md">
+          <button className=" text-gray-700 px-5 flex  justify-center py-3.5 rounded border-2 border-gray-300 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md">
             {/* <Heart size={20} /> */}
-            <img src={heart} alt="" />
+            <img src={heart} alt=""  />
           </button>
         </div>
       </div>

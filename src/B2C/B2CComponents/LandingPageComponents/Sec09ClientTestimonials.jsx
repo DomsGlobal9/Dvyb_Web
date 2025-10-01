@@ -107,7 +107,7 @@ const ClientTestimonials = () => {
 
         {/* Main Testimonials Section */}
         <div className="text-start mt-14 mb-12">
-          <div className='border border-black text-center p-2 w-2/12'><h3 className='text-[#09545F] font-semibold'>HEAR OUR VOICES</h3></div>
+          <div className='border border-black text-center p-2 w-40'><h3 className='text-[#09545F] font-semibold'>HEAR OUR VOICES</h3></div>
           <h2 className="text-3xl mt-4 sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           WHAT OUR USER SAYS
           </h2>
