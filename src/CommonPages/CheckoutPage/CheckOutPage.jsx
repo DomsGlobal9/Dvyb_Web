@@ -105,13 +105,29 @@ export default function CheckoutPage() {
   }, []);
 
   // Get default/billing address
-  const getBillingAddress = () => {
-    if (!userData || !userData.addresses || userData.addresses.length === 0) {
-      return null;
-    }
-    return userData.addresses.find((addr) => addr.isDefault) || userData.addresses[0];
-  };
-
+  // const getBillingAddress = () => {
+  //   if (!userData || !userData.addresses || userData.addresses.length === 0) {
+  //     return null;
+  //   }
+  //   return userData.addresses.find((addr) => addr.isDefault) || userData.addresses[0];
+  // };
+const getBillingAddress = () => {
+  if (!userData) {
+    return null;
+  }
+  
+  if (!userData.addresses || !Array.isArray(userData.addresses) || userData.addresses.length === 0) {
+    return null;
+  }
+  
+  const address = userData.addresses.find((addr) => addr.isDefault) || userData.addresses[0];
+  
+  if (!address || !address.name || !address.details || !address.phone) {
+    return null;
+  }
+  
+  return address;
+};
   const billingAddress = getBillingAddress();
 
   // Handle billing form changes
