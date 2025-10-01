@@ -207,10 +207,10 @@ const navigate=useNavigate()
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-2 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm mb-6 p-4 flex justify-between items-center">
+        {/* <div className="bg-white rounded-lg shadow-sm mb-6 p-4 flex justify-between items-center">
           <h1></h1>
           <button
             onClick={() => setShowShareModal(true)}
@@ -218,7 +218,7 @@ const navigate=useNavigate()
           >
             <Share2 className="h-5 w-5 text-gray-600" />
           </button>
-        </div>
+        </div> */}
 
         {/* Cart Table */}
         {cartItems.length === 0 ? (

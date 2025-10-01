@@ -15,10 +15,26 @@ function PremiumSection05() {
   const [wishlistItems, setWishlistItems] = useState(new Set());
   const [addingToCart, setAddingToCart] = useState(new Set());
   const [togglingWishlist, setTogglingWishlist] = useState(new Set());
-  
+  const [displayedProducts, setDisplayedProducts] = useState([]);
+
   const { user } = useAuth();
   const navigate = useNavigate();
 
+
+  useEffect(() => {
+  const handleResize = () => {
+    if (window.innerWidth < 768) { // mobile < md
+      setDisplayedProducts(products.slice(0, 3));
+    } else {
+      setDisplayedProducts(products);
+    }
+  };
+
+  handleResize(); // run on mount
+  window.addEventListener("resize", handleResize);
+
+  return () => window.removeEventListener("resize", handleResize);
+}, [products]);
   // Fetch products on component mount
   useEffect(() => {
     const fetchPremiumProducts = async () => {
@@ -209,13 +225,14 @@ function PremiumSection05() {
         </div>
 
         {/* Product Grid */}
-     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4  gap-2 lg:gap-24 justify-items-center">
+     <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-4  gap-2 lg:gap-24 justify-items-center">
   {products.length === 0 ? (
     <p className="text-gray-600 text-center col-span-full">
       No premium products available at the moment.
     </p>
   ) : (
-    products.map((product) => (
+    displayedProducts.map((product) => (
+
       <div
         key={product.id}
         className="bg-white rounded-lg shadow-sm border  border-gray-200 overflow-hidden hover:shadow-md transition-shadow w-full max-w-[320px] md:max-w-[340px] lg:max-w-[360px] xl:w-80 cursor-pointer"
@@ -295,7 +312,7 @@ function PremiumSection05() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center md:space-x-2">
+          <div className="flex items-center space-x-2">
             {/* Add to Cart Button */}
             <button 
               className={`flex-1 bg-[#3C8E9A] hover:bg-teal-700 text-white text-xs font-medium py-2 px-3 rounded flex items-center justify-center space-x-1 transition-colors ${
@@ -304,7 +321,7 @@ function PremiumSection05() {
               onClick={(e) => handleAddToCart(product, e)}
               disabled={addingToCart.has(product.id)}
             >
-              <ShoppingCart className="w-3 h-3 me-1 md:h-5 md:w-5 md:me-4" />
+              <ShoppingCart className="w-5  me-4 h-5 md:w-5 " />
               <p >
                 {addingToCart.has(product.id) ? (
                   <>ADDING...</>

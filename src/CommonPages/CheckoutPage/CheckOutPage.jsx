@@ -17,7 +17,7 @@ export default function CheckoutPage() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // Billing form state
-  const [useBillingAddressAsDefault, setUseBillingAddressAsDefault] = useState(true);
+  const [useBillingAddressAsDefault, setUseBillingAddressAsDefault] = useState(false);
   const [billingFormData, setBillingFormData] = useState({
     firstName: "",
     lastName: "",
@@ -141,9 +141,11 @@ export default function CheckoutPage() {
     try {
       let billingAddressToSave;
 
+      // Check if using default address and it exists
       if (useBillingAddressAsDefault && billingAddress) {
         billingAddressToSave = billingAddress;
       } else {
+        // Validate billing form - required for new users or custom address
         if (
           !billingFormData.firstName ||
           !billingFormData.lastName ||
@@ -165,7 +167,7 @@ export default function CheckoutPage() {
             billingFormData.aptSuite ? ", " + billingFormData.aptSuite : ""
           }, ${billingFormData.city}, ${billingFormData.state} ${
             billingFormData.postalCode
-          }, ${billingFormData.country}`,
+          }, ${billingFormData.country || ""}`,
           phone: billingFormData.phone,
           isBilling: true,
           createdAt: new Date().toISOString(),
@@ -268,20 +270,30 @@ export default function CheckoutPage() {
     }
 
     if (!deliveryConfirmed) {
-      alert("Please confirm billing details first");
+      alert("Please confirm billing details first by clicking 'Continue to Delivery'");
       return;
     }
 
-    setIsProcessingPayment(true);
-
+    // Verify addresses are saved in Firebase before proceeding
     try {
-      // Get addresses from Firebase
       const userRef = doc(db, collectionName, user.uid);
       const userSnap = await getDoc(userRef);
       const userData = userSnap.data();
 
-      const billingAddr = userData?.currentBillingAddress;
-      const shippingAddr = userData?.currentShippingAddress || billingAddr;
+      if (!userData?.currentBillingAddress) {
+        alert("Please confirm your billing address first");
+        return;
+      }
+
+      if (!userData?.currentShippingAddress && shippingOption !== "same") {
+        alert("Please confirm your shipping address by clicking 'Confirm Shipping Address'");
+        return;
+      }
+
+      setIsProcessingPayment(true);
+
+      const billingAddr = userData.currentBillingAddress;
+      const shippingAddr = userData.currentShippingAddress || billingAddr;
 
       // Prepare products array from cart
       const products = cartItems.map(item => ({
@@ -382,7 +394,8 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              {!useBillingAddressAsDefault && (
+              {/* Show form if no saved address OR checkbox is unchecked */}
+              {(!billingAddress || !useBillingAddressAsDefault) && (
                 <div className="space-y-4 mb-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
@@ -392,6 +405,7 @@ export default function CheckoutPage() {
                       onChange={handleBillingChange}
                       placeholder="First Name*"
                       className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      required
                     />
                     <input
                       type="text"
@@ -400,14 +414,40 @@ export default function CheckoutPage() {
                       onChange={handleBillingChange}
                       placeholder="Last Name*"
                       className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      required
                     />
                   </div>
+                  <input
+                    type="text"
+                    name="country"
+                    value={billingFormData.country}
+                    onChange={handleBillingChange}
+                    placeholder="Country / Region*"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                  />
+                  <input
+                    type="text"
+                    name="company"
+                    value={billingFormData.company}
+                    onChange={handleBillingChange}
+                    placeholder="Company (optional)"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                  />
                   <input
                     type="text"
                     name="streetAddress"
                     value={billingFormData.streetAddress}
                     onChange={handleBillingChange}
                     placeholder="Street Address*"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                    required
+                  />
+                  <input
+                    type="text"
+                    name="aptSuite"
+                    value={billingFormData.aptSuite}
+                    onChange={handleBillingChange}
+                    placeholder="Apt, suite, unit (optional)"
                     className="w-full px-4 py-2 border border-gray-300 rounded-md"
                   />
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -418,6 +458,7 @@ export default function CheckoutPage() {
                       onChange={handleBillingChange}
                       placeholder="City*"
                       className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      required
                     />
                     <input
                       type="text"
@@ -426,6 +467,7 @@ export default function CheckoutPage() {
                       onChange={handleBillingChange}
                       placeholder="State*"
                       className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      required
                     />
                     <input
                       type="text"
@@ -434,6 +476,7 @@ export default function CheckoutPage() {
                       onChange={handleBillingChange}
                       placeholder="Postal Code*"
                       className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      required
                     />
                   </div>
                   <input
@@ -443,6 +486,7 @@ export default function CheckoutPage() {
                     onChange={handleBillingChange}
                     placeholder="Phone*"
                     className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                    required
                   />
                 </div>
               )}
@@ -493,9 +537,152 @@ export default function CheckoutPage() {
                 </label>
               </div>
 
+              {/* Different Shipping Address Form - FIXED */}
               {shippingOption === "different" && (
                 <div className="mt-4 space-y-4">
-                  {/* Add shipping form fields similar to billing */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        First Name*
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={shippingFormData.firstName}
+                        onChange={handleShippingChange}
+                        placeholder="First Name"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Last Name*
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={shippingFormData.lastName}
+                        onChange={handleShippingChange}
+                        placeholder="Last Name"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Country / Region*
+                      </label>
+                      <input
+                        type="text"
+                        name="country"
+                        value={shippingFormData.country}
+                        onChange={handleShippingChange}
+                        placeholder="Country / Region"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Company Name
+                      </label>
+                      <input
+                        type="text"
+                        name="company"
+                        value={shippingFormData.company}
+                        onChange={handleShippingChange}
+                        placeholder="Company (optional)"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Street Address*
+                    </label>
+                    <input
+                      type="text"
+                      name="streetAddress"
+                      value={shippingFormData.streetAddress}
+                      onChange={handleShippingChange}
+                      placeholder="House number and street name"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Apt, suite, unit
+                    </label>
+                    <input
+                      type="text"
+                      name="aptSuite"
+                      value={shippingFormData.aptSuite}
+                      onChange={handleShippingChange}
+                      placeholder="apartment, suite, unit, etc. (optional)"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        City*
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={shippingFormData.city}
+                        onChange={handleShippingChange}
+                        placeholder="Town / City"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        State*
+                      </label>
+                      <select
+                        name="state"
+                        value={shippingFormData.state}
+                        onChange={handleShippingChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                      >
+                        <option value="">State</option>
+                        <option value="California">California</option>
+                        <option value="Texas">Texas</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Postal Code*
+                      </label>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        value={shippingFormData.postalCode}
+                        onChange={handleShippingChange}
+                        placeholder="Postal Code"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone*
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={shippingFormData.phone}
+                      onChange={handleShippingChange}
+                      placeholder="Phone"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                    />
+                  </div>
                 </div>
               )}
 
