@@ -295,7 +295,7 @@ function PremiumSection05() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center md:space-x-2">
             {/* Add to Cart Button */}
             <button 
               className={`flex-1 bg-[#3C8E9A] hover:bg-teal-700 text-white text-xs font-medium py-2 px-3 rounded flex items-center justify-center space-x-1 transition-colors ${
@@ -304,7 +304,7 @@ function PremiumSection05() {
               onClick={(e) => handleAddToCart(product, e)}
               disabled={addingToCart.has(product.id)}
             >
-              <ShoppingCart className="w-3 h-3 me-1.5 md:h-5 md:w-5 md:me-4" />
+              <ShoppingCart className="w-3 h-3 me-0.5 md:h-5 md:w-5 md:me-4" />
               <p >
                 {addingToCart.has(product.id) ? (
                   <>ADDING...</>
