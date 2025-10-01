@@ -22,6 +22,7 @@ import ProductsPage from "../B2BBulkOrders/Pages/Products/ProductsPage";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import B2bProfilePage from "../CommonPages/ProfilePage/B2bProfilePage";
 import ProductDetailWrapper from "../B2BBulkOrders/Pages/Products/ProductDetailWrapper";
+import CheckoutPage from "../CommonPages/CheckoutPage/CheckOutPage";
 // import Navbar from "../common/Navbar/b2cNavbar";
 
 const WebRoutes = () => {
@@ -73,7 +74,8 @@ const WebRoutes = () => {
             <CartPage />
           </ProtectedRoute>
         }
-      />
+      />/
+      <Route path="/checkoutpage" element={<CheckoutPage/>}/>
       <Route
         path="/your-profile"
         element={

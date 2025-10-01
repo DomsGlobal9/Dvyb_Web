@@ -1,13 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Share2, Trash2, X, MessageCircle, Mail, Facebook, Link } from 'lucide-react';
-import { subscribeToCart, removeFromCart } from '../../services/CartService';
+import React, { useState, useEffect } from "react";
+import {
+  Share2,
+  Trash2,
+  X,
+  MessageCircle,
+  Mail,
+  Facebook,
+  Link,
+} from "lucide-react";
+import { subscribeToCart, removeFromCart } from "../../services/CartService";
+import { useNavigate } from "react-router-dom";
 
 function CartPage() {
   const [cartItems, setCartItems] = useState([]);
-  const [couponCode, setCouponCode] = useState('');
+  const [couponCode, setCouponCode] = useState("");
   const [showShareModal, setShowShareModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
+const navigate=useNavigate()
   useEffect(() => {
     let unsubscribe = null;
 
@@ -18,7 +27,7 @@ function CartPage() {
           setIsLoading(false);
         });
       } catch (error) {
-        console.error('Error setting up cart subscription:', error);
+        console.error("Error setting up cart subscription:", error);
         setIsLoading(false);
       }
     };
@@ -32,18 +41,29 @@ function CartPage() {
     };
   }, []);
 
+  const handleProceedToCheckout = () => {
+  if (cartItems.length === 0) {
+    alert("Your cart is empty. Please add items before checkout.");
+    return;
+  }
+  navigate("/checkoutpage"); // Update path to match your routing
+};
+
   const removeItem = async (productId) => {
     try {
       await removeFromCart(productId);
       // Real-time listener will automatically update the cart
     } catch (error) {
-      console.error('Error removing item from cart:', error);
+      console.error("Error removing item from cart:", error);
       alert(`Failed to remove item: ${error.message}`);
     }
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
-  const shipping = cartItems.some(item => !item.freeShipping) ? 50 : 0;
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + (item.subtotal || 0),
+    0
+  );
+  const shipping = cartItems.some((item) => !item.freeShipping) ? 50 : 0;
   const grandTotal = subtotal + shipping;
 
   const ShareModal = () => (
@@ -67,15 +87,22 @@ function CartPage() {
         <div className="p-4 space-y-4">
           {/* Cart Summary */}
           <div>
-            <p className="text-sm text-gray-600 mb-3">Total Products: {cartItems.length}</p>
-            
+            <p className="text-sm text-gray-600 mb-3">
+              Total Products: {cartItems.length}
+            </p>
+
             {/* Product Images */}
             <div className="flex space-x-2 mb-4">
               {cartItems.map((item) => (
                 <div key={item.id} className="relative">
                   <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
-                    <img 
-                      src={item.image || 'https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&fit=crop'} 
+                    <img
+                      // src={item.image || 'https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&fit=crop'}
+                      src={
+                        item.imageUrls && item.imageUrls.length > 0
+                          ? item.imageUrls[0]
+                          : "https://via.placeholder.com/400"
+                      }
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />
@@ -96,7 +123,9 @@ function CartPage() {
 
           {/* Share Options */}
           <div>
-            <h3 className="text-sm font-medium text-gray-900 mb-3">Share Via:</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-3">
+              Share Via:
+            </h3>
             <div className="grid grid-cols-4 gap-4 mb-4">
               <button className="flex flex-col items-center space-y-1 p-2 hover:bg-gray-50 rounded-lg">
                 <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
@@ -104,21 +133,21 @@ function CartPage() {
                 </div>
                 <span className="text-xs text-gray-700">WhatsApp</span>
               </button>
-              
+
               <button className="flex flex-col items-center space-y-1 p-2 hover:bg-gray-50 rounded-lg">
                 <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
                   <Mail className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xs text-gray-700">Gmail</span>
               </button>
-              
+
               <button className="flex flex-col items-center space-y-1 p-2 hover:bg-gray-50 rounded-lg">
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                   <Facebook className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xs text-gray-700">Facebook</span>
               </button>
-              
+
               <button className="flex flex-col items-center space-y-1 p-2 hover:bg-gray-50 rounded-lg">
                 <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center">
                   <Link className="h-5 w-5 text-white" />
@@ -129,13 +158,13 @@ function CartPage() {
           </div>
 
           {/* Divider */}
-          <div className="text-center text-sm text-gray-500 py-2">
-            Or
-          </div>
+          <div className="text-center text-sm text-gray-500 py-2">Or</div>
 
           {/* QR Code Section */}
           <div className="text-center">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">Scan QR Code</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-3">
+              Scan QR Code
+            </h3>
             <div className="flex justify-center mb-4">
               <div className="w-32 h-32 bg-white border-2 border-gray-200 rounded-lg flex items-center justify-center">
                 <div className="w-28 h-28 bg-black relative overflow-hidden">
@@ -145,7 +174,7 @@ function CartPage() {
                         <div
                           key={i}
                           className={`${
-                            Math.random() > 0.5 ? 'bg-black' : 'bg-white'
+                            Math.random() > 0.5 ? "bg-black" : "bg-white"
                           }`}
                         />
                       ))}
@@ -182,8 +211,8 @@ function CartPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm mb-6 p-4 flex justify-between items-center">
-        <h1></h1>
-          <button 
+          <h1></h1>
+          <button
             onClick={() => setShowShareModal(true)}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
@@ -194,8 +223,12 @@ function CartPage() {
         {/* Cart Table */}
         {cartItems.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-            <h3 className="text-lg font-medium text-gray-900">Your cart is empty</h3>
-            <p className="text-sm text-gray-600">Start adding items to see them here!</p>
+            <h3 className="text-lg font-medium text-gray-900">
+              Your cart is empty
+            </h3>
+            <p className="text-sm text-gray-600">
+              Start adding items to see them here!
+            </p>
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
@@ -216,17 +249,31 @@ function CartPage() {
                   <div className="hidden lg:grid lg:grid-cols-12 items-center gap-4">
                     <div className="col-span-5 flex items-center space-x-4">
                       <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0">
-                        <img 
-                          src={item.image || 'https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop'} 
+                        <img
+                          // src={
+                          //   item.image ||
+                          //   "https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop"
+                          // }
+                          src={
+                        item.imageUrls && item.imageUrls.length > 0
+                          ? item.imageUrls[0]
+                          : "https://via.placeholder.com/400"
+                      }
                           alt={item.name}
                           className="w-full h-full object-cover rounded-lg"
                         />
                       </div>
                       <div>
-                        <h3 className="font-medium text-gray-900">{item.name}</h3>
-                        <p className="text-sm text-gray-600">Color: {item.color || 'N/A'}</p>
+                        <h3 className="font-medium text-gray-900">
+                          {item.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Color: {item.color || "N/A"}
+                        </p>
                         {item.shippingMessage && (
-                          <p className="text-xs text-orange-600 mt-1">{item.shippingMessage}</p>
+                          <p className="text-xs text-orange-600 mt-1">
+                            {item.shippingMessage}
+                          </p>
                         )}
                         {item.freeShipping && (
                           <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mt-1">
@@ -236,13 +283,17 @@ function CartPage() {
                       </div>
                     </div>
                     <div className="col-span-2 text-center">
-                      <span className="font-medium">₹{(item.price || 0).toLocaleString()}</span>
+                      <span className="font-medium">
+                        ₹{(item.price || 0).toLocaleString()}
+                      </span>
                     </div>
                     <div className="col-span-1 text-center">
-                      <span className="font-medium">{item.size || 'N/A'}</span>
+                      <span className="font-medium">{item.size || "N/A"}</span>
                     </div>
                     <div className="col-span-2 text-center">
-                      <span className="font-medium">₹{(item.subtotal || 0).toLocaleString()}</span>
+                      <span className="font-medium">
+                        ₹{(item.subtotal || 0).toLocaleString()}
+                      </span>
                     </div>
                     <div className="col-span-2 text-center">
                       <button
@@ -258,17 +309,31 @@ function CartPage() {
                   <div className="lg:hidden space-y-3">
                     <div className="flex space-x-4">
                       <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0">
-                        <img 
-                          src={item.image || 'https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop'} 
+                        <img
+                          // src={
+                          //   item.image ||
+                          //   "https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop"
+                          // }
+                          src={
+                        item.imageUrls && item.imageUrls.length > 0
+                          ? item.imageUrls[0]
+                          : "https://via.placeholder.com/400"
+                      }
                           alt={item.name}
                           className="w-full h-full object-cover rounded-lg"
                         />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{item.name}</h3>
-                        <p className="text-sm text-gray-600">Color: {item.color || 'N/A'}</p>
+                        <h3 className="font-medium text-gray-900">
+                          {item.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Color: {item.color || "N/A"}
+                        </p>
                         <div className="flex justify-between items-center mt-2">
-                          <span className="text-sm text-gray-600">Size: {item.size || 'N/A'}</span>
+                          <span className="text-sm text-gray-600">
+                            Size: {item.size || "N/A"}
+                          </span>
                           <button
                             onClick={() => removeItem(item.id)}
                             className="p-1 text-gray-400 hover:text-red-500 transition-colors"
@@ -279,11 +344,17 @@ function CartPage() {
                       </div>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Price: ₹{(item.price || 0).toLocaleString()}</span>
-                      <span className="font-medium">Subtotal: ₹{(item.subtotal || 0).toLocaleString()}</span>
+                      <span className="text-sm text-gray-600">
+                        Price: ₹{(item.price || 0).toLocaleString()}
+                      </span>
+                      <span className="font-medium">
+                        Subtotal: ₹{(item.subtotal || 0).toLocaleString()}
+                      </span>
                     </div>
                     {item.shippingMessage && (
-                      <p className="text-xs text-orange-600">{item.shippingMessage}</p>
+                      <p className="text-xs text-orange-600">
+                        {item.shippingMessage}
+                      </p>
                     )}
                     {item.freeShipping && (
                       <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
@@ -301,7 +372,9 @@ function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Discount Codes */}
           <div className="lg:col-span-2 bg-[#F6F6F6] rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Discount Codes</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Discount Codes
+            </h3>
             <div className="space-y-4">
               <input
                 type="text"
@@ -326,7 +399,9 @@ function CartPage() {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">Sub Total</span>
-                <span className="font-medium">₹{subtotal.toLocaleString()}</span>
+                <span className="font-medium">
+                  ₹{subtotal.toLocaleString()}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
@@ -337,14 +412,16 @@ function CartPage() {
                 <span>Grand Total</span>
                 <span>₹{grandTotal.toLocaleString()}</span>
               </div>
-              <button className="w-full bg-teal-700 text-white py-3 rounded-lg hover:bg-teal-800 transition-colors font-medium">
+              <button className="w-full bg-teal-700 text-white py-3 rounded-lg hover:bg-teal-800 transition-colors font-medium" 
+              onClick={handleProceedToCheckout}
+              >
                 Proceed To Checkout
               </button>
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Share Modal */}
       {showShareModal && <ShareModal />}
     </div>

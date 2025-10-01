@@ -16,7 +16,7 @@ function PremiumSection05() {
   const [addingToCart, setAddingToCart] = useState(new Set());
   const [togglingWishlist, setTogglingWishlist] = useState(new Set());
   
-  const { user, userRole, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   // Fetch products on component mount
