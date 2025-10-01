@@ -25,7 +25,7 @@ function PremiumSection05() {
       try {
         setLoading(true);
         const fetchedProducts = await productService.fetchAllProducts();
-        setProducts(fetchedProducts.slice(0, 6)); // Limit to last 6 products
+        setProducts(fetchedProducts.slice(0, 8)); // Limit to last 6 products
         console.log("Fetched products:", fetchedProducts);
       } catch (err) {
         setError("Failed to load premium products. Please try again later.");
@@ -209,7 +209,7 @@ function PremiumSection05() {
         </div>
 
         {/* Product Grid */}
-     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4  gap-2 lg:gap-24 justify-items-center">
   {products.length === 0 ? (
     <p className="text-gray-600 text-center col-span-full">
       No premium products available at the moment.
@@ -218,11 +218,11 @@ function PremiumSection05() {
     products.map((product) => (
       <div
         key={product.id}
-        className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow w-full max-w-[320px] md:max-w-[340px] lg:max-w-[360px] xl:w-80 cursor-pointer"
+        className="bg-white rounded-lg shadow-sm border  border-gray-200 overflow-hidden hover:shadow-md transition-shadow w-full max-w-[320px] md:max-w-[340px] lg:max-w-[360px] xl:w-80 cursor-pointer"
         onClick={() => handleProductClick(product)}
       >
         {/* Product Image */}
-        <div className="relative aspect-[4/5] overflow-hidden">
+        <div className="relative aspect-[4/5]  overflow-hidden">
           <img
             src={
               product.imageUrls && product.imageUrls.length > 0
@@ -304,8 +304,8 @@ function PremiumSection05() {
               onClick={(e) => handleAddToCart(product, e)}
               disabled={addingToCart.has(product.id)}
             >
-              <ShoppingCart className="w-5 h-5 me-4" />
-              <p>
+              <ShoppingCart className="w-3 h-3 me-1.5 md:h-5 md:w-5 md:me-4" />
+              <p >
                 {addingToCart.has(product.id) ? (
                   <>ADDING...</>
                 ) : (
