@@ -8,6 +8,9 @@ import {
   subscribeToWishlist,
   clearWishlist 
 } from '../../services/WishlistService';
+import { addToCart } from "../../services/CartService";
+import { toast } from "react-toastify"; // optional, for user feedback
+
 
 // Wishlist Button Component
 const WishlistButton = ({ productId, productData, className = "" }) => {
@@ -164,19 +167,20 @@ const WishlistPage = () => {
               }}
             >
               {/* Product Image */}
-              {item.image && (
-                <img 
-                  src={item.image} 
-                  alt={item.name || 'Product'} 
-                  style={{
-                    width: '80px',
-                    height: '80px',
-                    objectFit: 'cover',
-                    borderRadius: '4px',
-                    marginRight: '15px'
-                  }}
-                />
-              )}
+              {(item.image || item.imageUrls?.[0]) && (
+  <img 
+    src={item.image || item.imageUrls[0]} 
+    alt={item.name || 'Product'} 
+    style={{
+      width: '80px',
+      height: '80px',
+      objectFit: 'cover',
+      borderRadius: '4px',
+      marginRight: '15px'
+    }}
+  />
+)}
+
               
               {/* Product Details */}
               <div className="item-details" style={{ flex: 1 }}>
@@ -207,18 +211,37 @@ const WishlistPage = () => {
                 >
                   Remove
                 </button>
-                <button
-                  style={{
-                    background: '#2ed573',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 12px',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Add to Cart
-                </button>
+              <button
+  onClick={async () => {
+    try {
+      await addToCart(item.productId, {
+        name: item.name,
+        price: item.price,
+        color: item.color,
+        size: item.size,
+        imageUrls: item.imageUrls || [item.image],
+        freeShipping: item.freeShipping,
+        shippingMessage: item.shippingMessage,
+      });
+
+      alert("Added to cart!"); // or use toast for better UX
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      alert("Failed to add to cart. Please try again.");
+    }
+  }}
+  style={{
+    background: "#2ed573",
+    color: "white",
+    border: "none",
+    padding: "8px 12px",
+    borderRadius: "4px",
+    cursor: "pointer",
+  }}
+>
+  Add to Cart
+</button>
+
               </div>
             </div>
           ))}

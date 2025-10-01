@@ -16,6 +16,7 @@ import fav from "../../assets/B2Bassets/NavbarImages/heart.png";
 import cart from "../../assets/B2Bassets/NavbarImages/cart.png";
 import profile from "../../assets/B2Bassets/NavbarImages/profile.png";
 import { useNavigate } from "react-router-dom";
+import { useWishlist } from "../../context/WishlistContext";
 
 const Navbar = () => {
   const [showWomenCategories, setShowWomenCategories] = useState(false);
@@ -27,7 +28,11 @@ const Navbar = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   
+  //wishlist
 
+const { wishlist } = useWishlist();
+
+console.log(wishlist,'wishlists')
   // Auth check (from localStorage or context/provider if used)
   const isLoggedIn = !!localStorage.getItem("authToken");
 
@@ -156,14 +161,22 @@ const Navbar = () => {
               />
               {/* Favorites, Cart, Profile */}
               <div className="hidden md:flex items-center space-x-6 text-xl text-blue-900">
-                <img
-                  className="cursor-pointer w-5 h-5"
-                  src={fav}
-                  alt="wishlist"
-                  onClick={() =>
-                    handleProtectedClick(() => navigate("/mywishlist"))
-                  }
-                />
+              <div className="relative">
+  <img
+    className="cursor-pointer w-5 h-5"
+    src={fav}
+    alt="wishlist"
+    onClick={() =>
+      handleProtectedClick(() => navigate("/mywishlist"))
+    }
+  />
+  {wishlist.length > 0 && (
+    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+      {wishlist.length}
+    </span>
+  )}
+</div>
+
                 <img
                   className="cursor-pointer w-5 h-5"
                   src={cart}

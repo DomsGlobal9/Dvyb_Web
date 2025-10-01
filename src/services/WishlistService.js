@@ -55,6 +55,7 @@ export const addToWishlist = async (productId, productData = {}) => {
         cleanedProductData[key] = value;
       }
     }
+console.log("Saving productData:", productData);
 
     await setDoc(wishlistItemRef, {
       productId,
