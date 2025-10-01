@@ -48,7 +48,7 @@ const VideoSection = () => {
             alt="Background Image"
           />
           {/* Overlay the FashionTryOnSection */}
-          <div className="absolute inset-0 flex items-center justify-center pt-96 md:pt-16 lg:items-start lg:justify-start lg:pl-12 lg:pt-16">
+          <div className="absolute inset-0 flex items-center justify-center sm:pt-96 md:pt-16 lg:items-start lg:justify-start lg:pl-12 lg:pt-16">
             <FashionTryOnSection />
           </div>
         </div>
