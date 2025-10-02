@@ -7,6 +7,10 @@ import { subscribeToCart, clearCart } from "../../services/CartService";
 import { createOrder } from "../../services/OrderService";
 import { useNavigate } from "react-router-dom";
 
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { app } from "../../firebase";
+// import { connectFunctionsEmulator } from "firebase/functions";
+
 export default function CheckoutPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -15,6 +19,8 @@ export default function CheckoutPage() {
   const [userData, setUserData] = useState(null);
   const [collectionName, setCollectionName] = useState("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+// const functions = getFunctions(app);
+const functions = getFunctions(app, "us-central1");
 
   // Billing form state
   const [useBillingAddressAsDefault, setUseBillingAddressAsDefault] = useState(false);
@@ -130,6 +136,7 @@ export default function CheckoutPage() {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
   const shipping = cartItems.some((item) => !item.freeShipping) ? 50 : 0;
   const total = subtotal + shipping;
+  console.log(total,"total..............")
 
   // Continue to Delivery - Save billing details
   const handleContinueToDelivery = async () => {
@@ -263,81 +270,270 @@ export default function CheckoutPage() {
   };
 
   // Handle payment - CREATE ORDER
+  // const handlePayNow = async () => {
+  //   if (cartItems.length === 0) {
+  //     alert("Your cart is empty");
+  //     return;
+  //   }
+
+  //   if (!deliveryConfirmed) {
+  //     alert("Please confirm billing details first by clicking 'Continue to Delivery'");
+  //     return;
+  //   }
+
+  //   // Verify addresses are saved in Firebase before proceeding
+  //   try {
+  //     const userRef = doc(db, collectionName, user.uid);
+  //     const userSnap = await getDoc(userRef);
+  //     const userData = userSnap.data();
+
+  //     if (!userData?.currentBillingAddress) {
+  //       alert("Please confirm your billing address first");
+  //       return;
+  //     }
+
+  //     if (!userData?.currentShippingAddress && shippingOption !== "same") {
+  //       alert("Please confirm your shipping address by clicking 'Confirm Shipping Address'");
+  //       return;
+  //     }
+
+  //     setIsProcessingPayment(true);
+
+  //     const billingAddr = userData.currentBillingAddress;
+  //     const shippingAddr = userData.currentShippingAddress || billingAddr;
+
+  //     // Prepare products array from cart
+  //     const products = cartItems.map(item => ({
+  //       productId: item.productId || item.id,
+  //       name: item.name || item.title || "Product",
+  //       color: item.color || "N/A",
+  //       size: item.size || "N/A",
+  //       quantity: item.quantity || 1,
+  //       price: item.price || 0,
+  //       image: (item.imageUrls && item.imageUrls[0]) || item.image || "https://via.placeholder.com/80",
+  //       subtotal: item.subtotal || 0
+  //     }));
+
+  //     // Prepare order data
+  //     const orderData = {
+  //       products,
+  //       billingAddress: billingAddr,
+  //       shippingAddress: shippingAddr,
+  //       paymentMethod,
+  //       subtotal,
+  //       shipping,
+  //       total,
+  //       estimatedDelivery: "Within 5-7 business days"
+  //     };
+
+  //     // Create order in Firebase
+  //     const result = await createOrder(orderData);
+
+  //     if (result.success) {
+  //       // Clear the cart after successful order
+  //       await clearCart();
+        
+  //       alert(`Order placed successfully! Order ID: ${result.orderId}`);
+        
+  //       // Navigate to orders page
+  //       navigate("/");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error placing order:", error);
+  //     alert("Failed to place order: " + error.message);
+  //   } finally {
+  //     setIsProcessingPayment(false);
+  //   }
+  // };
+
+
+  
+
   const handlePayNow = async () => {
-    if (cartItems.length === 0) {
-      alert("Your cart is empty");
+  if (cartItems.length === 0) {
+    alert("Your cart is empty");
+    return;
+  }
+  if (!deliveryConfirmed) {
+    alert("Please confirm billing details first by clicking 'Continue to Delivery'");
+    return;
+  }
+
+//   if (window.location.hostname === "localhost") {
+//   connectFunctionsEmulator(functions, "localhost", 5001);
+// }
+
+  try {
+    // Validate addresses again (same as your existing checks)
+    const userRef = doc(db, collectionName, user.uid);
+    const userSnap = await getDoc(userRef);
+    const userData = userSnap.data();
+    if (!userData?.currentBillingAddress) {
+      alert("Please confirm your billing address first");
+      return;
+    }
+    if (!userData?.currentShippingAddress && shippingOption !== "same") {
+      alert("Please confirm your shipping address by clicking 'Confirm Shipping Address'");
       return;
     }
 
-    if (!deliveryConfirmed) {
-      alert("Please confirm billing details first by clicking 'Continue to Delivery'");
-      return;
-    }
+    setIsProcessingPayment(true);
 
-    // Verify addresses are saved in Firebase before proceeding
-    try {
-      const userRef = doc(db, collectionName, user.uid);
-      const userSnap = await getDoc(userRef);
-      const userData = userSnap.data();
+    const billingAddr = userData.currentBillingAddress;
+    const shippingAddr = userData.currentShippingAddress || billingAddr;
 
-      if (!userData?.currentBillingAddress) {
-        alert("Please confirm your billing address first");
-        return;
-      }
+    const products = cartItems.map(item => ({
+      productId: item.productId || item.id,
+      name: item.name || item.title || "Product",
+      color: item.color || "N/A",
+      size: item.size || "N/A",
+      quantity: item.quantity || 1,
+      price: item.price || 0,
+      image: (item.imageUrls && item.imageUrls[0]) || item.image || "https://via.placeholder.com/80",
+      subtotal: item.subtotal || 0
+    }));
 
-      if (!userData?.currentShippingAddress && shippingOption !== "same") {
-        alert("Please confirm your shipping address by clicking 'Confirm Shipping Address'");
-        return;
-      }
+    const orderData = {
+      products, billingAddress: billingAddr, shippingAddress: shippingAddr,
+      paymentMethod, subtotal, shipping, total, estimatedDelivery: "Within 5-7 business days"
+    };
 
-      setIsProcessingPayment(true);
-
-      const billingAddr = userData.currentBillingAddress;
-      const shippingAddr = userData.currentShippingAddress || billingAddr;
-
-      // Prepare products array from cart
-      const products = cartItems.map(item => ({
-        productId: item.productId || item.id,
-        name: item.name || item.title || "Product",
-        color: item.color || "N/A",
-        size: item.size || "N/A",
-        quantity: item.quantity || 1,
-        price: item.price || 0,
-        image: (item.imageUrls && item.imageUrls[0]) || item.image || "https://via.placeholder.com/80",
-        subtotal: item.subtotal || 0
-      }));
-
-      // Prepare order data
-      const orderData = {
-        products,
-        billingAddress: billingAddr,
-        shippingAddress: shippingAddr,
-        paymentMethod,
-        subtotal,
-        shipping,
-        total,
-        estimatedDelivery: "Within 5-7 business days"
-      };
-
-      // Create order in Firebase
-      const result = await createOrder(orderData);
-
-      if (result.success) {
-        // Clear the cart after successful order
+    // If COD -> use your server/firestore createOrder flow (no Razorpay)
+    if (paymentMethod === "cod") {
+      const res = await createOrder(orderData); // keep your existing service (server-side)
+      if (res.success) {
         await clearCart();
-        
-        alert(`Order placed successfully! Order ID: ${result.orderId}`);
-        
-        // Navigate to orders page
-        navigate("/");
+        alert(`Order placed successfully! Order ID: ${res.orderId}`);
+        navigate("/"); // or order success page
       }
-    } catch (error) {
-      console.error("Error placing order:", error);
-      alert("Failed to place order: " + error.message);
-    } finally {
-      setIsProcessingPayment(false);
+      return;
     }
-  };
+
+    // Prepaid (credit/upi) -> call cloud function to create Razorpay order
+    // const createRzpOrder = httpsCallable(functions, "createRazorpayOrder");
+
+    // Make sure total is a number
+console.log("Total amount:", total, "Type:", typeof total);
+
+const createRzpOrder = httpsCallable(functions, "createRazorpayOrder");
+const createRes = await createRzpOrder({ 
+  amount: Number(total) // Ensure it's a number
+});
+    
+    // console.log(amount,"amount..")
+// const res = await createRzpOrder({ amount: total });
+
+    if (!createRes.data?.success) throw new Error("Failed to create Razorpay order on server");
+
+    const rzpOrder = createRes.data.order; // raw order object from Razorpay
+    // OPEN RAZORPAY CHECKOUT
+
+    // const options = {
+    //   key: import.meta.env.REACT_APP_RAZORPAY_KEY_ID, // public key from .env
+    //   amount: rzpOrder.amount, // paise (Razorpay returns paise)
+    //   currency: rzpOrder.currency,
+    //   name: "Your Store Name",
+    //   description: "Order Payment",
+    //   order_id: rzpOrder.id,
+    //   handler: async function (response) {
+    //     try {
+    //       // response = { razorpay_payment_id, razorpay_order_id, razorpay_signature }
+    //       const verifyFn = httpsCallable(functions, "verifyRazorpayPayment");
+    //       const verifyRes = await verifyFn({
+    //         ...response,
+    //         orderData,
+    //       });
+    //       console.log(verifyRes,"verfigyResssss..")
+
+    //       if (verifyRes.data?.success) {
+    //         // Payment verified and Firestore order created server-side
+    //         await clearCart();
+    //         alert("Payment successful! Order ID: " + verifyRes.data.orderId);
+    //         navigate("/"); // or a success page
+    //       } else {
+    //         alert("Payment verification failed.");
+    //         console.error("verifyRes:", verifyRes);
+    //       }
+    //     } catch (err) {
+    //       console.error("verify error:", err);
+    //       alert("Payment verification failed: " + err.message);
+    //     }
+    //   },
+    //   prefill: {
+    //     name: billingAddr.name || "",
+    //     email: user.email || "",
+    //     contact: billingAddr.phone || ""
+    //   },
+    //   theme: { color: "#0b5cff" }
+    // };
+
+//     // Determine which env variable system you're using
+// const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID 
+const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
+console.log("Razorpay Key:", RAZORPAY_KEY); // Debug log
+
+if (!RAZORPAY_KEY) {
+  alert("Razorpay key not configured. Please add VITE_RAZORPAY_KEY_ID to .env file");
+  return;
+}
+
+const options = {
+  key: RAZORPAY_KEY, // Use the correct env variable
+  amount: rzpOrder.amount,
+  currency: rzpOrder.currency,
+  name: "Your Store Name",
+  description: "Order Payment",
+  order_id: rzpOrder.id,
+  handler: async function (response) {
+    try {
+      const verifyFn = httpsCallable(functions, "verifyRazorpayPayment");
+      const verifyRes = await verifyFn({
+        ...response,
+        orderData,
+      });
+
+      if (verifyRes.data?.success) {
+        await clearCart();
+        alert("Payment successful! Order ID: " + verifyRes.data.orderId);
+        navigate("/");
+      } else {
+        alert("Payment verification failed.");
+      }
+    } catch (err) {
+      console.error("Verification error:", err);
+      alert("Payment verification failed: " + err.message);
+    }
+  },
+  prefill: {
+    name: billingAddr.name || "",
+    email: user.email || "",
+    contact: billingAddr.phone || ""
+  },
+  theme: { color: "#0b5cff" }
+};
+
+if (!window.Razorpay) {
+  alert("Razorpay SDK not loaded. Please refresh the page.");
+  return;
+}
+
+
+
+    const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", function (response) {
+      console.error("payment.failed:", response);
+      alert("Payment failed: " + (response.error?.description || "Unknown error"));
+    });
+
+    rzp.open();
+  } catch (error) {
+    console.error("Checkout error", error);
+    alert("Checkout failed: " + error.message);
+  } finally {
+    setIsProcessingPayment(false);
+  }
+};
+
 
   if (isLoading) {
     return (
