@@ -2,23 +2,11 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 // import RigthImg from "../../../assets/B2cAssets/LandingPageImges/CuratedCollectionImg.png"
 import Sareeblack from "../../../assets/B2cAssets/LandingPageImges/Sareeblack.png"
-
-// import Sareepink from "../../../assets/B2cAssets/LandingPageImges/sareepink.png"
-
-
-
-
-
-
-
-
-
-
-
-
+import { useNavigate } from 'react-router-dom';
 
 
 function CuratedCollectionSection6() {
+  const navigate=useNavigate()
 
   const  Sareepink = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311389/Frame_1984078362_mrvcto.png'
   const BlueHalfSaree = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311251/Frame_1984078362_pybd6d.png'
@@ -36,14 +24,14 @@ const collections = [
       items: "2,467 ITEMS",
       trending: true
     },
-    {
-      id: 2,
-      image: BlueHalfSaree,
-      title: "EVENING WEAR",
-      description: "Contemporary sophistication for special occasions",
-      items: "1,823 ITEMS",
-      trending: false
-    },
+    // {
+    //   id: 2,
+    //   image: BlueHalfSaree,
+    //   title: "EVENING WEAR",
+    //   description: "Contemporary sophistication for special occasions",
+    //   items: "1,823 ITEMS",
+    //   trending: false
+    // },
     {
       id: 3,
       image: EthnicColl,
@@ -70,6 +58,10 @@ const collections = [
     }
   ];
 
+  const handleNavigateProducts=()=>{
+    navigate("/products")
+  }
+
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "Outfit" }}>
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -90,7 +82,7 @@ Discover our exclusive collections, designed to suit every style <br /> and occa
           {/* Left Column - Collections List */}
           <div className="space-y-4">
             {collections.map((collection) => (
-              <div key={collection.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow cursor-pointer group">
+              <div key={collection.id} onClick={handleNavigateProducts} className="border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow cursor-pointer group">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
@@ -114,9 +106,9 @@ Discover our exclusive collections, designed to suit every style <br /> and occa
                       <p className="text-gray-600 text-sm mb-2">
                         {collection.description}
                       </p>
-                      <p className="text-gray-500 text-xs font-medium">
+                      {/* <p className="text-gray-500 text-xs font-medium">
                         {collection.items}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />

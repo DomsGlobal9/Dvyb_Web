@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const FashionTryOnSection = () => {
+    const [showModall, setShowModall] = useState(false);
   const navigate = useNavigate();
 
+   const handleTryOnClick = () => {
+    setShowModall(true);
+  };
+
+   const handleYes = () => {
+    setShowModall(false);
+    navigate("/products");
+  };
+
+  const handleNo = () => {
+    setShowModall(false);
+    navigate("/");
+  };
+
   return (
+    <>
     <div className="text-white p-4 sm:p-6 md:p-8 lg:p-0">
       {/* Main Hero Section */}
       <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
@@ -14,32 +30,32 @@ const FashionTryOnSection = () => {
           {/* Content Section */}
           <div className="lg:ml-8 text-left w-full lg:w-auto">
             {/* Top Row - Heading */}
-            <div className="space-y-2">
+            <div className="space-y-2" style={{fontFamily:"Red Hat Display"}}>
               <h1  className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-semi-bold leading-tight">
                 Experience Fashion Like<br />Never Before
               </h1>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold">
+              <h2 className="text-4xl sm:text-4xl md:text-5xl lg:text-7xl font-bold">
                 TRY ON
               </h2>
             </div>
 
             {/* Bottom Section - Description and CTAs */}
             <div className="mt-6 sm:mt-8 lg:mt-10 space-y-4 max-w-full sm:max-w-lg lg:max-w-md xl:max-w-lg">
-              <p className="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed" style={{fontFamily:"Outfit"}}>
                 Step into the future of shopping – Try outfits on your Try On avatar before you buy.
               </p>
 
               {/* Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4" style={{fontFamily:"Outfit"}}>
                 <button
-                  onClick={() => navigate('/try-on')}
-                  className="bg-[#5B9BA5] hover:bg-teal-600 text-white px-6 py-3  font-semibold flex items-center justify-center gap-2 transition-colors duration-200 text-sm sm:text-base"
+                  onClick={handleTryOnClick}
+                  className="bg-[#5B9BA5] cursor-pointer hover:bg-teal-600 text-white px-6 py-3  font-semibold flex items-center justify-center gap-2 transition-colors duration-200 text-sm sm:text-base"
                 >
                   Try It Now <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
                   onClick={() => navigate('/products')}
-                  className="bg-white text-black hover:bg-gray-200 px-6 py-3  font-semibold flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base"
+                  className="bg-white text-black cursor-pointer hover:bg-gray-200 px-6 py-3  font-semibold flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base"
                 >
                   Explore Collections <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -49,6 +65,32 @@ const FashionTryOnSection = () => {
         </div>
       </div>
     </div>
+
+         {showModall && (
+            <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm">
+              <div className="bg-white rounded-lg shadow-lg p-6 w-80">
+                <p className="text-gray-800 mb-4 text-center">
+                  For try-on you need to select a product. <br />
+                  Would you like to try?
+                </p>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={handleYes}
+                    className="px-4 py-2 bg-[#5B9BA5] cursor-pointer text-white rounded-lg hover:bg-blue-950"
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={handleNo}
+                    className="px-4 py-2 bg-gray-300 cursor-pointer text-gray-800 rounded-lg hover:bg-gray-400"
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          </>
   );
 };
 

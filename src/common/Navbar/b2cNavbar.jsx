@@ -128,7 +128,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="border-b relative bg-white sticky top-0 z-50 shadow-md">
+    <header className="relative bg-white sticky top-0 z-50 shadow-md">
       {/* Search View */}
       {searchOpen ? (
         <div className="flex justify-between items-start px-4 sm:px-6 py-4 bg-white">
@@ -238,32 +238,32 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex justify-center items-center space-x-8 py-2 text-sm font-medium text-gray-700 relative">
+          <nav className="hidden  lg:flex justify-center border-t border-gray-300 border-b items-center space-x-8 py-4 pt-6 text-sm font-medium text-gray-700 relative">
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleWomenCategories}
-                className="text-blue-900 font-semibold hover:text-blue-700"
+                className="text-blue-900 cursor-pointer font-semibold hover:text-blue-700 text-[18px]"
               >
                 WOMEN
               </button>
               {showWomenCategories && (
                 <div
-                  className="absolute left-0 right-0 top-full bg-gray-100 border-t shadow-md z-50"
+                  className="absolute left-0 right-0 top-full mt-4  cursor-pointer  bg-gray-100  shadow-md z-50"
                   style={{
                     left: "470%",
                     width: "100vw",
-                    marginLeft: "-50vw",
+                    marginLeft: "-53vw",
                   }}
                 >
-                  <div className="flex justify-center space-x-8 py-3 text-sm font-medium text-gray-700 border-b">
+                  <div className="flex justify-center space-x-8 pt-3 pb-1 text-sm font-medium text-gray-700 ">
                     {Object.keys(womenCategories).map((cat, index) => (
                       <button
                         key={index}
                         onClick={() => setActiveCategory(cat)}
-                        className={`transition ${
+                        className={`transition text-[16px] ${
                           activeCategory === cat
-                            ? "text-blue-900 border-b-2 border-blue-900"
-                            : "hover:text-blue-900"
+                            ? "text-blue-900 border-b-2 pb-2 cursor-pointer  border-blue-900"
+                            : "hover:text-blue-900 pb-2 cursor-pointer"
                         }`}
                       >
                         {cat}
@@ -293,15 +293,15 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            <span className="text-gray-500 hover:text-gray-700 cursor-default">
+            <span className="text-gray-500 cursor-pointer hover:text-gray-700  text-[18px]">
               MEN <span className="text-xs">(coming soon)</span>
             </span>
-            <span className="text-gray-500 hover:text-gray-700 cursor-default">
+            <span className="text-gray-500 cursor-pointer hover:text-gray-700  text-[18px]">
               KIDS <span className="text-xs">(coming soon)</span>
             </span>
-            <button onClick={handleTryOnClick}>2D TRY ON</button>
+            <button className="text-[18px]" onClick={handleTryOnClick}>2D TRY ON</button>
             <FaSearch
-              className="ml-6 cursor-pointer text-gray-600 hover:text-blue-900"
+              className="ml-6 cursor-pointer text-gray-600 hover:text-blue-900 text-[18px]"
               onClick={() => setSearchOpen(true)}
             />
           </nav>
