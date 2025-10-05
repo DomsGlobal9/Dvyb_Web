@@ -9,7 +9,7 @@ const B2cHomePages = () => {
     <>
       <Navbar />
       <B2cLandingPage />
-      <Footer />
+      {/* <Footer /> */}
     </>
   )
 }

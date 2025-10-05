@@ -3,6 +3,7 @@ import './App.css'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import WebRoutes from './WebRoutes/WebRoutes'
+import Footer from './common/Footer/Footer';
 
 function App() {
 
@@ -11,6 +12,7 @@ function App() {
     <>
        <ToastContainer position="top-right" autoClose={3000} />
        <WebRoutes/>
+       <Footer/>
   
     </>
 

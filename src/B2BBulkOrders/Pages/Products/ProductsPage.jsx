@@ -247,8 +247,7 @@ const ProductsPage = () => {
     <div className="min-h-screen bg-gray-50">
      <Navbar />
       {/* Header - Fixed */}
-      <div className="bg-white sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           {/* Mobile Filter Toggle */}
           <div className="lg:hidden mb-4">
             <button
@@ -289,7 +288,7 @@ const ProductsPage = () => {
             </div>
           )}
         </div>
-      </div>
+      
 
       {/* Mobile Filter Overlay */}
       {showMobileFilters && (

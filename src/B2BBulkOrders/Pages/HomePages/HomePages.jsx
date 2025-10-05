@@ -36,7 +36,7 @@ const HomePages = () => {
     <>
       <B2BNavbar />
       <LandingPage />
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };

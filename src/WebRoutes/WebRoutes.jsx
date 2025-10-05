@@ -48,13 +48,12 @@ const WebRoutes = () => {
       <Route path="/preview" element={<TryOnPreview />} />
 
       {/* <Route path="/upload-selfie" element = {<UploadSelfie/>}/>
-            <Route path="/preview" element = {<TryOnPreview/>}/> */}
+      <Route path="/preview" element = {<TryOnPreview/>}/> */}
 
       {/* B2c PRODUCTS ROUTES */}
       <Route path="/" element={<B2cHomePages />} />
       <Route path="B2c-login" element={<B2cLoginPage />} />
       {/* <Route path="/b2c-navbar" element={<Navbar/>}/> */}
-
       {/* <Route path="/b2c-products" element = {<B2cProductsPage/>}/> */}
 
       {/*COMMON PAGE ROUTES*/}
@@ -77,7 +76,7 @@ const WebRoutes = () => {
         }
       />
 
-     <Route path="/my-orders" element={<MyOrders />} />
+      <Route path="/my-orders" element={<MyOrders />} />
       <Route path="/checkoutpage" element={<CheckoutPage/>}/>
       <Route
         path="/your-profile"

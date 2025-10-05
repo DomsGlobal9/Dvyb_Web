@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { colorUtils } from '../../../utils/colorUtils';
 import { addToCart } from '../../../services/CartService';
+import Navbar from '../../../common/Navbar/b2cNavbar';
 
 const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateToTryOn, onProductClick }) => {
   const [selectedSize, setSelectedSize] = useState('');
@@ -84,6 +85,14 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
       return;
     }
     setShowAddToCartModal(true);
+  };
+
+   const handleBuyNow = () => {
+    if (!user) {
+      toast.error("Please log in to add items to cart!");
+      return;
+    }
+    alert("on the way")
   };
 
   // MAIN FIX: Properly add item to cart with correct data structure
@@ -206,6 +215,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
     return (
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+
         <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Select Options</h3>
@@ -310,6 +320,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar/>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <button onClick={onBackClick} className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -422,7 +433,9 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                   <ShoppingCart className="h-5 mr-2" />
                   Add to cart
                 </button>
-                <button className="w-42 h-12 bg-[#1C4C74] shadow-sm text-white py-3 px-6 rounded-lg hover:bg-[#163d5d] font-medium transition-colors">
+                <button 
+                onClick={handleBuyNow}
+                className="w-42 h-12 bg-[#1C4C74] shadow-sm text-white py-3 px-6 rounded-lg hover:bg-[#163d5d] font-medium transition-colors">
                   Buy Now
                 </button>
               </div>

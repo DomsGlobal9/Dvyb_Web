@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Phone, MessageCircle } from 'lucide-react';
+import imgBanner from "../assets/CommonAssets/faqImg.png"
+import logo from "../assets/logo/NavLogo.png"
+import bluesaree from '../assets/CommonAssets/faqSaee.png'
 
 const faqs = [
   {
@@ -55,15 +58,14 @@ export default function FAQPage() {
       {/* Intro Section */}
       <section className="flex flex-col md:flex-row items-center gap-6 p-6">
         <img
-          src="/images/help-banner.jpg"
+          src={imgBanner}
           alt="Help banner"
-          className="rounded-lg w-full md:w-1/2 object-cover"
+          className="rounded-lg w-1/2 md:w-1/2 object-cover h-120 center"
         />
         <div className="md:w-1/2 space-y-3">
-          <h2 className="text-2xl font-bold">DVYB</h2>
+          <img src={logo} alt=""  className='h-12 w-30 center ml-50'/>
           <p>
-            At DVYB, we’re here to assist you with shopping that's simple and budget-friendly,
-            without compromising on style or quality.
+            At DVYB, we’re here to assist you with shopping that’s both simple and budget-friendly, all while ensuring you don’t sacrifice style, quality, or variety. Whether you’re preparing for weddings or family gatherings, our carefully selected collections for men, women, and kids are tailored to create cohesive looks at incredible prices.
           </p>
         </div>
       </section>
@@ -71,9 +73,10 @@ export default function FAQPage() {
       {/* FAQ Section */}
       <section className="px-6 py-4">
         <h2 className="text-xl font-bold mb-4">Popular FAQ'S Topics</h2>
-        <div className="space-y-4">
+       <div className=' flex '>
+           <div className="space-y-4 w-full">
           {faqs.map((faq, index) => (
-            <div key={index} className="border rounded-lg p-4">
+            <div key={index} className="border rounded-lg p-4 w-full">
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="flex justify-between items-center w-full text-left font-medium"
@@ -85,6 +88,10 @@ export default function FAQPage() {
             </div>
           ))}
         </div>
+        <div>
+          <img src={bluesaree} alt="" className='h-100 w-100 ' />
+        </div>
+       </div>
       </section>
 
       {/* Contact Section */}

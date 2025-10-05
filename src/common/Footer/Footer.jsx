@@ -55,9 +55,9 @@ const Footer = () => {
               About Us
             </Link>
 
-            <Link to="/contact" className="text-gray-600 hover:text-gray-900">
+            {/* <Link to="/contact" className="text-gray-600 hover:text-gray-900">
               Contact Us
-            </Link>
+            </Link> */}
 
             <Link to="/faq" className="text-gray-600 hover:text-gray-900">
               FAQ
