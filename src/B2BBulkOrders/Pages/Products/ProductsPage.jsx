@@ -16,6 +16,7 @@ import {
 import ProductCard from '../../Components/products/ProductCard';
 import FilterSidebar from '../../Components/products/FiltersBar';
 import ProductDetailPage from './ProductDetails';
+import Navbar from '../../../common/Navbar/b2cNavbar';
 
 const ProductsPage = () => {
   const navigate = useNavigate();
@@ -244,6 +245,7 @@ const ProductsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+     <Navbar />
       {/* Header - Fixed */}
       <div className="bg-white sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-6">

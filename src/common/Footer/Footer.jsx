@@ -6,6 +6,8 @@ import Footerlog3 from "../../assets/FooterImages/footerlog3.png";
 import logo from "../../assets/Navbar/DVYB_Enterprise_Logo.png";
 import footerbottomlogo01 from "../../assets/FooterImages/Guarantee.png";
 import footerbottomlogo02 from "../../assets/FooterImages/ReturnIcon.png";
+import { Link } from "react-router-dom";
+import { LinkIcon } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -23,9 +25,9 @@ const Footer = () => {
             <h3 className="font-semibold text-gray-900 uppercase tracking-wide">
               SHOP
             </h3>
-            <a href="#" className="text-gray-700 hover:text-gray-900 uppercase">
+            <Link to="/products" className="text-gray-700 hover:text-gray-900 uppercase">
               Women
-            </a>
+            </Link>
             <a href="#" className="text-gray-700 uppercase">
               MEN{" "}
               <sup className="text-xxs text-gray-500">(coming soon)</sup>
@@ -41,21 +43,25 @@ const Footer = () => {
             <h3 className="font-semibold text-gray-900 uppercase tracking-wide">
               DVYB WHOLESALE
             </h3>
-            <a
-              href="#"
+
+            <Link
+              to="/tryon"
               className="text-gray-600 hover:text-gray-900 flex items-center space-x-2"
             >
-              <span>2D try on</span>
-            </a>
-            <a href="#" className="text-gray-600 hover:text-gray-900">
-              About us
-            </a>
-            <a href="#" className="text-gray-600 hover:text-gray-900">
-              Contact us
-            </a>
-            <a href="#" className="text-gray-600 hover:text-gray-900">
+              <span>2D Try On</span>
+            </Link>
+
+            <Link to="/aboutUs" className="text-gray-600 hover:text-gray-900">
+              About Us
+            </Link>
+
+            <Link to="/contact" className="text-gray-600 hover:text-gray-900">
+              Contact Us
+            </Link>
+
+            <Link to="/faq" className="text-gray-600 hover:text-gray-900">
               FAQ
-            </a>
+            </Link>
           </div>
 
           {/* DVYB BRANDS */}
