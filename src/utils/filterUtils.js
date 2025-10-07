@@ -23,7 +23,7 @@ export const CATEGORIES = [
 ];
 
 // Convert anything ("red", "red_#FF0000", "#FF0000", {code,name,hex}) to a canonical color code (e.g. "red")
-const normalizeColorToCode = (val) => {
+export const normalizeColorToCode = (val) => {
   if (!val) return '';
   if (typeof val === 'object') {
     // option object {code,name,hex} or {name, hex}
