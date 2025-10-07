@@ -8,6 +8,7 @@ import { normalizeColorToCode } from '../../../utils/filterUtils';
 
 
 const FilterSidebar = ({
+  selectedCategory,
   filters,
   filterSections,
   filterOptions,
@@ -21,10 +22,15 @@ const FilterSidebar = ({
 }) => {
   // Helper function to get option value and label
  // inside FilterSidebar.jsx
+ console.log("cat",selectedCategory,25)
+ 
+const cat = (selectedCategory || '').toLowerCase().replace('_', ' ');
+const shouldHideSizes = ['saree', 'designer saree'].includes(cat);
 
 // Unified option accessor (works for colors and plain strings)
 const getOptionData = (option, filterType) => {
   if (filterType === 'selectedColors') {
+     console.log("filterType",filterType,25)
     // expected shape: {code, name, hex}; but also tolerate {name, hex} or strings
     const code = normalizeColorToCode(option);
     const label = typeof option === 'object' && option.name ? option.name : code;
@@ -38,6 +44,8 @@ const getOptionData = (option, filterType) => {
       isColorObject: true
     };
   }
+
+
   // default path for non-color filters
   const val = typeof option === 'string' ? option : String(option);
   return { value: val, label: val, color: null, isColorObject: false };
@@ -94,7 +102,7 @@ const isOptionSelected = (filters, filterType, optionValue) => {
       )}
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-scroll scrollbar pr-2">
+      <div className="flex-1 overflow-y-scroll scrollbar-none pr-2">
         {/* Price Range Section */}
         <div className="mb-6">
           <button
@@ -145,7 +153,7 @@ const isOptionSelected = (filters, filterType, optionValue) => {
         </div>
 
         {/* Other Filter Sections */}
-        {Object.entries(filterOptions).filter(([key]) => key !== 'priceSort').map(([filterType, options]) => (
+        {Object.entries(filterOptions).filter(([key]) => key !== 'priceSort').filter(([key]) => !(shouldHideSizes && key === 'selectedSizes')).map(([filterType, options]) => (
           <div key={filterType} className="mb-6">
             <button
               onClick={() => onToggleFilterSection(filterType)}

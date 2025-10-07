@@ -70,7 +70,7 @@ const hexToCode = (hex) => {
 
 export const FILTER_OPTIONS = {
   priceSort: ['Low to High', 'High to Low'],
-  category: ['WOMEN', 'MEN', 'KIDS'],
+  category: ['WOMEN'],
      selectedColors: COLORS.map(c => ({ code: c.code, name: c.name, hex: c.value })),
   selectedSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
   fabric: [

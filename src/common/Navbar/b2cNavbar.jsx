@@ -326,19 +326,19 @@ const Navbar = () => {
                 <div className="p-4">
                   {/* Mobile Women Dropdown */}
                   <div className="mb-4">
-                    {/* <button
-                      className="flex justify-between items-center w-full text-left text-blue-900 font-semibold py-2"
-                      onClick={toggleWomenCategories}
-                    >
-                      WOMEN
-                      <span
-                        className={`transform transition-transform ${
-                          showWomenCategories ? "rotate-180" : ""
-                        }`}
+                      <button
+                        className="flex justify-between items-center w-full text-left text-blue-900 font-semibold py-2"
+                        onClick={toggleWomenCategories}
                       >
-                        ▼
-                      </span>
-                    </button> */}
+                        WOMEN
+                        <span
+                          className={`transform transition-transform ${
+                            showWomenCategories ? "rotate-180" : ""
+                          }`}
+                        >
+                          ▼
+                        </span>
+                      </button>
                     {showWomenCategories && (
                       <div className="mt-2 ml-4">
                         {Object.keys(womenCategories).map((cat, index) => (
@@ -385,12 +385,12 @@ const Navbar = () => {
                     )} 
                     
                   </div>
-                  {/* <span className="block py-3 text-gray-500 border-t cursor-default">
+                  <span className="block py-3 text-gray-500 border-t cursor-default">
                     MEN <span className="text-xs">(coming soon)</span>
                   </span>
                   <span className="block py-3 text-gray-500 border-t cursor-default">
                     KIDS <span className="text-xs">(coming soon)</span>
-                  </span> */}
+                  </span>
                   <span
                     className="block py-3 text-gray-700 cursor-default" //border-t 
                     onClick={handleTryOnClick}

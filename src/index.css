@@ -5,7 +5,6 @@
 @theme {
   --color-landingpage-bg-blue :  #5B9BA5;
   --color-primary-blue: #1C4C74;
-
   --color-bg-light-blue: #DEF2FF;
   --color-bg-primary-white : #FFFFFF
 }
@@ -18,4 +17,13 @@ body {
 
 body::-webkit-scrollbar {
   display: none;                 /* Chrome, Safari */
+}
+
+.scrollbar::-webkit-scrollbar-thumb{
+  border-radius: 0;
+  border: 0; /* creates gap effect */
+}
+
+.scrollbar-none{
+  scrollbar-width: none;                /* Firefox */
 }

@@ -394,6 +394,7 @@ const B2cProductsPage = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowMobileFilters(false)} />
           <div className="fixed right-0 top-0 h-full w-80 max-w-full bg-white shadow-xl overflow-y-auto">
             <FilterSidebar 
+            selectedCategory={selectedCategory}  
               isMobile={true}
               filters={filters}
               filterSections={filterSections}
@@ -415,6 +416,7 @@ const B2cProductsPage = () => {
           {/* Desktop Filter Sidebar */}
           <div className="hidden lg:block w-64 flex-shrink-0">
             <FilterSidebar 
+            selectedCategory={selectedCategory}
               filters={filters}
               filterSections={filterSections}
               filterOptions={FILTER_OPTIONS}
