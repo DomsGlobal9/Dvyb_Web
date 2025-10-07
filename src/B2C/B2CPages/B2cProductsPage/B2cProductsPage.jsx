@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 // Import services
 import { productService, debugService } from '../../../services/firebaseServices';
 // import { testDataService } from '../services/testDataService';
+import { normalizeColorToCode } from '../../../utils/colorNormalize';
+
 
 // Import utils
 import { 
@@ -50,29 +52,41 @@ const B2cProductsPage = () => {
   };
 
   const handleFilterChange = (filterType, value, isRemove = false) => {
-    setFilters(prev => {
-      if (filterType === 'priceSort') {
-        return { ...prev, priceSort: value };
-      } else if (filterType === 'priceRange') {
-        return { ...prev, priceRange: { ...prev.priceRange, ...value } };
-      } else {
-        const currentFilters = prev[filterType] || [];
-        if (isRemove) {
-          return {
-            ...prev,
-            [filterType]: currentFilters.filter(item => item !== value)
-          };
-        } else {
-          return {
-            ...prev,
-            [filterType]: currentFilters.includes(value)
-              ? currentFilters.filter(item => item !== value)
-              : [...currentFilters, value]
-          };
-        }
-      }
+  setFilters(prev => {
+    // single-select or object updates
+    if (filterType === 'priceSort') {
+      return { ...prev, priceSort: value };
+    }
+    if (filterType === 'priceRange') {
+      return { ...prev, priceRange: { ...prev.priceRange, ...value } };
+    }
+
+    // multi-selects
+    const current = prev[filterType] || [];
+
+    // normalize only for colors; keep others as strings
+    const norm = filterType === 'selectedColors'
+      ? normalizeColorToCode(value)
+      : String(value);
+
+    const exists = current.some(v => {
+      const nv = filterType === 'selectedColors' ? normalizeColorToCode(v) : String(v);
+      return nv === norm;
     });
-  };
+
+    let next;
+    if (isRemove || exists) {
+      next = current.filter(v => {
+        const nv = filterType === 'selectedColors' ? normalizeColorToCode(v) : String(v);
+        return nv !== norm;
+      });
+    } else {
+      next = [...current, norm];
+    }
+
+    return { ...prev, [filterType]: next };
+  });
+};
 
   const clearAllFilters = () => {
     setFilters(DEFAULT_FILTERS);
