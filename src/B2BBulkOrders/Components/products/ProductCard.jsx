@@ -176,7 +176,7 @@ const ProductCard = ({
           </div>
           <button
             onClick={() => navigate(`/products/${item.id}`)}
-            className="text-xs bg-blue-600 text-white px-2 py-1 rounded"
+            className="text-xs border border-2-[#1C4C74] text-[#1C4C74] px-4 py-2 rounded"
           >
             View
           </button>

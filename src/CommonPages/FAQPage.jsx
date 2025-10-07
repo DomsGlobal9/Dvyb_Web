@@ -89,7 +89,7 @@ export default function FAQPage() {
           ))}
         </div>
         <div>
-          <img src={bluesaree} alt="" className='h-100 w-100 ' />
+          <img src={bluesaree} alt="" className='h-100 w-100' />
         </div>
        </div>
       </section>

@@ -387,7 +387,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
                 <div className="mb-6">
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl font-bold text-blue-600">₹{Math.round(discountedPrice)}</span>
+                    <span className="text-3xl font-bold text-[#0A95D4]">₹{Math.round(discountedPrice)}</span>
                     <span className="text-lg text-gray-500">/Piece</span>
                   </div>
 
