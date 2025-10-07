@@ -238,32 +238,28 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden  lg:flex justify-center border-t border-gray-300 border-b items-center space-x-8 py-4 pt-6 text-sm font-medium text-gray-700 relative">
-            <div className="relative" ref={dropdownRef}>
+         {/* Desktop Navigation */}
+          <nav className="flex flex-row lg:flex-row lg:justify-center justify-around items-center border-t border-b border-gray-300 py-4 text-sm font-medium text-gray-700 space-y-2  lg:space-y-0 lg:space-x-8 relative">
+ <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleWomenCategories}
-                className="text-blue-900 cursor-pointer font-semibold hover:text-blue-700 text-[18px]"
+                className="text-blue-900  cursor-pointer font-semibold lg:text-xl hover:text-blue-700 text-sm"
               >
                 WOMEN
               </button>
               {showWomenCategories && (
                 <div
-                  className="absolute left-0 right-0 top-full mt-4  cursor-pointer  bg-gray-100  shadow-md z-50"
-                  style={{
-                    left: "470%",
-                    width: "100vw",
-                    marginLeft: "-53vw",
-                  }}
+                  className="fixed left-0 right-0 mt-4 lg:mt-0  cursor-pointer bg-gray-100 shadow-md z-50 w-screen"
                 >
-                  <div className="flex justify-center space-x-8 pt-3 pb-1 text-sm font-medium text-gray-700 ">
+                  <div className="flex justify-center items-center space-x-8  pt-4 pb-3 border-b border-gray-200">
                     {Object.keys(womenCategories).map((cat, index) => (
                       <button
                         key={index}
                         onClick={() => setActiveCategory(cat)}
-                        className={`transition text-[16px] ${
+                        className={`transition text-[16px] pb-2 ${
                           activeCategory === cat
-                            ? "text-blue-900 border-b-2 pb-2 cursor-pointer  border-blue-900"
-                            : "hover:text-blue-900 pb-2 cursor-pointer"
+                            ? "text-blue-900 border-b-2 cursor-pointer border-blue-900"
+                            : "hover:text-blue-900 cursor-pointer"
                         }`}
                       >
                         {cat}
@@ -271,40 +267,42 @@ const Navbar = () => {
                     ))}
                   </div>
                   {activeCategory && (
-                    <div className="flex justify-center gap-8 py-6 flex-wrap bg-white">
-                      {womenCategories[activeCategory].map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex flex-col items-center w-32 cursor-pointer"
-                          onClick={() => handleSubcategoryClick(item.name)}
-                        >
-                          <img
-                            src={item.img}
-                            alt={item.name}
-                            className="h-32 w-24 object-cover rounded shadow-sm hover:scale-105 transition"
-                          />
-                          <span className="mt-2 text-xs font-medium text-gray-700">
-                            {item.name}
-                          </span>
-                        </div>
-                      ))}
+                    <div className="w-full  bg-white py-8 px-4">
+                      <div className="max-w-7xl mx-auto flex justify-center gap-8 flex-wrap">
+                        {womenCategories[activeCategory].map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="flex flex-col items-center w-32 cursor-pointer"
+                            onClick={() => handleSubcategoryClick(item.name)}
+                          >
+                            <img
+                              src={item.img}
+                              alt={item.name}
+                              className="h-14 w-20  lg:h-32 lg:w-24 object-contain lg:object-cover   rounded shadow-sm hover:scale-105 transition"
+                            />
+                            <span className="mt-2 text-xs font-medium text-gray-700 text-center">
+                              {item.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
               )}
             </div>
-            <span className="text-gray-500 cursor-pointer hover:text-gray-700  text-[18px]">
+             <span className="text-gray-500 cursor-pointer hover:text-gray-700 lg:text-xl text-sm">
               MEN <span className="text-xs">(coming soon)</span>
             </span>
-            <span className="text-gray-500 cursor-pointer hover:text-gray-700  text-[18px]">
+            <span className="text-gray-500 cursor-pointer hover:text-gray-700 lg:text-xl text-sm">
               KIDS <span className="text-xs">(coming soon)</span>
             </span>
-            <button className="text-[18px]" onClick={handleTryOnClick}>2D TRY ON</button>
+            <button className="text-[18px] hidden lg:block" onClick={handleTryOnClick}>2D TRY ON</button>
             <FaSearch
-              className="ml-6 cursor-pointer text-gray-600 hover:text-blue-900 text-[18px]"
+              className="ml-6 hidden lg:block cursor-pointer text-gray-600 hover:text-blue-900 text-[18px]"
               onClick={() => setSearchOpen(true)}
             />
-          </nav>
+            </nav>
 
           {/* MOBILE OVERLAY MENU */}
           {mobileMenuOpen && (
@@ -328,7 +326,7 @@ const Navbar = () => {
                 <div className="p-4">
                   {/* Mobile Women Dropdown */}
                   <div className="mb-4">
-                    <button
+                    {/* <button
                       className="flex justify-between items-center w-full text-left text-blue-900 font-semibold py-2"
                       onClick={toggleWomenCategories}
                     >
@@ -340,7 +338,7 @@ const Navbar = () => {
                       >
                         ▼
                       </span>
-                    </button>
+                    </button> */}
                     {showWomenCategories && (
                       <div className="mt-2 ml-4">
                         {Object.keys(womenCategories).map((cat, index) => (
@@ -384,16 +382,17 @@ const Navbar = () => {
                           </div>
                         ))}
                       </div>
-                    )}
+                    )} 
+                    
                   </div>
-                  <span className="block py-3 text-gray-500 border-t cursor-default">
+                  {/* <span className="block py-3 text-gray-500 border-t cursor-default">
                     MEN <span className="text-xs">(coming soon)</span>
                   </span>
                   <span className="block py-3 text-gray-500 border-t cursor-default">
                     KIDS <span className="text-xs">(coming soon)</span>
-                  </span>
+                  </span> */}
                   <span
-                    className="block py-3 text-gray-700 border-t cursor-default"
+                    className="block py-3 text-gray-700 cursor-default" //border-t 
                     onClick={handleTryOnClick}
                   >
                     2D TRY ON
@@ -482,5 +481,6 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
 
 
