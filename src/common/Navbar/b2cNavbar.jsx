@@ -16,7 +16,7 @@ import cart from "../../assets/B2Bassets/NavbarImages/cart.png";
 import profile from "../../assets/B2Bassets/NavbarImages/profile.png";
 import { useNavigate } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
-import { subscribeToCart } from "../../services/CartService";
+import { subscribeToCart } from "../../services/CartService"; // Import cart service
 
 const Navbar = () => {
   const [showWomenCategories, setShowWomenCategories] = useState(false);
@@ -34,6 +34,9 @@ const Navbar = () => {
   // Cart state
   const [cartItems, setCartItems] = useState([]);
 
+  console.log(wishlist, 'wishlists');
+  console.log(cartItems, 'cart items');
+
   // Auth check
   const isLoggedIn = !!localStorage.getItem("authToken");
 
@@ -48,14 +51,13 @@ const Navbar = () => {
         });
       } catch (error) {
         console.error("Error setting up cart subscription:", error);
-        toast.error("Failed to load cart. Please try again.");
       }
     };
 
     if (isLoggedIn) {
       setupCartSubscription();
     } else {
-      setCartItems([]);
+      setCartItems([]); // Clear cart if not logged in
     }
 
     return () => {
@@ -65,7 +67,7 @@ const Navbar = () => {
     };
   }, [isLoggedIn]);
 
-  // Click outside closes dropdown (desktop)
+  // Click outside closes dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -96,14 +98,12 @@ const Navbar = () => {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen((prev) => !prev);
-    if (mobileMenuOpen) {
-      setShowWomenCategories(false);
-      setActiveCategory(null);
-    }
+    setShowWomenCategories(false);
   };
 
   const toggleWomenCategories = () => {
     setShowWomenCategories((prev) => !prev);
+    setActiveCategory(null);
   };
 
   const handleSubcategoryClick = (subcategoryName) => {
@@ -150,13 +150,7 @@ const Navbar = () => {
               />
               <button
                 className="ml-2 bg-blue-900 text-white px-2 sm:px-3 py-2 text-xs sm:text-sm whitespace-nowrap"
-                onClick={() => {
-                  if (!searchQuery.trim()) {
-                    toast.error("Please enter a search term");
-                    return;
-                  }
-                  navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
-                }}
+                onClick={() => navigate(`/search?query=${searchQuery}`)}
               >
                 SEARCH
               </button>
@@ -176,7 +170,6 @@ const Navbar = () => {
               <FaBars
                 className="text-xl text-gray-600 cursor-pointer"
                 onClick={toggleMobileMenu}
-                aria-label="Toggle mobile menu"
               />
             </div>
             <div className="hidden md:block md:w-1/3"></div>
@@ -195,7 +188,6 @@ const Navbar = () => {
               <FaSearch
                 className="md:hidden text-lg cursor-pointer text-gray-600 hover:text-blue-900"
                 onClick={() => setSearchOpen(true)}
-                aria-label="Open search"
               />
               {/* Favorites, Cart, Profile */}
               <div className="hidden md:flex items-center space-x-6 text-xl text-blue-900">
@@ -208,7 +200,6 @@ const Navbar = () => {
                     onClick={() =>
                       handleProtectedClick(() => navigate("/mywishlist"))
                     }
-                    aria-label="View wishlist"
                   />
                   {wishlist.length > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -226,7 +217,6 @@ const Navbar = () => {
                     onClick={() =>
                       handleProtectedClick(() => navigate("/mycart"))
                     }
-                    aria-label="View cart"
                   />
                   {cartItems.length > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -242,44 +232,39 @@ const Navbar = () => {
                   onClick={() =>
                     handleProtectedClick(() => navigate("/your-profile"))
                   }
-                  aria-label="View profile"
                 />
               </div>
             </div>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex justify-center border-t border-gray-300 border-b items-center space-x-8 py-4 pt-6 text-sm font-medium text-gray-700 relative">
+          <nav className="hidden  lg:flex justify-center border-t border-gray-300 border-b items-center space-x-8 py-4 pt-6 text-sm font-medium text-gray-700 relative">
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleWomenCategories}
                 className="text-blue-900 cursor-pointer font-semibold hover:text-blue-700 text-[18px]"
-                aria-expanded={showWomenCategories}
-                aria-label="Toggle Women's Categories"
               >
                 WOMEN
               </button>
               {showWomenCategories && (
                 <div
-                  className="absolute left-0 right-0 top-full mt-4 cursor-pointer bg-gray-100 shadow-md z-50"
+                  className="absolute left-0 right-0 top-full mt-4  cursor-pointer  bg-gray-100  shadow-md z-50"
                   style={{
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    width: "90vw",
-                    maxWidth: "1200px",
+                    left: "470%",
+                    width: "100vw",
+                    marginLeft: "-53vw",
                   }}
                 >
-                  <div className="flex justify-center space-x-8 pt-3 pb-1 text-sm font-medium text-gray-700">
+                  <div className="flex justify-center space-x-8 pt-3 pb-1 text-sm font-medium text-gray-700 ">
                     {Object.keys(womenCategories).map((cat, index) => (
                       <button
                         key={index}
                         onClick={() => setActiveCategory(cat)}
                         className={`transition text-[16px] ${
                           activeCategory === cat
-                            ? "text-blue-900 border-b-2 pb-2 cursor-pointer border-blue-900"
+                            ? "text-blue-900 border-b-2 pb-2 cursor-pointer  border-blue-900"
                             : "hover:text-blue-900 pb-2 cursor-pointer"
                         }`}
-                        aria-label={`Select ${cat}`}
                       >
                         {cat}
                       </button>
@@ -308,19 +293,16 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            <span className="text-gray-500 cursor-pointer hover:text-gray-700 text-[18px]">
+            <span className="text-gray-500 cursor-pointer hover:text-gray-700  text-[18px]">
               MEN <span className="text-xs">(coming soon)</span>
             </span>
-            <span className="text-gray-500 cursor-pointer hover:text-gray-700 text-[18px]">
+            <span className="text-gray-500 cursor-pointer hover:text-gray-700  text-[18px]">
               KIDS <span className="text-xs">(coming soon)</span>
             </span>
-            <button className="text-[18px]" onClick={handleTryOnClick} aria-label="2D Try On">
-              2D TRY ON
-            </button>
+            <button className="text-[18px]" onClick={handleTryOnClick}>2D TRY ON</button>
             <FaSearch
               className="ml-6 cursor-pointer text-gray-600 hover:text-blue-900 text-[18px]"
               onClick={() => setSearchOpen(true)}
-              aria-label="Open search"
             />
           </nav>
 
@@ -329,15 +311,9 @@ const Navbar = () => {
             <div className="fixed inset-0 z-50 lg:hidden">
               <div
                 className="fixed inset-0 bg-black bg-opacity-50"
-                onClick={(e) => {
-                  if (e.target === e.currentTarget) {
-                    setMobileMenuOpen(false);
-                    setShowWomenCategories(false);
-                    setActiveCategory(null);
-                  }
-                }}
+                onClick={() => setMobileMenuOpen(false)}
               ></div>
-              <div className="fixed top-0 left-0 w-4/5 max-w-[300px] h-full bg-white shadow-lg overflow-y-auto">
+              <div className="fixed top-0 left-0 w-4/5 max-w-sm h-full bg-white shadow-lg overflow-y-auto">
                 <div className="flex justify-between items-center p-4 border-b">
                   <img
                     src={b2clogo}
@@ -346,8 +322,7 @@ const Navbar = () => {
                   />
                   <FaTimes
                     className="text-xl text-gray-600 cursor-pointer"
-                    onClick={toggleMobileMenu}
-                    aria-label="Close mobile menu"
+                    onClick={() => setMobileMenuOpen(false)}
                   />
                 </div>
                 <div className="p-4">
@@ -356,8 +331,6 @@ const Navbar = () => {
                     <button
                       className="flex justify-between items-center w-full text-left text-blue-900 font-semibold py-2"
                       onClick={toggleWomenCategories}
-                      aria-expanded={showWomenCategories}
-                      aria-label="Toggle Women's Categories"
                     >
                       WOMEN
                       <span
@@ -373,25 +346,18 @@ const Navbar = () => {
                         {Object.keys(womenCategories).map((cat, index) => (
                           <div key={index} className="mb-3">
                             <button
-                              className={`flex justify-between items-center w-full text-left py-2 px-2 text-sm font-medium transition ${
+                              className={`block w-full text-left py-2 px-2 text-sm font-medium transition ${
                                 activeCategory === cat
                                   ? "text-blue-900 bg-blue-50 rounded"
                                   : "text-gray-700 hover:text-blue-900"
                               }`}
-                              onClick={() => {
-                                setActiveCategory(activeCategory === cat ? null : cat);
-                              }}
-                              aria-expanded={activeCategory === cat}
-                              aria-label={`Toggle ${cat} Subcategories`}
+                              onClick={() =>
+                                setActiveCategory(
+                                  activeCategory === cat ? null : cat
+                                )
+                              }
                             >
                               {cat}
-                              <span
-                                className={`text-xs transform transition-transform ${
-                                  activeCategory === cat ? "rotate-180" : ""
-                                }`}
-                              >
-                                ▼
-                              </span>
                             </button>
                             {activeCategory === cat && (
                               <div className="mt-2 ml-4 grid grid-cols-2 gap-3">
@@ -399,7 +365,9 @@ const Navbar = () => {
                                   <div
                                     key={idx}
                                     className="flex flex-col items-center cursor-pointer"
-                                    onClick={() => handleSubcategoryClick(item.name)}
+                                    onClick={() =>
+                                      handleSubcategoryClick(item.name)
+                                    }
                                   >
                                     <img
                                       src={item.img}
@@ -425,9 +393,8 @@ const Navbar = () => {
                     KIDS <span className="text-xs">(coming soon)</span>
                   </span>
                   <span
-                    className="block py-3 text-gray-700 border-t cursor-pointer"
+                    className="block py-3 text-gray-700 border-t cursor-default"
                     onClick={handleTryOnClick}
-                    aria-label="2D Try On"
                   >
                     2D TRY ON
                   </span>
@@ -439,7 +406,6 @@ const Navbar = () => {
                       onClick={() =>
                         handleProtectedClick(() => navigate("/mywishlist"))
                       }
-                      aria-label="View wishlist"
                     >
                       <div className="relative">
                         <img className="w-6 h-6 mb-1" src={fav} alt="wishlist" />
@@ -458,7 +424,6 @@ const Navbar = () => {
                       onClick={() =>
                         handleProtectedClick(() => navigate("/mycart"))
                       }
-                      aria-label="View cart"
                     >
                       <div className="relative">
                         <img className="w-6 h-6 mb-1" src={cart} alt="cart" />
@@ -476,7 +441,6 @@ const Navbar = () => {
                       onClick={() =>
                         handleProtectedClick(() => navigate("/your-profile"))
                       }
-                      aria-label="View profile"
                     >
                       <img className="w-6 h-6 mb-1" src={profile} alt="profile" />
                       <span className="text-xs text-gray-600">Profile</span>
@@ -488,8 +452,8 @@ const Navbar = () => {
           )}
 
           {showModal && (
-            <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm z-[60]">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-sm">
+            <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm">
+              <div className="bg-white rounded-lg shadow-lg p-6 w-80">
                 <p className="text-gray-800 mb-4 text-center">
                   For try-on you need to select a product. <br />
                   Would you like to try?
@@ -498,14 +462,12 @@ const Navbar = () => {
                   <button
                     onClick={handleYes}
                     className="px-4 py-2 bg-[#5B9BA5] text-white rounded-lg hover:bg-blue-950"
-                    aria-label="Go to products"
                   >
                     Yes
                   </button>
                   <button
                     onClick={handleNo}
                     className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
-                    aria-label="Return to home"
                   >
                     No
                   </button>
@@ -520,3 +482,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+
