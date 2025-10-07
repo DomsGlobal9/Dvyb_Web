@@ -22,6 +22,34 @@ export const CATEGORIES = [
   'JACKETS',
 ];
 
+// Convert anything ("red", "red_#FF0000", "#FF0000", {code,name,hex}) to a canonical color code (e.g. "red")
+const normalizeColorToCode = (val) => {
+  if (!val) return '';
+  if (typeof val === 'object') {
+    // option object {code,name,hex} or {name, hex}
+    if (val.code) return String(val.code).toLowerCase();
+    if (val.name) return String(val.name).toLowerCase(); // fallback if no code
+  }
+  if (typeof val === 'string') {
+    const s = val.trim();
+    // legacy "red_#FF0000"
+    if (s.includes('_')) return s.split('_')[0].toLowerCase();
+    // if hex only, map hex -> code if possible
+    if (s.startsWith('#')) return hexToCode(s);
+    // plain code
+    return s.toLowerCase();
+  }
+  return '';
+};
+
+// optional: map hex to code using your COLORS table (in case product stores hex only)
+const hexToCode = (hex) => {
+  const clean = (hex || '').toUpperCase();
+  const match = (COLORS || []).find(c => (c.value || '').toUpperCase() === clean);
+  return match ? match.code.toLowerCase() : clean.toLowerCase(); // fallback to hex as key
+};
+
+
 export const FILTER_OPTIONS = {
   priceSort: ['Low to High', 'High to Low'],
   category: ['WOMEN', 'MEN', 'KIDS'],

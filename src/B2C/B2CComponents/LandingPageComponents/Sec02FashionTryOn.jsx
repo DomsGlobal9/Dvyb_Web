@@ -25,13 +25,13 @@ const FashionTryOnSection = () => {
     <div className="text-white p-4 sm:p-6 md:p-8 lg:p-0">
       {/* Main Hero Section */}
       <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center lg:justify-start w-full">
+        <div className="flex flex-col lg:flex-row items-end lg:items-start justify-center lg:justify-start w-full">
           {/* Left Section - Image Placeholder (Handled by VideoSection background) */}
           {/* Content Section */}
           <div className="lg:ml-8 text-left w-full lg:w-auto">
             {/* Top Row - Heading */}
             <div className="space-y-2" style={{fontFamily:"Red Hat Display"}}>
-              <h1  className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-semi-bold leading-tight">
+              <h1  className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-semi-bold leading-tight ">
                 Experience Fashion Like<br />Never Before
               </h1>
               <h2 className="text-4xl sm:text-4xl md:text-5xl lg:text-7xl font-bold">

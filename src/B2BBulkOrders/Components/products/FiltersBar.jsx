@@ -4,6 +4,7 @@
 import React from 'react';
 import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { filterUtils } from '../../../utils/filterUtils';
+import normalizeColorToCode from '../../../utils/filterUtils.js'
 
 const FilterSidebar = ({
   filters,
@@ -18,27 +19,45 @@ const FilterSidebar = ({
   onCloseMobile,
 }) => {
   // Helper function to get option value and label
-  const getOptionData = (option, filterType) => {
-    if (filterType === 'selectedColors' && typeof option === 'object' && option.name && option.hex) {
-      return {
-        value: option.name,
-        label: option.name,
-        color: option.hex,
-        isColorObject: true
-      };
-    }
-    return {
-      value: option,
-      label: option,
-      color: null,
-      isColorObject: false
-    };
-  };
+ // inside FilterSidebar.jsx
 
-  // Helper function to check if an option is selected
-  const isOptionSelected = (filters, filterType, optionValue) => {
-    return filters[filterType]?.includes(optionValue) || false;
-  };
+// Unified option accessor (works for colors and plain strings)
+const getOptionData = (option, filterType) => {
+  if (filterType === 'selectedColors') {
+    // expected shape: {code, name, hex}; but also tolerate {name, hex} or strings
+    const code = normalizeColorToCode(option);
+    const label = typeof option === 'object' && option.name ? option.name : code;
+    const hex =
+      (typeof option === 'object' && option.hex) ||
+      (typeof option === 'string' && option.startsWith('#') ? option : null);
+    return {
+      value: code,     // canonical comparable value
+      label,
+      color: hex,
+      isColorObject: true
+    };
+  }
+  // default path for non-color filters
+  const val = typeof option === 'string' ? option : String(option);
+  return { value: val, label: val, color: null, isColorObject: false };
+};
+
+// Selected check with normalization
+const isOptionSelected = (filters, filterType, optionValue) => {
+  if (!filters[filterType]) return false;
+  // normalize all selected values and compare to normalized optionValue
+  const normalizedOption = filterType === 'selectedColors'
+    ? normalizeColorToCode(optionValue)
+    : String(optionValue).toLowerCase();
+
+  return filters[filterType].some(sel => {
+    const normalizedSel = filterType === 'selectedColors'
+      ? normalizeColorToCode(sel)
+      : String(sel).toLowerCase();
+    return normalizedSel === normalizedOption;
+  });
+};
+
 
   return (
     <div className={`bg-white overflow-y-scroll scrollbar ${isMobile ? 'p-4 h-full flex flex-col w-3/4' : 'p-6'} ${!isMobile ? 'sticky top-4 max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col' : ''}`}>
