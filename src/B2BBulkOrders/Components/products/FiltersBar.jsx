@@ -3,8 +3,8 @@
 
 import React from 'react';
 import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
-import { filterUtils } from '../../../utils/filterUtils';
-import normalizeColorToCode from '../../../utils/filterUtils.js'
+import { filterUtils, normalizeColorToCode } from '../../../utils/filterUtils';
+
 
 const FilterSidebar = ({
   filters,
