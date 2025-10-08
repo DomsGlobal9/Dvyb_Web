@@ -24,7 +24,7 @@ function PremiumSection05() {
   useEffect(() => {
   const handleResize = () => {
     if (window.innerWidth < 768) { // mobile < md
-      setDisplayedProducts(products.slice(0, 3));
+      setDisplayedProducts(products.slice(0, 4));
     } else {
       setDisplayedProducts(products);
     }
@@ -204,7 +204,7 @@ function PremiumSection05() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-block border border-black px-4 p-1 mb-6">
+          <div className="inline-block border-gray-200 border px-4 p-1 mb-6">
             <span className="text-xs font-medium text-gray-600 tracking-wider">
              DVYB COLLECTION
             </span>
@@ -225,7 +225,7 @@ function PremiumSection05() {
         </div>
 
         {/* Product Grid */}
-     <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-4  gap-2 lg:gap-24 justify-items-center">
+     <div className="grid grid-cols-2  md:grid-cols-2 lg:grid-cols-4  gap-2 lg:gap-24 justify-items-center">
   {products.length === 0 ? (
     <p className="text-gray-600 text-center col-span-full">
       No premium products available at the moment.
@@ -312,7 +312,7 @@ function PremiumSection05() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center  justify-center space-x-2">
             {/* Add to Cart Button */}
             <button 
               className={`flex-1 bg-[#3C8E9A] hover:bg-teal-700 text-white text-xs font-medium py-2 px-3 rounded flex items-center justify-center space-x-1 transition-colors ${
@@ -321,12 +321,12 @@ function PremiumSection05() {
               onClick={(e) => handleAddToCart(product, e)}
               disabled={addingToCart.has(product.id)}
             >
-              <ShoppingCart className="w-5  me-4 h-5 md:w-5 " />
-              <p >
+              <ShoppingCart className="w-4  me-2 h-4 md:w-5  md:h-5" />
+              <p className="text-[8px] md:text-xs" >
                 {addingToCart.has(product.id) ? (
                   <>ADDING...</>
                 ) : (
-                  <>ADD TO <br />COLLECTION</>
+                  < >ADD TO <br />COLLECTION</>
                 )}
               </p>
             </button>
@@ -340,7 +340,7 @@ function PremiumSection05() {
               disabled={togglingWishlist.has(product.id)}
             >
               <Heart 
-                className={`w-5 h-5 m-2 transition-colors ${
+                className={`w-3 h-3 md:h-5 md:w-5 m-2 transition-colors ${
                   wishlistItems.has(product.id) 
                     ? 'text-red-500 fill-current' 
                     : 'text-gray-600'

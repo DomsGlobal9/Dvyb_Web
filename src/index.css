@@ -27,3 +27,11 @@ body::-webkit-scrollbar {
 .scrollbar-none{
   scrollbar-width: none;                /* Firefox */
 }
+
+
+.red-hat-display {
+  font-family: "Red Hat Display", sans-serif;
+  font-optical-sizing: auto;
+  /* font-weight: <weight>;
+  font-style: normal; */
+}

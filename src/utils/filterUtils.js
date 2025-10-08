@@ -1,9 +1,8 @@
+// filterUtils.js - FIXED VERSION
+
 import { COLORS } from '../constants/colors';
 
-
-// already exporting COLORS and normalizeColorToCode in your file
 const getProductColorCodes = (product) => {
-  // Try common fields that might exist in your data
   const raw =
     product.selectedColors ??
     product.color ??
@@ -14,7 +13,6 @@ const getProductColorCodes = (product) => {
   if (Array.isArray(raw)) return raw.map(normalizeColorToCode).filter(Boolean);
   return [normalizeColorToCode(raw)].filter(Boolean);
 };
-
 
 export const CATEGORIES = [
   'ALL',
@@ -40,38 +38,39 @@ export const CATEGORIES = [
   'JACKETS',
 ];
 
-// Convert anything ("red", "red_#FF0000", "#FF0000", {code,name,hex}) to a canonical color code (e.g. "red")
+// Map curated collection titles to product categories
+const CATEGORY_MAPPING = {
+  'SAREES & BLOUSES': ['SAREE', 'BLOUSES'],
+  'ETHNIC COLLECTION': ['SALWAR SUITS', 'LEHENGAS', 'ANARKALI', 'DUPATTAS'],
+  'PREMIUM FABRICS': ['SILK DRESS', 'DESIGNER SAREE'],
+  'LUXURY ACCESSORIES': ['DUPATTAS', 'ETHNIC JACKET'],
+};
+
 export const normalizeColorToCode = (val) => {
   if (!val) return '';
   if (typeof val === 'object') {
-    // option object {code,name,hex} or {name, hex}
     if (val.code) return String(val.code).toLowerCase();
-    if (val.name) return String(val.name).toLowerCase(); // fallback if no code
+    if (val.name) return String(val.name).toLowerCase();
   }
   if (typeof val === 'string') {
     const s = val.trim();
-    // legacy "red_#FF0000"
     if (s.includes('_')) return s.split('_')[0].toLowerCase();
-    // if hex only, map hex -> code if possible
     if (s.startsWith('#')) return hexToCode(s);
-    // plain code
     return s.toLowerCase();
   }
   return '';
 };
 
-// optional: map hex to code using your COLORS table (in case product stores hex only)
 const hexToCode = (hex) => {
   const clean = (hex || '').toUpperCase();
   const match = (COLORS || []).find(c => (c.value || '').toUpperCase() === clean);
-  return match ? match.code.toLowerCase() : clean.toLowerCase(); // fallback to hex as key
+  return match ? match.code.toLowerCase() : clean.toLowerCase();
 };
-
 
 export const FILTER_OPTIONS = {
   priceSort: ['Low to High', 'High to Low'],
   category: ['WOMEN'],
-     selectedColors: COLORS.map(c => ({ code: c.code, name: c.name, hex: c.value })),
+  selectedColors: COLORS.map(c => ({ code: c.code, name: c.name, hex: c.value })),
   selectedSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
   fabric: [
     'Cotton', 'Silk', 'Silk Cotton', 'Georgette', 'Chiffon', 'Net',
@@ -112,81 +111,112 @@ export const DEFAULT_FILTER_SECTIONS = {
 
 export const filterUtils = {
   applyFilters(products, filters, selectedCategory, searchTerm) {
-  let filtered = [...products];
+    let filtered = [...products];
 
-  // (your category + search code unchanged)
-
-  // Sort and price range (unchanged)
-  Object.keys(filters).forEach(filterType => {
-    if (filterType === 'priceSort' && filters.priceSort) {
-      filtered = filtered.sort((a, b) => {
-        const priceA = parseFloat(a.price) || 0;
-        const priceB = parseFloat(b.price) || 0;
-        return filters.priceSort === 'Low to High' ? priceA - priceB : priceB - priceA;
-      });
-      return;
-    }
-
-    if (filterType === 'priceRange') {
-      const { min, max } = filters.priceRange;
-      if (min) filtered = filtered.filter(p => (parseFloat(p.price) || 0) >= parseFloat(min));
-      if (max) filtered = filtered.filter(p => (parseFloat(p.price) || 0) <= parseFloat(max));
-      return;
-    }
-
-    // ✅ Special handling for colors
-    if (filterType === 'selectedColors' && (filters.selectedColors?.length || 0) > 0) {
-      const want = filters.selectedColors.map(normalizeColorToCode);
-      filtered = filtered.filter(p => {
-        const have = getProductColorCodes(p); // ["red","blue",...]
-        return want.some(c => have.includes(c));
-      });
-      return;
-    }
-
-    // Generic multi-selects (sizes, fabric, craft, etc.)
-    if (filters[filterType]?.length > 0) {
+    // 1. CATEGORY FILTER (from navigation or sidebar)
+    if (selectedCategory && selectedCategory !== 'ALL') {
+      const cat = selectedCategory.toUpperCase().trim();
+      
       filtered = filtered.filter(product => {
-        const field = product[filterType];
-        if (!field) return false;
-        if (Array.isArray(field)) {
-          return filters[filterType].some(v => field.includes(v));
+        const productType = (product.dressType || '').toUpperCase().trim();
+        
+        // Direct match
+        if (productType === cat) return true;
+        
+        // Check if it's a curated collection category
+        if (CATEGORY_MAPPING[cat]) {
+          return CATEGORY_MAPPING[cat].some(mappedCat => 
+            productType.includes(mappedCat) || mappedCat.includes(productType)
+          );
         }
-        return filters[filterType].includes(field);
+        
+        // Partial match as fallback
+        return productType.includes(cat) || cat.includes(productType);
       });
     }
-  });
 
-  return filtered;
-},
+    // 2. SEARCH TERM FILTER
+    if (searchTerm && searchTerm.trim()) {
+      const search = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(product => {
+        return (
+          product.productName?.toLowerCase().includes(search) ||
+          product.description?.toLowerCase().includes(search) ||
+          product.dressType?.toLowerCase().includes(search) ||
+          product.fabric?.toLowerCase().includes(search)
+        );
+      });
+    }
 
+    // 3. APPLY ALL OTHER FILTERS
+    Object.keys(filters).forEach(filterType => {
+      // Price sort
+      if (filterType === 'priceSort' && filters.priceSort) {
+        filtered = filtered.sort((a, b) => {
+          const priceA = parseFloat(a.price) || 0;
+          const priceB = parseFloat(b.price) || 0;
+          return filters.priceSort === 'Low to High' ? priceA - priceB : priceB - priceA;
+        });
+        return;
+      }
 
+      // Price range
+      if (filterType === 'priceRange') {
+        const { min, max } = filters.priceRange;
+        if (min) filtered = filtered.filter(p => (parseFloat(p.price) || 0) >= parseFloat(min));
+        if (max) filtered = filtered.filter(p => (parseFloat(p.price) || 0) <= parseFloat(max));
+        return;
+      }
 
+      // Color filter (special handling)
+      if (filterType === 'selectedColors' && (filters.selectedColors?.length || 0) > 0) {
+        const want = filters.selectedColors.map(normalizeColorToCode);
+        filtered = filtered.filter(p => {
+          const have = getProductColorCodes(p);
+          return want.some(c => have.includes(c));
+        });
+        return;
+      }
+
+      // Generic multi-selects (sizes, fabric, craft, dressType, etc.)
+      if (filters[filterType]?.length > 0) {
+        filtered = filtered.filter(product => {
+          const field = product[filterType];
+          if (!field) return false;
+          if (Array.isArray(field)) {
+            return filters[filterType].some(v => field.includes(v));
+          }
+          return filters[filterType].includes(field);
+        });
+      }
+    });
+
+    return filtered;
+  },
 
   getFilterCount(products, filterType, filterValue) {
-  // ✅ Colors
-  if (filterType === 'selectedColors') {
-    const want = normalizeColorToCode(filterValue);
-    return products.reduce((acc, p) => {
-      const have = getProductColorCodes(p);
-      return acc + (have.includes(want) ? 1 : 0);
-    }, 0);
-  }
-
-  // Category count (your custom mapping)
-  if (filterType === 'category') {
-    return products.filter(p => p.dressType === filterValue).length;
-  }
-
-  // Generic fields
-  return products.filter(product => {
-    if (Array.isArray(product[filterType])) {
-      return product[filterType].includes(filterValue);
+    // Colors
+    if (filterType === 'selectedColors') {
+      const want = normalizeColorToCode(filterValue);
+      return products.reduce((acc, p) => {
+        const have = getProductColorCodes(p);
+        return acc + (have.includes(want) ? 1 : 0);
+      }, 0);
     }
-    return product[filterType] === filterValue;
-  }).length;
-},
 
+    // Category count
+    if (filterType === 'category') {
+      return products.filter(p => p.dressType === filterValue).length;
+    }
+
+    // Generic fields
+    return products.filter(product => {
+      if (Array.isArray(product[filterType])) {
+        return product[filterType].includes(filterValue);
+      }
+      return product[filterType] === filterValue;
+    }).length;
+  },
 
   countActiveFilters(filters, selectedCategory) {
     let count = 0;
@@ -201,25 +231,34 @@ export const filterUtils = {
     return count;
   },
 
- getActiveFilterChips(filters, selectedCategory) {
-  const chips = [];
-  // ... your existing code above
-  Object.keys(filters).forEach(filterType => {
-    if (filterType !== 'priceSort' && filterType !== 'priceRange' && filters[filterType]?.length > 0) {
-      filters[filterType].forEach(value => {
-        let display = value;
-        if (filterType === 'selectedColors') {
-          const hit = COLORS.find(c => c.code.toLowerCase() === String(value).toLowerCase());
-          display = hit ? hit.name : value;
-        }
-        chips.push({
-          displayValue: display,
-          onRemove: () => ({ type: filterType, value, remove: true }),
-        });
+  getActiveFilterChips(filters, selectedCategory) {
+    const chips = [];
+    
+    // Category chip
+    if (selectedCategory !== 'ALL') {
+      chips.push({
+        displayValue: selectedCategory,
+        onRemove: () => ({ type: 'category', value: 'ALL', remove: true }),
       });
     }
-  });
-  return chips;
-},
 
+    // Other filter chips
+    Object.keys(filters).forEach(filterType => {
+      if (filterType !== 'priceSort' && filterType !== 'priceRange' && filters[filterType]?.length > 0) {
+        filters[filterType].forEach(value => {
+          let display = value;
+          if (filterType === 'selectedColors') {
+            const hit = COLORS.find(c => c.code.toLowerCase() === String(value).toLowerCase());
+            display = hit ? hit.name : value;
+          }
+          chips.push({
+            displayValue: display,
+            onRemove: () => ({ type: filterType, value, remove: true }),
+          });
+        });
+      }
+    });
+    
+    return chips;
+  },
 };

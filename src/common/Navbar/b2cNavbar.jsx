@@ -272,14 +272,14 @@ const Navbar = () => {
                         {womenCategories[activeCategory].map((item, idx) => (
                           <div
                             key={idx}
-                            className="flex flex-col items-center w-32 cursor-pointer"
+                            className="flex flex-col items-center cursor-pointer"
                             onClick={() => handleSubcategoryClick(item.name)}
                           >
                             <img
                               src={item.img}
                               alt={item.name}
                               className="h-14 w-20  lg:h-32 lg:w-24 object-contain lg:object-cover   rounded shadow-sm hover:scale-105 transition"
-                            />
+                            />  
                             <span className="mt-2 text-xs font-medium text-gray-700 text-center">
                               {item.name}
                             </span>

@@ -22,16 +22,16 @@ const FashionTryOnSection = () => {
 
   return (
     <>
-    <div className="text-white p-4 sm:p-6 md:p-8 lg:p-0">
+    <div className="text-white p-4 mt-80 md:mt-0 lg:mt-56 font-redhat  sm:p-6 md:p-8 lg:p-0">
       {/* Main Hero Section */}
       <div className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <div className="flex flex-col lg:flex-row items-end lg:items-start justify-center lg:justify-start w-full">
+        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center lg:justify-start w-full">
           {/* Left Section - Image Placeholder (Handled by VideoSection background) */}
           {/* Content Section */}
           <div className="lg:ml-8 text-left w-full lg:w-auto">
             {/* Top Row - Heading */}
-            <div className="space-y-2" style={{fontFamily:"Red Hat Display"}}>
-              <h1  className="text-3xl sm:text-4xl md:text-5xl lg:text-4xl font-semi-bold leading-tight ">
+            <div className="space-y-2" >
+              <h1  className="text-3xl sm:text-4xl md:text-5xl  font-redhat lg:text-4xl font-semi-bold leading-tight">
                 Experience Fashion Like<br />Never Before
               </h1>
               <h2 className="text-4xl sm:text-4xl md:text-5xl lg:text-7xl font-bold">
@@ -52,11 +52,11 @@ const FashionTryOnSection = () => {
                   className="bg-[#5B9BA5] cursor-pointer hover:bg-teal-600 text-white px-6 py-3  font-semibold flex items-center justify-center gap-2 transition-colors duration-200 text-sm sm:text-base"
                 >
                   Try It Now <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button
-                  onClick={() => navigate('/products')}
-                  className="bg-white text-black cursor-pointer hover:bg-gray-200 px-6 py-3  font-semibold flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base"
-                >
+                </button> 
+                  <button
+                    onClick={() => navigate('/products')}
+                    className="bg-white text-black  cursor-pointer hover:bg-black hover:text-white px-6 py-3  font-semibold flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base"
+                  >
                   Explore Collections <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>

@@ -1,41 +1,33 @@
+// CuratedCollectionSection6.jsx - FIXED VERSION
+
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
-// import RigthImg from "../../../assets/B2cAssets/LandingPageImges/CuratedCollectionImg.png"
-import Sareeblack from "../../../assets/B2cAssets/LandingPageImges/Sareeblack.png"
 import { useNavigate } from 'react-router-dom';
 
-
 function CuratedCollectionSection6() {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
-  const  Sareepink = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311389/Frame_1984078362_mrvcto.png'
-  const BlueHalfSaree = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311251/Frame_1984078362_pybd6d.png'
-const EthnicColl = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311096/imgs1_esjlgs.png'
-const PremiumFabrics = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311253/pentaloons_fmedex.png' 
-const RigthImg = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311210/Rectangle_34624274_kv5dgp.png'
+  const Sareepink = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311389/Frame_1984078362_mrvcto.png';
+  const BlueHalfSaree = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311251/Frame_1984078362_pybd6d.png';
+  const EthnicColl = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311096/imgs1_esjlgs.png';
+  const PremiumFabrics = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311253/pentaloons_fmedex.png';
+  const RigthImg = 'https://res.cloudinary.com/doiezptnn/image/upload/v1759311210/Rectangle_34624274_kv5dgp.png';
 
-
-const collections = [
+  const collections = [
     {
       id: 1,
-      image: Sareepink ,
+      image: Sareepink,
       title: "SAREES & BLOUSES",
+      categoryKey: "SAREES & BLOUSES", // This will be used for filtering
       description: "Traditional elegance for every occasion",
       items: "2,467 ITEMS",
       trending: true
     },
-    // {
-    //   id: 2,
-    //   image: BlueHalfSaree,
-    //   title: "EVENING WEAR",
-    //   description: "Contemporary sophistication for special occasions",
-    //   items: "1,823 ITEMS",
-    //   trending: false
-    // },
     {
       id: 3,
       image: EthnicColl,
       title: "ETHNIC COLLECTION",
+      categoryKey: "ETHNIC COLLECTION",
       description: "Heritage craftsmanship meets modern comfort",
       items: "3,891 ITEMS",
       trending: true
@@ -44,6 +36,7 @@ const collections = [
       id: 4,
       image: PremiumFabrics,
       title: "PREMIUM FABRICS",
+      categoryKey: "PREMIUM FABRICS",
       description: "Finest materials for timeless creations",
       items: "567 ITEMS",
       trending: false
@@ -52,37 +45,42 @@ const collections = [
       id: 5,
       image: Sareepink,
       title: "LUXURY ACCESSORIES",
+      categoryKey: "LUXURY ACCESSORIES",
       description: "Perfect finishing touches for complete elegance",
       items: "2,945 ITEMS",
       trending: true
     }
   ];
 
-  const handleNavigateProducts=()=>{
-    navigate("/products")
-  }
+  const handleNavigateProducts = (categoryKey) => {
+    navigate(`/products?category=${encodeURIComponent(categoryKey)}`);
+  };
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "Outfit" }}>
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-block border border-black  px-4 p-1 mb-6">
+          <div className="inline-block border border-black px-4 p-1 mb-6">
             <span className="text-xs font-medium text-[#09545F] tracking-wider">PRODUCT CATEGORIES</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             CURATED COLLECTIONS
           </h1>
           <p className="text-gray-600">
-Discover our exclusive collections, designed to suit every style <br /> and occasion.
+            Discover our exclusive collections, designed to suit every style <br /> and occasion.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 overflow-hidden">
           {/* Left Column - Collections List */}
           <div className="space-y-4">
             {collections.map((collection) => (
-              <div key={collection.id} onClick={handleNavigateProducts} className="border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow cursor-pointer group">
+              <div 
+                key={collection.id} 
+                onClick={() => handleNavigateProducts(collection.categoryKey)} 
+                className="border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow cursor-pointer group"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
@@ -94,7 +92,7 @@ Discover our exclusive collections, designed to suit every style <br /> and occa
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-1">
-                        <h3 className="font-bold text-gray-900 text-lg">
+                        <h3 className="font-bold text-gray-900 text-xs md:text-lg">
                           {collection.title}
                         </h3>
                         {collection.trending && (
@@ -106,9 +104,6 @@ Discover our exclusive collections, designed to suit every style <br /> and occa
                       <p className="text-gray-600 text-sm mb-2">
                         {collection.description}
                       </p>
-                      {/* <p className="text-gray-500 text-xs font-medium">
-                        {collection.items}
-                      </p> */}
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
@@ -117,38 +112,15 @@ Discover our exclusive collections, designed to suit every style <br /> and occa
             ))}
           </div>
 
-          {/* Right Column - Featured Image and Stats */}
-          <div className="space-y-6">
-            {/* Featured Image */}
-            <div className=" rounded-lg overflow-hidden">
+          {/* Right Column - Featured Image */}
+          <div className="lg:-mt-11 lg:h-[76vh]">
+            <div className="rounded-lg overflow-hidden">
               <img 
                 src={RigthImg}
                 alt="Featured Collection"
                 className="w-full h-full object-cover"
               />
             </div>
-
-            {/* Stats */}
-            {/* <div className="grid grid-cols-3 gap-4">
-              <div className="text-center bg-white border border-gray-200 rounded-lg p-6">
-                <div className="text-3xl font-bold text-gray-900 mb-2">99.8%</div>
-                <div className="text-sm text-gray-600 mb-1">FIT</div>
-                <div className="text-sm text-gray-600 mb-3">PRECISION</div>
-                <div className="text-xs text-teal-600 font-medium">accuracy</div>
-              </div>
-              <div className="text-center bg-white border border-gray-200 rounded-lg p-6">
-                <div className="text-3xl font-bold text-gray-900 mb-2">4.9</div>
-                <div className="text-sm text-gray-600 mb-1">QUALITY</div>
-                <div className="text-sm text-gray-600 mb-3">RATING</div>
-                <div className="text-xs text-teal-600 font-medium">star</div>
-              </div>
-              <div className="text-center bg-white border border-gray-200 rounded-lg p-6">
-                <div className="text-3xl font-bold text-gray-900 mb-2">&lt; 2%</div>
-                <div className="text-sm text-gray-600 mb-1">RETURN</div>
-                <div className="text-sm text-gray-600 mb-3">RATE</div>
-                <div className="text-xs text-teal-600 font-medium">with 3D</div>
-              </div>
-            </div> */}
           </div>
         </div>
       </div>
