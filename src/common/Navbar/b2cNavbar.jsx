@@ -12,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { womenCategories } from "./navCatData";
 import b2clogo from "../../assets/Navbar/B2cLogo.png";
 import fav from "../../assets/B2Bassets/NavbarImages/heart.png";
+import search_icon from '../../assets/Navbar/search_icon.svg'
 import cart from "../../assets/B2Bassets/NavbarImages/cart.png";
 import profile from "../../assets/B2Bassets/NavbarImages/profile.png";
 import { useNavigate } from "react-router-dom";
@@ -192,6 +193,10 @@ const Navbar = () => {
               {/* Favorites, Cart, Profile */}
               <div className="hidden md:flex items-center space-x-6 text-xl text-blue-900">
                 {/* Wishlist with badge */}
+                   <img src={search_icon}
+              className="ml-6 hidden lg:block cursor-pointer text-gray-600 hover:text-blue-900 text-[18px]"
+              onClick={() => setSearchOpen(true)}
+            />
                 <div className="relative">
                   <img
                     className="cursor-pointer w-5 h-5"
@@ -298,10 +303,7 @@ const Navbar = () => {
               KIDS <span className="text-xs">(coming soon)</span>
             </span>
             <button className="text-[18px] hidden lg:block" onClick={handleTryOnClick}>2D TRY ON</button>
-            <FaSearch
-              className="ml-6 hidden lg:block cursor-pointer text-gray-600 hover:text-blue-900 text-[18px]"
-              onClick={() => setSearchOpen(true)}
-            />
+         
             </nav>
 
           {/* MOBILE OVERLAY MENU */}
