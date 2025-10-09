@@ -10,8 +10,8 @@ const PrecisionTryOnSection = () => {
         
         {/* Section Header */}
         <div className="text-center space-y-4 mb-12 lg:mb-16">
-          <div className="inline-flex items-center gap-2 border border-gray-300 bg-white px-5 py-2">
-            <span className="text-xs font-semibold text-gray-600 tracking-widest uppercase">
+          <div className="inline-flex items-center gap-2 px-5 py-2">
+            <span className="text-[16px] font-semibold text-gray-600 tracking-widest uppercase">
               INTERACTIVE EXPERIENCE
             </span>
           </div>

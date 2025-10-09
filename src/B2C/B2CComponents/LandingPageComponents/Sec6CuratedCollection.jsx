@@ -64,7 +64,7 @@ function CuratedCollectionSection6() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-block px-4 p-1 mb-6">
-            <span className="text-sm font-medium text-[#09545F] tracking-wider">PRODUCT CATEGORIES</span>
+            <span className="text-[16px] font-medium text-[#09545F] tracking-wider">PRODUCT CATEGORIES</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             CURATED COLLECTIONS

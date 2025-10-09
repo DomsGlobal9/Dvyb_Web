@@ -205,8 +205,8 @@ function PremiumSection05() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-block border-gray-200 border px-4 p-1 mb-6">
-            <span className="text-xs font-medium text-gray-600 tracking-wider">
+          <div className="inline-block  px-4 p-1 mb-6">
+            <span className="text-[18px] text-[#98C0D9] font-medium  tracking-wider">
              DVYB COLLECTION
             </span>
           </div>
