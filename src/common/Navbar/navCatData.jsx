@@ -15,12 +15,12 @@ export const womenCategories = {
       { name: "ETHNIC JACKET", img: ethinic_jacket },
     ],
     "TOP WEAR": [
-      { name: "T-SHIRTS", img: saree },
-      { name: "SHIRTS", img: saree },
+      // { name: "T-SHIRTS", img: saree },
+      // { name: "SHIRTS", img: saree },
       { name: "BLOUSES", img: saree },
     ],
     "BOTTOM WEAR": [
-      { name: "JEANS", img: saree },
+      // { name: "JEANS", img: saree },
       { name: "TROUSERS", img: saree },
       { name: "SKIRTS", img: saree },
     ],
