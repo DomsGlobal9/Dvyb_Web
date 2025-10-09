@@ -31,16 +31,16 @@ const FashionTryOnSection = () => {
           <div className="lg:ml-8 text-left w-full lg:w-auto">
             {/* Top Row - Heading */}
             <div className="space-y-2" >
-              <h1  className="text-3xl sm:text-4xl md:text-5xl  font-redhat lg:text-4xl font-semi-bold leading-tight">
-                Experience Fashion Like<br />Never Before
+              <h1  className="text-2xl sm:text-4xl md:text-5xl  font-redhat lg:text-4xl font-semi-bold leading-tight">
+                Experience Fashion Like<br className='hidden lg:block' /> Never Before
               </h1>
-              <h2 className="text-4xl sm:text-4xl md:text-5xl lg:text-7xl font-bold">
+              <h2 className="text-5xl mt-3 sm:text-4xl md:text-5xl lg:text-7xl font-bold">
                 TRY ON
               </h2>
             </div>
 
             {/* Bottom Section - Description and CTAs */}
-            <div className="mt-6 sm:mt-8 lg:mt-10 space-y-4 max-w-full sm:max-w-lg lg:max-w-md xl:max-w-lg">
+            <div className="mt-5 sm:mt-8 lg:mt-7 space-y-4 max-w-full sm:max-w-lg lg:max-w-md xl:max-w-lg">
               <p className="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed" style={{fontFamily:"Outfit"}}>
                 Step into the future of shopping – Try outfits on your Try On avatar before you buy.
               </p>

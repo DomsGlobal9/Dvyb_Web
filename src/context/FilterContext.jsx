@@ -1,5 +1,6 @@
 // context/FilterContext.js
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { productService } from '../services/firebaseServices';
 
 const FilterContext = createContext();
 
@@ -16,8 +17,32 @@ export const FilterProvider = ({ children }) => {
     dressType: [],
   });
 
+  // Add allProducts state
+  const [allProducts, setAllProducts] = useState([]);
+
+  // Fetch products on mount
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const products = await productService.fetchAllProducts();
+        setAllProducts(products);
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   return (
-    <FilterContext.Provider value={{ selectedCategory, setSelectedCategory, filters, setFilters }}>
+    <FilterContext.Provider
+      value={{
+        selectedCategory,
+        setSelectedCategory,
+        filters,
+        setFilters,
+        allProducts, // expose products
+      }}
+    >
       {children}
     </FilterContext.Provider>
   );

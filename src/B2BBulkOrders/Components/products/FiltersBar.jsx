@@ -13,7 +13,7 @@ const FilterSidebar = ({
   filterSections,
   filterOptions,
   products,
-  activeFiltersCount,
+  activeFiltersCount, 
   isMobile = false,
   onFilterChange,
   onToggleFilterSection,
@@ -69,9 +69,10 @@ const isOptionSelected = (filters, filterType, optionValue) => {
 
 
   return (
-    <div className={`bg-white overflow-y-scroll scrollbar ${isMobile ? 'p-4 h-full flex flex-col w-3/4' : 'p-6'} ${!isMobile ? 'sticky top-4 max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col' : ''}`}>
+    <div  className={`bg-white overflow-y-scroll border  border-[#233650]
+               scrollbar ${isMobile ? 'p-4  h-full flex flex-col w-3/4' : 'p-6'} ${!isMobile ? 'sticky top-4    max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col' : ''}`}>
       {/* Header - Fixed */}
-      <div className="flex items-center justify-between mb-6 flex-shrink-0">
+      <div className="flex items-center  justify-between mb-6 flex-shrink-0">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <Filter className="w-5 h-5 mr-2" />
           FILTER
@@ -151,9 +152,7 @@ const isOptionSelected = (filters, filterType, optionValue) => {
             </div>
           )}
         </div>
-
-        {/* Other Filter Sections */}
-        {Object.entries(filterOptions).filter(([key]) => key !== 'priceSort').filter(([key]) => !(shouldHideSizes && key === 'selectedSizes')).map(([filterType, options]) => (
+    {Object.entries(filterOptions).filter(([key]) => key == 'dressType').filter(([key]) => !(shouldHideSizes && key === 'selectedSizes')).map(([filterType, options]) => (
           <div key={filterType} className="mb-6">
             <button
               onClick={() => onToggleFilterSection(filterType)}
@@ -164,7 +163,66 @@ const isOptionSelected = (filters, filterType, optionValue) => {
             </button>
             {filterSections[filterType] && (
               <div className="py-4">
-                <div className="space-y-2 max-h-48 overflow-y-auto overflow-y-scroll scrollbar">
+                <div className="space-y-2 max-h-48 overflow-y-auto overflow-x-scroll scrollbar">
+                  {options.map((option, index) => {
+                    const { value, label, color, isColorObject } = getOptionData(option, filterType);
+                    
+                    // Create unique key for each option
+                    const optionKey = isColorObject ? `${filterType}-${value}-${index}` : `${filterType}-${value}`;
+                    
+                    // Get count for this option (use value for counting)
+                    const count = filterUtils.getFilterCount(products, filterType, value);
+                    const isSelected = isOptionSelected(filters, filterType, value);
+
+                    return (
+                      <label
+                        key={optionKey}
+                        className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded"
+                      >
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => onFilterChange(filterType, value)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          
+                          {/* Special rendering for colors with swatch */}
+                          {isColorObject ? (
+                            <div className="ml-3 flex items-center space-x-2">
+                              <div
+                                className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"
+                                style={{ backgroundColor: color }}
+                                title={label}
+                              />
+                              <span className="text-sm text-gray-700 capitalize">{label}</span>
+                            </div>
+                          ) : (
+                            <span className="ml-3 text-sm text-gray-700">{label}</span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-500">({count})</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+        {/* Other Filter Sections */}
+        {Object.entries(filterOptions).filter(([key]) => key !== 'priceSort' && key !== 'dressType').filter(([key]) => !(shouldHideSizes && key === 'selectedSizes')).map(([filterType, options]) => (
+          <div key={filterType} className="mb-6">
+            <button
+              onClick={() => onToggleFilterSection(filterType)}
+              className="w-full flex items-center justify-between py-3 border-b border-gray-200"
+            >
+              <span className="font-medium text-gray-900">{filterType.toUpperCase()}</span>
+              {filterSections[filterType] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+            {filterSections[filterType] && (
+              <div className="py-4">
+                <div className="space-y-2 max-h-48 overflow-y-auto overflow-x-scroll scrollbar">
                   {options.map((option, index) => {
                     const { value, label, color, isColorObject } = getOptionData(option, filterType);
                     

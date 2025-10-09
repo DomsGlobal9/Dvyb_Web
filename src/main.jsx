@@ -9,7 +9,7 @@ import { SearchProvider } from './context/SearchContext.jsx';
 import { FilterProvider } from './context/FilterContext.jsx';
 import { WishlistProvider } from "./context/WishlistContext";
 import { OrdersProvider } from './context/OrdersContext';
-
+import Footer from './common/Footer/Footer.jsx';
 
 createRoot(document.getElementById('root')).render(
    <React.StrictMode>
@@ -23,6 +23,7 @@ createRoot(document.getElementById('root')).render(
 
 
       <App />
+      
            </OrdersProvider>
         </WishlistProvider>
       </FilterProvider>

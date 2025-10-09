@@ -9,7 +9,8 @@ import {
   clearWishlist 
 } from '../../services/WishlistService';
 import { addToCart } from "../../services/CartService";
-import { toast } from "react-toastify"; // optional, for user feedback
+import { toast } from "react-toastify";
+import { Trash2 } from 'lucide-react';
 
 
 // Wishlist Button Component
@@ -118,130 +119,105 @@ const WishlistPage = () => {
 
   if (loading) {
     return (
-      <div className="wishlist-container">
-        <div className="loading">Loading your wishlist...</div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">Loading your wishlist...</div>
       </div>
     );
   }
 
   return (
-    <div className="wishlist-container" style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <div className="wishlist-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h1>My Wishlist ({wishlistItems.length})</h1>
-        {wishlistItems.length > 0 && (
-          <button 
-            onClick={handleClearWishlist}
-            style={{
-              background: '#ff4757',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Clear All
-          </button>
-        )}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 border-l-4 border-gray-800 pl-4">
+          Wishlist
+        </h1>
       </div>
 
       {wishlistItems.length === 0 ? (
-        <div className="empty-wishlist" style={{ textAlign: 'center', padding: '40px' }}>
-          <h3>Your wishlist is empty</h3>
-          <p>Start adding items you love to see them here!</p>
+        <div className="text-center py-16">
+          <h3 className="text-xl font-medium text-gray-700 mb-2">Your wishlist is empty</h3>
+          <p className="text-gray-500">Start adding items you love to see them here!</p>
         </div>
       ) : (
-        <div className="wishlist-items">
+        <div className="space-y-6">
           {wishlistItems.map((item) => (
             <div 
               key={item.productId} 
-              className="wishlist-item"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '15px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                marginBottom: '15px',
-                backgroundColor: 'white'
-              }}
+              className="flex items-start gap-4 pb-6 border-b border-gray-200"
             >
               {/* Product Image */}
               {(item.image || item.imageUrls?.[0]) && (
-  <img 
-    src={item.image || item.imageUrls[0]} 
-    alt={item.name || 'Product'} 
-    style={{
-      width: '80px',
-      height: '80px',
-      objectFit: 'cover',
-      borderRadius: '4px',
-      marginRight: '15px'
-    }}
-  />
-)}
-
+                <img 
+                  src={item.image || item.imageUrls[0]} 
+                  alt={item.name || 'Product'} 
+                  className="w-24 h-32 object-cover rounded flex-shrink-0"
+                />
+              )}
               
               {/* Product Details */}
-              <div className="item-details" style={{ flex: 1 }}>
-                <h3 style={{ margin: '0 0 5px 0' }}>{item.name || 'Product Name'}</h3>
-                <p style={{ margin: '0 0 5px 0', color: '#666' }}>
-                  Color: {item.color || 'N/A'} | Size: {item.size || 'N/A'}
-                </p>
-                <p style={{ margin: '0', fontWeight: 'bold', fontSize: '18px' }}>
-                  ₹{item.price || '0'}
-                </p>
-                <p style={{ margin: '5px 0 0 0', fontSize: '12px', color: '#888' }}>
-                  Added on: {item.addedAt?.toDate?.()?.toLocaleDateString() || 'Unknown'}
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-medium text-gray-900 mb-2">
+                  {item.name || 'Product Name'}
+                </h3>
+                <div className="space-y-1 text-sm text-gray-600">
+                  <p>
+                    <span className="font-medium">Color :</span> {item.color || 'N/A'}
+                  </p>
+                  <p>
+                    <span className="font-medium">Quantity :</span> {item.quantity || '14'}
+                  </p>
+                  <p>
+                    <span className="font-medium">Sizes :</span> {item.sizes || item.size || 'XS, S, M, L, XL, 2XL'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Price */}
+              <div className='lg:flex  lg:justify-center lg:gap-56 '>
+
+              
+              <div className=" flex text-center">
+                <p className="text-lg font-semibold text-gray-900">
+                  ₹{item.price ? item.price.toLocaleString('en-IN') : '0'}
                 </p>
               </div>
 
-              {/* Action Buttons */}
-              <div className="item-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Add to Cart Button */}
+              <div className="mt-4 lg:mt-0 flex-shrink-0">
                 <button
-                  onClick={() => handleRemoveItem(item.productId)}
-                  style={{
-                    background: '#ff4757',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 12px',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
+                  onClick={async () => {
+                    try {
+                      await addToCart(item.productId, {
+                        name: item.name,
+                        price: item.price,
+                        color: item.color,
+                        size: item.size,
+                        imageUrls: item.imageUrls || [item.image],
+                        freeShipping: item.freeShipping,
+                        shippingMessage: item.shippingMessage,
+                      });
+
+                      toast.success("Added to cart!");
+                    } catch (error) {
+                      console.error("Failed to add to cart:", error);
+                      toast.error("Failed to add to cart. Please try again.");
+                    }
                   }}
+                  className="bg-[#1e3a5f] hover:bg-[#152a45] text-white px-6 py-2.5 rounded text-sm font-medium transition-colors"
                 >
-                  Remove
+                  Add to cart
                 </button>
+              </div>
+
+              {/* Delete Icon */}
               <button
-  onClick={async () => {
-    try {
-      await addToCart(item.productId, {
-        name: item.name,
-        price: item.price,
-        color: item.color,
-        size: item.size,
-        imageUrls: item.imageUrls || [item.image],
-        freeShipping: item.freeShipping,
-        shippingMessage: item.shippingMessage,
-      });
-
-      alert("Added to cart!"); // or use toast for better UX
-    } catch (error) {
-      console.error("Failed to add to cart:", error);
-      alert("Failed to add to cart. Please try again.");
-    }
-  }}
-  style={{
-    background: "#2ed573",
-    color: "white",
-    border: "none",
-    padding: "8px 12px",
-    borderRadius: "4px",
-    cursor: "pointer",
-  }}
->
-  Add to Cart
-</button>
-
+                onClick={() => handleRemoveItem(item.productId)}
+                className="flex-shrink-0 mt-4 lg:mt-0 text-gray-400 hover:text-red-500 transition-colors p-1"
+                aria-label="Remove from wishlist"
+              >
+                <Trash2 size={20} />
+              </button>
               </div>
             </div>
           ))}

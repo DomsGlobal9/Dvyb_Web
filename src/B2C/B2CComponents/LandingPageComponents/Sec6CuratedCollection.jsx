@@ -3,6 +3,7 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import upward_ic from '../../../assets/B2cAssets/LandingPageImges/upward_ic.svg'
 
 function CuratedCollectionSection6() {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ function CuratedCollectionSection6() {
     }
   ];
 
+  
   const handleNavigateProducts = (categoryKey) => {
     navigate(`/products?category=${encodeURIComponent(categoryKey)}`);
   };
@@ -61,8 +63,8 @@ function CuratedCollectionSection6() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-block border border-black px-4 p-1 mb-6">
-            <span className="text-xs font-medium text-[#09545F] tracking-wider">PRODUCT CATEGORIES</span>
+          <div className="inline-block px-4 p-1 mb-6">
+            <span className="text-sm font-medium text-[#09545F] tracking-wider">PRODUCT CATEGORIES</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             CURATED COLLECTIONS
@@ -74,46 +76,60 @@ function CuratedCollectionSection6() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 overflow-hidden">
           {/* Left Column - Collections List */}
-          <div className="space-y-4">
-            {collections.map((collection) => (
-              <div 
-                key={collection.id} 
-                onClick={() => handleNavigateProducts(collection.categoryKey)} 
-                className="border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow cursor-pointer group"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                      <img 
-                        src={collection.image}
-                        alt={collection.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-1">
-                        <h3 className="font-bold text-gray-900 text-xs md:text-lg">
-                          {collection.title}
-                        </h3>
-                        {collection.trending && (
-                          <span className="bg-teal-600 text-white text-xs font-medium px-2 py-1 rounded">
-                            TRENDING
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-gray-600 text-sm mb-2">
-                        {collection.description}
-                      </p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                </div>
-              </div>
-            ))}
+        <div className="space-y-4">
+  {collections.map((collection) => (
+    <div 
+      key={collection.id} 
+      onClick={() => handleNavigateProducts(collection.categoryKey)} 
+      className="border  border-gray-200 hover:border-[#265C64] hover:border-2 rounded-lg p-6 hover:shadow-sm transition-shadow cursor-pointer group"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-start space-x-4 ">
+          {/* Image */}
+          <div className="w-24 h-24  overflow-hidden flex-shrink-0">
+            <img 
+              src={collection.image}
+              alt={collection.title}
+              
+              className="w-full h-full object-cover"
+            />
+            
           </div>
 
+          {/* Text block */}
+          <div className="flex-1 flex flex-col  justify-between">
+            {/* Title + Trending badge */}
+            <div className="flex items-center lg:gap-36 gap-1 md:gap-64 justify-between mb-1">
+              <h3 className="font-outfit md:w-48  font-semibold text-gray-900 text-xs md:text-lg">
+                {collection.title}
+              </h3>
+              {collection.trending && (
+                <span className="bg-[#3C8E9A] w-[104px] h-6 text-[12px] md:w-auto md:h-auto flex text-white text-xs font-outfit px-2 py-1 items-center gap-2 ">
+                  <img src={upward_ic} alt="" className="w-5 h-5" /> 
+                  <span>TRENDING</span>
+                </span>
+              )}
+            </div>
+
+            {/* Description */}
+            <p className="text-gray-600 text-sm mb-2">
+              {collection.description}
+            </p>
+
+            {/* Items count + arrow */}
+            <div className="flex items-center  text-gray-700 text-sm font-medium">
+              <span>{collection.itemsCount?.toLocaleString()|| 0 } Items</span>
+              <ChevronRight className="w-5 h-5 ml-1 text-[#3C8E9A]  group-hover:text-gray-600 transition-colors" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
           {/* Right Column - Featured Image */}
-          <div className="lg:-mt-11 lg:h-[76vh]">
+          <div className="lg:-mt-11 lg:h-[64vh]">
             <div className="rounded-lg overflow-hidden">
               <img 
                 src={RigthImg}

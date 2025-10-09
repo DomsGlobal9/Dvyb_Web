@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Star, ArrowRight, Heart } from "lucide-react";
 import saree from "../../../assets/B2cAssets/LandingPageImges/sareepink.png";
-import Bag from "../../../assets/B2cAssets/LandingPageImges/Bag.png";
+import Bag from "../../../assets/B2cAssets/LandingPageImges/Bag_ic.svg";
 import { useNavigate } from "react-router-dom";
 
 import { productService } from "../../../services/firebaseServices";
@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // StatsCard unchanged
-const StatsCard = ({ value, label, sublabel }) => (
+const   StatsCard = ({ value, label, sublabel }) => (
   <div className="p-4 text-center">
     <div className="text-xs text-gray-400">{sublabel}</div>
     <div className="text-2xl md:text-3xl font-bold text-white mb-1">
@@ -67,24 +67,24 @@ const ProductCard = ({
             </div>
             <span className="text-gray-400 text-xs ml-2">(4.0)</span>
           </div>
-          <span className="text-gray-400 text-xs">1967 FITTED</span>
+          {/* <span className="text-gray-400 text-xs">1967 FITTED</span> */}
         </div>
 
-        <h3 className="text-white text-sm font-medium mb-3 uppercase tracking-wide">
+        <h3 className="text-white  text-sm font-medium mt-4 uppercase tracking-wide">
           {product.name || product.title}
         </h3>
 
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-white font-bold text-lg">₹{currentPrice}</span>
-          <span className="text-gray-500 line-through text-sm">
+        <div className="flex items-center mt-1  gap-3 mb-2">
+          <span className="text-white font-outfit text-xl">₹{currentPrice}</span>
+          <span className="text-gray-500 line-through font-outfit text-xl">
             ₹{originalPrice}
           </span>
         </div>
 
-        <div className="text-teal-400 text-xs font-medium mb-4">{savePercent}</div>
+        <div className="text-[#DA4218] text-[16px] font-outfit mb-2">{savePercent}</div>
 
-        <div className="p-3">
-          <div className="flex justify-between text-xs mb-2">
+        <div className=" ">
+          <div className="flex justify-between text-md mb-2">
             <span className="text-[#3C8E9A]">TRY ON SCORE</span>
             <span className="py-1 font-medium">+38%</span>
           </div>
@@ -93,16 +93,16 @@ const ProductCard = ({
             <div className="bg-teal-500 h-1" style={{ width: "80%" }}></div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center gap-3">
             {/* Add to Bag */}
             <button
-              className={`flex items-center w-3/4 gap-2 bg-[#3C8E9A] text-white px-6 py-2 ${
+              className={`flex items-center justify-center w-3/4 gap-2 bg-[#3C8E9A] text-white px-6 py-2 ${
                 addingToCart ? "opacity-50 cursor-not-allowed" : ""
               }`}
               onClick={(e) => handleAddToCart(product, e)}
               disabled={addingToCart}
             >
-              <img src={Bag} className="h-3" alt="bag" />
+              <img src={Bag} className="h-3 lg:h-4" alt="bag" />
               <span className="text-sm tracking-wide">
                 {addingToCart ? "ADDING..." : "ADD TO BAG"}
               </span>
@@ -110,7 +110,7 @@ const ProductCard = ({
 
             {/* Wishlist - replaced image with Lucide Heart so we can color it */}
             <button
-              className={`flex items-center justify-center border border-gray-500 px-3 py-2 rounded-sm ${
+              className={`flex items-center justify-center border border-gray-500 px-3 py-2  ${
                 togglingWishlist ? "opacity-50 cursor-not-allowed" : ""
               }`}
               onClick={(e) => handleWishlistToggle(product, e)}
@@ -247,12 +247,10 @@ function VirtualTryonSection8() {
 
         <div className="text-start mb-8 md:mb-12">
           <h1 className="text-4xl md:text-6xl lg:text-5xl font-bold mb-6 leading-tight">
-            Trending in Virtual Try-On
+            TRENDING IN VIRTUAL TRY-ON
           </h1>
-          <p className="text-gray-400 text-sm md:text-base max-w-2xl leading-relaxed">
-            This week, the outfits that have been tried-on the most by our users
-            are truly remarkable! From stylish dresses to trendy casual wear,
-            everyone seems to be exploring new looks.
+          <p className="text-gray-400  font-outfit text-sm   md:text-base max-w-2xl leading-relaxed">
+            This week, the outfits that have been tried on the most by our users are truly remarkable! From stylish dresses to trendy casual wear, everyone seems to be exploring new looks.
           </p>
         </div>
 
@@ -275,14 +273,14 @@ function VirtualTryonSection8() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-px mb-8 md:mb-12 border-[2px] border-[#212833]">
-          <StatsCard value="12,847" label="DAILY VIRTUAL FITTINGS" sublabel="Active" />
-          <StatsCard value="847" label="TRENDING ITEMS" sublabel="Live" />
-          <StatsCard value="99.2%" label="PRECISION RATE" sublabel="Accuracy" />
-          <StatsCard value="1,247" label="GLOBAL USERS" sublabel="Online" />
+          <StatsCard value="1200" label="DAILY VIRTUAL FITTINGS" sublabel="Active" />
+          <StatsCard value="1k" label="TRENDING ITEMS" sublabel="Live" />
+          <StatsCard value="99.4%" label="PRECISION RATE" sublabel="Accuracy" />
+          <StatsCard value="2000+" label="GLOBAL USERS" sublabel="Online" />
         </div>
 
         <div className="text-center space-y-6">
-          <button className="bg-[#3C8E9A] hover:bg-teal-600 text-white font-medium px-8 py-4 transition-colors duration-200 flex items-center gap-2 mx-auto">
+          <button onClick={()=>navigate('/products')} className="bg-[#3C8E9A] hover:bg-teal-600 text-white font-medium px-8 py-4 transition-colors duration-200 flex items-center gap-2 mx-auto">
             EXPLORE TRENDING COLLECTION
             <ArrowRight size={16} />
           </button>

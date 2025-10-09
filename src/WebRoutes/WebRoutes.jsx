@@ -24,6 +24,8 @@ import B2bProfilePage from "../CommonPages/ProfilePage/B2bProfilePage";
 import ProductDetailWrapper from "../B2BBulkOrders/Pages/Products/ProductDetailWrapper";
 import CheckoutPage from "../CommonPages/CheckoutPage/CheckOutPage";
 import MyOrders from "../common/ProfilePageComponents/Orders";
+import ScrollToTop from "../common/ProfilePageComponents/ScrollToTop";
+
 // import Navbar from "../common/Navbar/b2cNavbar";
 
 const WebRoutes = () => {
@@ -32,6 +34,7 @@ const WebRoutes = () => {
 
   return (
     <AuthProvider>
+      <ScrollToTop/>
     <Routes>
       {/* B2B bulk routes */}
       <Route path="/B2BBulkOrders-home" element={<HomePages/>} />

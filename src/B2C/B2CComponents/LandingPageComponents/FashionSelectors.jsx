@@ -33,9 +33,9 @@ const FashionSelector = () => {
             className="w-full h-auto object-cover"
           />
           {/* Label Overlay */}
-          <div className="absolute bottom-6 left-6 bg-white px-5 py-3 shadow-lg">
-            <p className="text-black text-sm font-bold leading-tight">{selectedGarment !== null ? garments[selectedGarment].name.toUpperCase() : 'DEFAULT'}</p>
-            <p className="text-gray-600 text-xs">Premium</p>
+          <div className="absolute bottom-10 left-9  bg-white px-5 py-3 shadow-lg">
+            <p className="text-black text-[11px] font-outfit   font-semibold leading-tight">{selectedGarment !== null ? garments[selectedGarment].name.toUpperCase() : 'SILK SAREE'}</p>
+            <p className="text-gray-600 pt-2 text-[10px]">Premium silk</p>
           </div>
         </div>
       </div>

@@ -68,6 +68,10 @@ const hexToCode = (hex) => {
 };
 
 export const FILTER_OPTIONS = {
+  dressType: [
+    'Traditional Lehenga', 'Designer Saree', 'Cotton Kurti', 'Silk Dress',
+    'Party Wear', 'Casual Wear', 'Wedding Wear', 'Formal Wear',
+  ],
   priceSort: ['Low to High', 'High to Low'],
   category: ['WOMEN'],
   selectedColors: COLORS.map(c => ({ code: c.code, name: c.name, hex: c.value })),
@@ -82,10 +86,7 @@ export const FILTER_OPTIONS = {
     'Woven', 'Printed', 'Plain', 'Sequined', 'Beaded', 'Mirror Work',
     'Dabu', 'Shibori', 'Mukasish', 'Brocade', 'Cutout', 'Ikat', 'Chikankari',
   ],
-  dressType: [
-    'Traditional Lehenga', 'Designer Saree', 'Cotton Kurti', 'Silk Dress',
-    'Party Wear', 'Casual Wear', 'Wedding Wear', 'Formal Wear',
-  ],
+  
 };
 
 export const DEFAULT_FILTERS = {
@@ -194,29 +195,40 @@ export const filterUtils = {
     return filtered;
   },
 
-  getFilterCount(products, filterType, filterValue) {
-    // Colors
-    if (filterType === 'selectedColors') {
-      const want = normalizeColorToCode(filterValue);
-      return products.reduce((acc, p) => {
-        const have = getProductColorCodes(p);
-        return acc + (have.includes(want) ? 1 : 0);
-      }, 0);
-    }
+ getFilterCount(products, filterType, filterValue) {
+  if (filterType === "selectedColors") {
+    const want = normalizeColorToCode(filterValue);
+    return products.reduce((acc, p) => {
+      const have = getProductColorCodes(p);
+      return acc + (have.includes(want) ? 1 : 0);
+    }, 0);
+  }
 
-    // Category count
-    if (filterType === 'category') {
-      return products.filter(p => p.dressType === filterValue).length;
-    }
+  // ✅ Category count fix for curated section
+  if (filterType === "category") {
+    const target = String(filterValue).toLowerCase();
+    return products.filter(p => {
+      const dress = (p.dressType || "").toLowerCase();
+      const cat = (p.category || "").toLowerCase();
+      const title = (p.title || p.name || "").toLowerCase();
 
-    // Generic fields
-    return products.filter(product => {
-      if (Array.isArray(product[filterType])) {
-        return product[filterType].includes(filterValue);
-      }
-      return product[filterType] === filterValue;
+      // Match if any relevant field includes the target
+      return (
+        dress.includes(target) ||
+        cat.includes(target) ||
+        title.includes(target)
+      );
     }).length;
-  },
+  }
+
+  // Generic fields fallback
+  return products.filter(product => {
+    if (Array.isArray(product[filterType])) {
+      return product[filterType].includes(filterValue);
+    }
+    return product[filterType] === filterValue;
+  }).length;
+},
 
   countActiveFilters(filters, selectedCategory) {
     let count = 0;

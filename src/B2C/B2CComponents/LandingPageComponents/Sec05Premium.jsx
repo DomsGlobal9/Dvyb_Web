@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Heart, Star, ShoppingCart } from "lucide-react";
+import Bag_ic from '../../../assets/B2cAssets/LandingPageImges/Bag_ic.svg'
 import { useNavigate } from "react-router-dom";
 import { productService } from "../../../services/firebaseServices";
 import { addToCart } from "../../../services/CartService";
@@ -283,9 +284,9 @@ function PremiumSection05() {
 
             {/* Accuracy */}
             <div>
-              <span className="text-xs text-gray-500 font-medium text-end">
+              {/* <span className="text-xs text-gray-500 font-medium text-end">
                 95% FIT ACCURACY
-              </span>
+              </span> */}
             </div>
           </div>
 
@@ -321,12 +322,12 @@ function PremiumSection05() {
               onClick={(e) => handleAddToCart(product, e)}
               disabled={addingToCart.has(product.id)}
             >
-              <ShoppingCart className="w-4  me-2 h-4 md:w-5  md:h-5" />
+              <img src={Bag_ic} className="w-4  me-2 h-4 md:w-5  md:h-5" />
               <p className="text-[8px] md:text-xs" >
                 {addingToCart.has(product.id) ? (
                   <>ADDING...</>
                 ) : (
-                  < >ADD TO <br />COLLECTION</>
+                  < >ADD TO BAG</>
                 )}
               </p>
             </button>
@@ -340,7 +341,7 @@ function PremiumSection05() {
               disabled={togglingWishlist.has(product.id)}
             >
               <Heart 
-                className={`w-3 h-3 md:h-5 md:w-5 m-2 transition-colors ${
+                className={`w-3 h-3 md:h-5 md:w-5 m-1 transition-colors ${
                   wishlistItems.has(product.id) 
                     ? 'text-red-500 fill-current' 
                     : 'text-gray-600'

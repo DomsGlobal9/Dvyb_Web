@@ -106,8 +106,8 @@ const ClientTestimonials = () => {
 
 
         {/* Main Testimonials Section */}
-        <div className="text-start mt-14 mb-12">
-          <div className='border border-black text-center p-2 w-40'><h3 className='text-[#09545F] font-semibold'>HEAR OUR VOICES</h3></div>
+        <div className="text-center   mt-14 mb-12">
+          <h3 className='text-[#98C0D9] text-center  font-semibold'>HEAR OUR VOICES</h3>
           <h2 className="text-3xl mt-4 sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           WHAT OUR USER SAYS
           </h2>
@@ -117,9 +117,9 @@ const ClientTestimonials = () => {
         </div>
 
         {/* Testimonial Card */}
-        <div className="relative w-auto  ">
+        <div className="relative w-auto   ">
           <div className="bg-white rounded-2xl  lg:h-80  shadow-xl overflow-hidden">
-            <div className="flex flex-col lg:flex-row">
+            <div className="flex flex-col justify-center lg:flex-row">
               {/* Left Side - Profile */}
               <div className="  text-white p-8 flex flex-col items-center justify-center">
                 <div className="relative mb-6">
@@ -218,7 +218,7 @@ const ClientTestimonials = () => {
         </div>
 
         {/* Dots Indicator */}
-        <div className="flex justify-center mt-8 gap-3">
+        <div className="flex justify-center mt-8  gap-3">
           {testimonials.map((_, index) => (
             <button
               key={index}
@@ -229,7 +229,7 @@ const ClientTestimonials = () => {
                   : 'bg-gray-300 hover:bg-gray-400'
               }`}
             />
-          ))}
+          ))} 
         </div>
 
         {/* Auto-play indicator */}
