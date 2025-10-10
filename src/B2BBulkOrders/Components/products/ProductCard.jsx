@@ -120,9 +120,9 @@ const ProductCard = ({
 
         {/* Badges */}
         <div className="absolute top-3 left-3 space-y-2">
-          <span className="px-2 py-1 bg-gray-800 text-white text-xs rounded font-medium">
+          {/* <span className="px-2 py-1 bg-gray-800 text-white text-xs rounded font-medium">
             TRY ON
-          </span>
+          </span> */}
           {product.discount && product.discount > 0 && (
             <span className="block px-2 py-1 bg-red-500 text-white text-xs rounded font-medium">
               {product.discount}% OFF
@@ -184,7 +184,7 @@ const ProductCard = ({
         </div>
 
         {/* Colors */}
-        {product.selectedColors && product.selectedColors.length > 0 && (
+        {/* {product.selectedColors && product.selectedColors.length > 0 && (
           <div className="flex items-center space-x-1">
             <span className="text-xs text-gray-500">Colors:</span>
             <div className="flex space-x-1">
@@ -208,7 +208,7 @@ const ProductCard = ({
               )}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

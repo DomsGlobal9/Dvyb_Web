@@ -4,7 +4,7 @@ import Cotton from '../../../assets/B2cAssets/LandingPageImges/Cotton.png';
 import Velvet from '../../../assets/B2cAssets/LandingPageImges/Velvet.png';
 import Linen from '../../../assets/B2cAssets/LandingPageImges/Linen.png';
 import heart from '../../../assets/B2cAssets/LandingPageImges/majesticons_heart-line.png';
-import Bag from '../../../assets/B2cAssets/LandingPageImges/Bag.png';
+import Bag from '../../../assets/B2cAssets/LandingPageImges/Bag_ic.svg';
 const FashionSelector = () => {
   const [selectedGarment, setSelectedGarment] = useState(null); // Initialize as null for default image
   const [selectedColor, setSelectedColor] = useState(0);
@@ -58,14 +58,17 @@ const FashionSelector = () => {
                     : 'ring-1 ring-gray-200 hover:ring-gray-300 hover:shadow-md'
                 }`}
               >
-                <div className="w-full h-auto p-1  overflow-hidden">
-                  <img
-                    src={garment.image}
-                    alt={garment.name}
-                    className="w-full h-full   object-contain"
-                  />
-                  <p className="text-sm pl-4 p-0.5 font-medium text-gray-800">{garment.name}</p>
-                </div>
+            <div className="w-full p-2">  {/* Changed from w-[145px] to w-full */}
+  <img
+    src={garment.image} 
+    alt={garment.name}
+    className="w-full h-[116px] object-cover rounded" 
+  />
+  <p className="text-[13px] pt-2 text-center font-medium text-gray-800">
+    {garment.name}
+  </p>
+  <div className='p-0.5'></div>
+</div>
                 {/* <div className="pl-4 p-1">
                   
                 </div> */}
@@ -99,7 +102,7 @@ const FashionSelector = () => {
         {/* Action Buttons */}
         <div className="flex flex-col justify-center  sm:flex-row gap-3 pt-2">
           <button className="flex-1  bg-[#5B9BA5] hover:bg-[#4A8A94] text-white px-6 py-3.5 rounded font-semibold text-sm uppercase tracking-wide transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
-          <img src={Bag} alt="" className='h-4' />  ADD TO BAG
+          <img src={Bag} alt="" className='h-5' />  ADD TO BAG
           </button>
           <button className=" text-gray-700 px-5 flex  justify-center py-3.5 rounded border-2 border-gray-300 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md">
             {/* <Heart size={20} /> */}

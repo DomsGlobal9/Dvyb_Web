@@ -69,7 +69,7 @@ const isOptionSelected = (filters, filterType, optionValue) => {
 
 
   return (
-    <div  className={`bg-white overflow-y-scroll border  border-[#233650]
+    <div  className={`bg-white overflow-y-scroll border  rounded-xl    border-[#233650]
                scrollbar ${isMobile ? 'p-4  h-full flex flex-col w-3/4' : 'p-6'} ${!isMobile ? 'sticky top-4    max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col' : ''}`}>
       {/* Header - Fixed */}
       <div className="flex items-center  justify-between mb-6 flex-shrink-0">
@@ -120,7 +120,7 @@ const isOptionSelected = (filters, filterType, optionValue) => {
                 <select
                   value={filters.priceSort}
                   onChange={(e) => onFilterChange('priceSort', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full p-2 border border-[#98C0D9]  rounded-lg text-sm"
                 >
                   {filterOptions.priceSort.map((option) => (
                     <option key={option} value={option}>{option}</option>
@@ -129,13 +129,13 @@ const isOptionSelected = (filters, filterType, optionValue) => {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">Min Price</label>
+                  <label className="block text-xs    text-gray-600 mb-1">Min Price</label>
                   <input
                     type="number"
                     placeholder="₹ Min"
                     value={filters.priceRange.min}
                     onChange={(e) => onFilterChange('priceRange', { min: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                    className="w-full p-2 border border-[#98C0D9] rounded text-sm"
                   />
                 </div>
                 <div>
@@ -145,7 +145,7 @@ const isOptionSelected = (filters, filterType, optionValue) => {
                     placeholder="₹ Max"
                     value={filters.priceRange.max}
                     onChange={(e) => onFilterChange('priceRange', { max: e.target.value })}
-                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                    className="w-full p-2 border border-[#98C0D9] rounded text-sm"
                   />
                 </div>
               </div>

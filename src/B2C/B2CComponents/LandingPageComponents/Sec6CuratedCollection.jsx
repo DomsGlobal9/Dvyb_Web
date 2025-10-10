@@ -31,7 +31,7 @@ function CuratedCollectionSection6() {
       categoryKey: "ETHNIC COLLECTION",
       description: "Heritage craftsmanship meets modern comfort",
       items: "3,891 ITEMS",
-      trending: true
+      trending: false
     },
     {
       id: 4,
@@ -49,7 +49,7 @@ function CuratedCollectionSection6() {
       categoryKey: "LUXURY ACCESSORIES",
       description: "Perfect finishing touches for complete elegance",
       items: "2,945 ITEMS",
-      trending: true
+      trending: false
     }
   ];
 
