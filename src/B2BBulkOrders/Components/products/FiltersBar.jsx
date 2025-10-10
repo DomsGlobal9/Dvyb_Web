@@ -1,13 +1,9 @@
-
-
-
 import React from 'react';
 import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
-import { filterUtils } from '../../../utils/filterUtils';
-import { normalizeColorToCode } from '../../../utils/filterUtils';
-
+import { filterUtils, normalizeColorToCode } from '../../../utils/filterUtils';
 
 const FilterSidebar = ({
+  fromExplore = false,
   selectedCategory,
   filters,
   filterSections,
@@ -20,59 +16,134 @@ const FilterSidebar = ({
   onClearAllFilters,
   onCloseMobile,
 }) => {
-  // Helper function to get option value and label
- // inside FilterSidebar.jsx
- console.log("cat",selectedCategory,25)
- 
-const cat = (selectedCategory || '').toLowerCase().replace('_', ' ');
-const shouldHideSizes = ['saree', 'designer saree'].includes(cat);
 
-// Unified option accessor (works for colors and plain strings)
-const getOptionData = (option, filterType) => {
-  if (filterType === 'selectedColors') {
-     console.log("filterType",filterType,25)
-    // expected shape: {code, name, hex}; but also tolerate {name, hex} or strings
-    const code = normalizeColorToCode(option);
-    const label = typeof option === 'object' && option.name ? option.name : code;
-    const hex =
-      (typeof option === 'object' && option.hex) ||
-      (typeof option === 'string' && option.startsWith('#') ? option : null);
-    return {
-      value: code,     // canonical comparable value
-      label,
-      color: hex,
-      isColorObject: true
-    };
-  }
+  // const cat = (selectedCategory || '').toLowerCase().replace('_', ' ');
+  // const shouldHideSizes = ['SAREE','saree', 'designer saree'].includes(cat);
 
+  const selectedDressTypes = filters.dressType?.map((d) => d.toLowerCase()) || [];
 
-  // default path for non-color filters
-  const val = typeof option === 'string' ? option : String(option);
-  return { value: val, label: val, color: null, isColorObject: false };
-};
+const sareeTypes = ['saree', 'designer saree'];
+const hasOnlySareeSelected =
+  selectedDressTypes.length > 0 &&
+  selectedDressTypes.every((type) => sareeTypes.includes(type));
 
-// Selected check with normalization
-const isOptionSelected = (filters, filterType, optionValue) => {
-  if (!filters[filterType]) return false;
-  // normalize all selected values and compare to normalized optionValue
-  const normalizedOption = filterType === 'selectedColors'
-    ? normalizeColorToCode(optionValue)
-    : String(optionValue).toLowerCase();
+const shouldHideSizes = hasOnlySareeSelected;
 
-  return filters[filterType].some(sel => {
-    const normalizedSel = filterType === 'selectedColors'
-      ? normalizeColorToCode(sel)
-      : String(sel).toLowerCase();
-    return normalizedSel === normalizedOption;
-  });
-};
+  // Unified option accessor (works for colors and plain strings)
+  const getOptionData = (option, filterType) => {
+    if (filterType === 'selectedColors') {
+      const code = normalizeColorToCode(option);
+      const label = typeof option === 'object' && option.name ? option.name : code;
+      const hex =
+        (typeof option === 'object' && option.hex) ||
+        (typeof option === 'string' && option.startsWith('#') ? option : null);
+      return {
+        value: code,
+        label,
+        color: hex,
+        isColorObject: true,
+      };
+    }
 
+    const val = typeof option === 'string' ? option : String(option);
+    return { value: val, label: val, color: null, isColorObject: false };
+  };
+
+  // Selected check
+  const isOptionSelected = (filters, filterType, optionValue) => {
+    if (!filters[filterType]) return false;
+    const normalizedOption =
+      filterType === 'selectedColors'
+        ? normalizeColorToCode(optionValue)
+        : String(optionValue).toLowerCase();
+
+    return filters[filterType].some((sel) => {
+      const normalizedSel =
+        filterType === 'selectedColors'
+          ? normalizeColorToCode(sel)
+          : String(sel).toLowerCase();
+      return normalizedSel === normalizedOption;
+    });
+  };
+
+  // Prepare filter groups
+  let filterEntries = Object.entries(filterOptions).filter(([key]) => key !== 'priceSort');
+  const dressTypeEntry = filterEntries.filter(([key]) => key === 'dressType');
+  const otherFilters = filterEntries.filter(([key]) => key !== 'dressType');
+
+  // Helper: render a filter block
+  const renderFilterBlock = (filterType, options) => (
+    <div key={filterType} className="mb-6">
+      <button
+        onClick={() => onToggleFilterSection(filterType)}
+        className="w-full flex items-center justify-between py-3 border-b border-gray-200"
+      >
+        <span className="font-medium text-gray-900">{filterType.toUpperCase()}</span>
+        {filterSections[filterType] ? (
+          <ChevronUp className="w-4 h-4" />
+        ) : (
+          <ChevronDown className="w-4 h-4" />
+        )}
+      </button>
+
+      {filterSections[filterType] && (
+        <div className="py-4">
+          <div className="space-y-2 max-h-48 overflow-y-auto overflow-x-scroll scrollbar">
+            {options.map((option, index) => {
+              const { value, label, color, isColorObject } = getOptionData(option, filterType);
+              const optionKey = isColorObject
+                ? `${filterType}-${value}-${index}`
+                : `${filterType}-${value}`;
+              const count = filterUtils.getFilterCount(products, filterType, value);
+              const isSelected = isOptionSelected(filters, filterType, value);
+
+              return (
+                <label
+                  key={optionKey}
+                  className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded"
+                >
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => onFilterChange(filterType, value)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    {isColorObject ? (
+                      <div className="ml-3 flex items-center space-x-2">
+                        <div
+                          className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"
+                          style={{ backgroundColor: color }}
+                          title={label}
+                        />
+                        <span className="text-sm text-gray-700 capitalize">{label}</span>
+                      </div>
+                    ) : (
+                      <span className="ml-3 text-sm text-gray-700">{label}</span>
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-500">({count})</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
-    <div  className={`bg-white overflow-y-scroll border  rounded-xl    border-[#233650]
-               scrollbar ${isMobile ? 'p-4  h-full flex flex-col w-3/4' : 'p-6'} ${!isMobile ? 'sticky top-4    max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col' : ''}`}>
-      {/* Header - Fixed */}
-      <div className="flex items-center  justify-between mb-6 flex-shrink-0">
+    <div
+      className={`bg-white overflow-y-scroll border rounded-xl border-[#233650] scrollbar ${
+        isMobile ? 'p-4 h-full flex flex-col w-3/4' : 'p-6'
+      } ${
+        !isMobile
+          ? 'sticky top-4 max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col'
+          : ''
+      }`}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <Filter className="w-5 h-5 mr-2" />
           FILTER
@@ -92,7 +163,7 @@ const isOptionSelected = (filters, filterType, optionValue) => {
         )}
       </div>
 
-      {/* Clear All Button - Fixed */}
+      {/* Clear All */}
       {activeFiltersCount > 0 && (
         <button
           onClick={onClearAllFilters}
@@ -102,49 +173,72 @@ const isOptionSelected = (filters, filterType, optionValue) => {
         </button>
       )}
 
-      {/* Scrollable Content */}
+      {/* Scrollable Body */}
       <div className="flex-1 overflow-y-scroll scrollbar-none pr-2">
-        {/* Price Range Section */}
+
+        {/* 🥇 Dress Type first when fromExplore */}
+        {fromExplore &&
+          dressTypeEntry.map(([filterType, options]) =>
+            renderFilterBlock(filterType, options)
+          )}
+
+        {/* 🥈 Price Range */}
         <div className="mb-6">
           <button
             onClick={() => onToggleFilterSection('price')}
             className="w-full flex items-center justify-between py-3 border-b border-gray-200"
           >
             <span className="font-medium text-gray-900">PRICE RANGE</span>
-            {filterSections.price ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {filterSections.price ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </button>
           {filterSections.price && (
             <div className="py-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Sort by:</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sort by:
+                </label>
                 <select
                   value={filters.priceSort}
                   onChange={(e) => onFilterChange('priceSort', e.target.value)}
-                  className="w-full p-2 border border-[#98C0D9]  rounded-lg text-sm"
+                  className="w-full p-2 border border-[#98C0D9] rounded-lg text-sm"
                 >
                   {filterOptions.priceSort.map((option) => (
-                    <option key={option} value={option}>{option}</option>
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs    text-gray-600 mb-1">Min Price</label>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Min Price
+                  </label>
                   <input
                     type="number"
                     placeholder="₹ Min"
                     value={filters.priceRange.min}
-                    onChange={(e) => onFilterChange('priceRange', { min: e.target.value })}
+                    onChange={(e) =>
+                      onFilterChange('priceRange', { min: e.target.value })
+                    }
                     className="w-full p-2 border border-[#98C0D9] rounded text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">Max Price</label>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Max Price
+                  </label>
                   <input
                     type="number"
                     placeholder="₹ Max"
                     value={filters.priceRange.max}
-                    onChange={(e) => onFilterChange('priceRange', { max: e.target.value })}
+                    onChange={(e) =>
+                      onFilterChange('priceRange', { max: e.target.value })
+                    }
                     className="w-full p-2 border border-[#98C0D9] rounded text-sm"
                   />
                 </div>
@@ -152,123 +246,19 @@ const isOptionSelected = (filters, filterType, optionValue) => {
             </div>
           )}
         </div>
-    {Object.entries(filterOptions).filter(([key]) => key == 'dressType').filter(([key]) => !(shouldHideSizes && key === 'selectedSizes')).map(([filterType, options]) => (
-          <div key={filterType} className="mb-6">
-            <button
-              onClick={() => onToggleFilterSection(filterType)}
-              className="w-full flex items-center justify-between py-3 border-b border-gray-200"
-            >
-              <span className="font-medium text-gray-900">{filterType.toUpperCase()}</span>
-              {filterSections[filterType] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
-            {filterSections[filterType] && (
-              <div className="py-4">
-                <div className="space-y-2 max-h-48 overflow-y-auto overflow-x-scroll scrollbar">
-                  {options.map((option, index) => {
-                    const { value, label, color, isColorObject } = getOptionData(option, filterType);
-                    
-                    // Create unique key for each option
-                    const optionKey = isColorObject ? `${filterType}-${value}-${index}` : `${filterType}-${value}`;
-                    
-                    // Get count for this option (use value for counting)
-                    const count = filterUtils.getFilterCount(products, filterType, value);
-                    const isSelected = isOptionSelected(filters, filterType, value);
 
-                    return (
-                      <label
-                        key={optionKey}
-                        className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded"
-                      >
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => onFilterChange(filterType, value)}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                          />
-                          
-                          {/* Special rendering for colors with swatch */}
-                          {isColorObject ? (
-                            <div className="ml-3 flex items-center space-x-2">
-                              <div
-                                className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"
-                                style={{ backgroundColor: color }}
-                                title={label}
-                              />
-                              <span className="text-sm text-gray-700 capitalize">{label}</span>
-                            </div>
-                          ) : (
-                            <span className="ml-3 text-sm text-gray-700">{label}</span>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-500">({count})</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-        {/* Other Filter Sections */}
-        {Object.entries(filterOptions).filter(([key]) => key !== 'priceSort' && key !== 'dressType').filter(([key]) => !(shouldHideSizes && key === 'selectedSizes')).map(([filterType, options]) => (
-          <div key={filterType} className="mb-6">
-            <button
-              onClick={() => onToggleFilterSection(filterType)}
-              className="w-full flex items-center justify-between py-3 border-b border-gray-200"
-            >
-              <span className="font-medium text-gray-900">{filterType.toUpperCase()}</span>
-              {filterSections[filterType] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
-            {filterSections[filterType] && (
-              <div className="py-4">
-                <div className="space-y-2 max-h-48 overflow-y-auto overflow-x-scroll scrollbar">
-                  {options.map((option, index) => {
-                    const { value, label, color, isColorObject } = getOptionData(option, filterType);
-                    
-                    // Create unique key for each option
-                    const optionKey = isColorObject ? `${filterType}-${value}-${index}` : `${filterType}-${value}`;
-                    
-                    // Get count for this option (use value for counting)
-                    const count = filterUtils.getFilterCount(products, filterType, value);
-                    const isSelected = isOptionSelected(filters, filterType, value);
+        {/* 🥉 Remaining filters */}
+        {otherFilters
+          .filter(([key]) => !(shouldHideSizes && key === 'selectedSizes'))
+          .map(([filterType, options]) =>
+            renderFilterBlock(filterType, options)
+          )}
 
-                    return (
-                      <label
-                        key={optionKey}
-                        className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded"
-                      >
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => onFilterChange(filterType, value)}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                          />
-                          
-                          {/* Special rendering for colors with swatch */}
-                          {isColorObject ? (
-                            <div className="ml-3 flex items-center space-x-2">
-                              <div
-                                className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"
-                                style={{ backgroundColor: color }}
-                                title={label}
-                              />
-                              <span className="text-sm text-gray-700 capitalize">{label}</span>
-                            </div>
-                          ) : (
-                            <span className="ml-3 text-sm text-gray-700">{label}</span>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-500">({count})</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
+        {/* 🪄 If not fromExplore, show dressType last */}
+        {!fromExplore &&
+          dressTypeEntry.map(([filterType, options]) =>
+            renderFilterBlock(filterType, options)
+          )}
       </div>
     </div>
   );

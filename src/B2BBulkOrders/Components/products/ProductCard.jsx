@@ -1,19 +1,21 @@
-import React from 'react';
-import { Package, Heart, Eye, Star } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Package, Heart, Star } from 'lucide-react';
 import { addToWishlist, removeFromWishlist, isInWishlist } from '../../../services/WishlistService';
+import { addToCart } from '../../../services/CartService';
+import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Bag_ic from '../../../assets/B2cAssets/LandingPageImges/Bag_ic.svg';
 
 const ProductCard = ({
   product,
   onProductClick,
   onToggleFavorite,
-  // isFavorite 
 }) => {
   const [isInWishlistState, setIsInWishlistState] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     checkWishlistStatus();
@@ -27,7 +29,6 @@ const ProductCard = ({
       console.error('Error checking wishlist status:', error);
     }
   };
-
 
   const handleToggleWishlist = async (e) => {
     e.stopPropagation();
@@ -60,10 +61,45 @@ const ProductCard = ({
       }
     } catch (error) {
       console.error('Error toggling wishlist:', error);
-      // alert('Failed to update wishlist. Please try again.');
       toast.error("Please log in to continue!");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddToCart = async (event) => {
+    event.stopPropagation(); // Prevent product click navigation
+    
+    if (!user) {
+      toast.error("Please log in to add items to cart!");
+      return;
+    }
+
+    if (addingToCart) return; // Prevent double clicks
+
+    try {
+      setAddingToCart(true);
+
+      const productData = {
+        name: product.name || product.title,
+        title: product.title || product.name,
+        price: parseFloat(product.price) || 0,
+        imageUrls: product.imageUrls || [],
+        selectedColors: product.selectedColors || [],
+        selectedSizes: product.selectedSizes || [],
+        fabric: product.fabric || '',
+        craft: product.craft || '',
+        description: product.description || ''
+      };
+
+      await addToCart(product.id, productData, 1);
+      toast.success(`${productData.name} added to cart!`);
+      
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add item to cart. Please try again.");
+    } finally {
+      setAddingToCart(false);
     }
   };
 
@@ -87,42 +123,41 @@ const ProductCard = ({
         )}
 
         {/* Overlay Actions */}
-        <div className=" absolute inset-0 
-  bg-black/0 group-hover:bg-black/20 
-  backdrop-blur-0 group-hover:backdrop-blur-sm 
-  transition-all duration-300 
-  flex items-center justify-center 
-  opacity-0 group-hover:opacity-100">
+        <div className="absolute inset-0 
+          bg-black/0 group-hover:bg-black/20 
+          backdrop-blur-0 group-hover:backdrop-blur-sm 
+          transition-all duration-300 
+          flex items-center justify-center 
+          opacity-0 group-hover:opacity-100">
           <div className="flex space-x-2">
             <button
               onClick={handleToggleWishlist}
               disabled={isLoading}
-              className={`p-2 rounded-full transition-colors ${isInWishlistState
-                ? 'bg-red-500 text-white'
-                : 'bg-white text-gray-700'
-                } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
+              className={`p-2 rounded-full transition-colors ${
+                isInWishlistState
+                  ? 'bg-red-500 text-white'
+                  : 'bg-white text-gray-700'
+              } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
               title={isInWishlistState ? 'Remove from wishlist' : 'Add to wishlist'}
             >
               <Heart className={`w-4 h-4 ${isInWishlistState ? 'fill-current' : ''}`} />
             </button>
 
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onProductClick(product);
-              }}
-              className="p-2 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-colors"
+              onClick={handleAddToCart}
+              disabled={addingToCart}
+              className={`p-2 text-gray-700 bg-white rounded-full transition-colors ${
+                addingToCart ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 hover:scale-110'
+              }`}
+              title="Add to cart"
             >
-              <Eye className="w-4 h-4" />
+              <img src={Bag_ic} alt="bag" className="w-4 h-4 invert" />
             </button>
           </div>
         </div>
 
         {/* Badges */}
         <div className="absolute top-3 left-3 space-y-2">
-          {/* <span className="px-2 py-1 bg-gray-800 text-white text-xs rounded font-medium">
-            TRY ON
-          </span> */}
           {product.discount && product.discount > 0 && (
             <span className="block px-2 py-1 bg-red-500 text-white text-xs rounded font-medium">
               {product.discount}% OFF
@@ -154,7 +189,9 @@ const ProductCard = ({
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-3 h-3 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                  className={`w-3 h-3 ${
+                    i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                  }`}
                 />
               ))}
             </div>
@@ -175,40 +212,15 @@ const ProductCard = ({
             )}
           </div>
           <button
-            onClick={() => navigate(`/products/${item.id}`)}
-            className="text-xs border border-2-[#1C4C74] text-[#1C4C74] px-4 py-2 rounded"
+            onClick={(e) => {
+              e.stopPropagation();
+              onProductClick(product);
+            }}
+            className="text-xs border border-2 border-[#1C4C74] text-[#1C4C74] px-4 py-2 rounded hover:bg-[#1C4C74] hover:text-white transition-colors"
           >
             View
           </button>
-
         </div>
-
-        {/* Colors */}
-        {/* {product.selectedColors && product.selectedColors.length > 0 && (
-          <div className="flex items-center space-x-1">
-            <span className="text-xs text-gray-500">Colors:</span>
-            <div className="flex space-x-1">
-              {product.selectedColors.slice(0, 4).map((color, index) => {
-                // Split the string: "orange_#FFA500"
-                const [name, hex] = color.split("_");
-                return (
-                  <div
-                    key={index}
-                    className="w-3 h-3 rounded-full border border-gray-300"
-                    style={{ backgroundColor: hex }} // ✅ use hex code
-                    title={name} // ✅ show name on hover
-                  />
-                );
-              })}
-
-              {product.selectedColors.length > 4 && (
-                <span className="text-xs text-gray-500">
-                  +{product.selectedColors.length - 4}
-                </span>
-              )}
-            </div>
-          </div>
-        )} */}
       </div>
     </div>
   );

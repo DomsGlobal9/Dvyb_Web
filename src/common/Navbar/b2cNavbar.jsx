@@ -522,7 +522,7 @@ const Navbar = () => {
             }}
             className={`w-full py-3 rounded-md font-medium text-white transition-colors uppercase tracking-wide text-sm sm:text-base ${
               selectedProduct
-                ? 'bg-[#5B9BA5] hover:bg-[#A5C5C9] cursor-pointer'
+                ? 'bg-[#5B9BA5] hover:bg-[#3C8E9A] cursor-pointer'
                 : 'bg-[#B8D4D8] opacity-60 cursor-not-allowed'
             } focus:outline-none focus:ring-2 focus:ring-[#5B9BA5]`}
             disabled={!selectedProduct}

@@ -31,6 +31,7 @@ const ProductsPage = () => {
   const [favorites, setFavorites] = useState(new Set());
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  const fromExplore = location.state?.fromExplore || false;
   const handleNavigateToTryOn = ({ garmentImage }) => {
     navigate('/TryYourOutfit', { state: { garmentImage } });
   };
@@ -309,6 +310,7 @@ const ProductsPage = () => {
           />
           <div className="fixed right-0 top-0 h-full w-80 max-w-full bg-white shadow-xl">
             <FilterSidebar
+              fromExplore={fromExplore}
             selectedCategory={selectedCategory}  
               isMobile={true}
               filters={filters}
@@ -331,6 +333,7 @@ const ProductsPage = () => {
           {/* Desktop Filter Sidebar - Sticky */}
           <div className="hidden lg:block w-64 flex-shrink-0">
             <FilterSidebar
+              fromExplore={fromExplore}
             selectedCategory={selectedCategory}
               filters={filters}
               filterSections={filterSections}

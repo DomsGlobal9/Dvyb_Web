@@ -47,7 +47,7 @@ const FashionTryOnSection = () => {
                   Try It Now <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </button> 
                   <button
-                    onClick={() => navigate('/products')}
+                   onClick={() => navigate('/products', { state: { fromExplore: true } })}
                     className="bg-white text-black  cursor-pointer hover:bg-black hover:text-white px-6 py-3  font-semibold flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base"
                   >
                   Explore Collections <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
@@ -121,7 +121,7 @@ const FashionTryOnSection = () => {
                   }}
                   className={`w-full py-3 rounded-md font-medium text-white transition-colors uppercase tracking-wide text-sm sm:text-base ${
                     selectedProduct
-                      ? 'bg-[#5B9BA5] hover:bg-[#A5C5C9] cursor-pointer'
+                      ? 'bg-[#5B9BA5] hover:bg-[#3C8E9A] cursor-pointer'
                       : 'bg-[#B8D4D8] opacity-60 cursor-not-allowed'
                   } focus:outline-none focus:ring-2 focus:ring-[#5B9BA5]`}
                   disabled={!selectedProduct}

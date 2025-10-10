@@ -40,12 +40,25 @@ export const CATEGORIES = [
 
 // Map curated collection titles to product categories
 const CATEGORY_MAPPING = {
-  'SAREES & BLOUSES': ['SAREE', 'BLOUSES'],
-  'ETHNIC COLLECTION': ['SALWAR SUITS', 'LEHENGAS', 'ANARKALI', 'DUPATTAS'],
-  'PREMIUM FABRICS': ['SILK DRESS', 'DESIGNER SAREE'],
+  'SAREES & BLOUSES': ['SAREE','saree', 'BLOUSES'],
+  'ETHNIC COLLECTION': ['SAREE','SALWAR SUITS', 'LEHENGAS', 'ANARKALI', 'DUPATTAS'],
+  'PREMIUM FABRICS': ['SILK DRESS', 'DESIGNER SAREE', 'Cotton', 'Silk', 'Silk Cotton', 'Georgette', 'Chiffon', 'Net',
+    'Velvet', 'Crepe', 'Khadi', 'Tissue', 'Pure Linen', 'Kota',
+    'Viscose', 'Mulmul', 'Organza',],
   'LUXURY ACCESSORIES': ['DUPATTAS', 'ETHNIC JACKET'],
 };
-
+// Map navbar categories to their dress type variations
+const NAVBAR_TO_DRESS_TYPE = {
+  'SAREE': ['Saree', 'Designer Saree'],
+  'SALWAR SUITS': ['Salwar Suits', 'Salwar Suit'],
+  'LEHENGAS': ['Lehenga', 'Lehenga'],
+  'ANARKALI': ['Anarkali'],
+  'DUPATTAS': ['Dupatta', 'Dupattas'],
+  'ETHNIC JACKET': ['Ethnic Jacket'],
+  'BLOUSES': ['Blouse', 'Blouses'],
+  'TROUSERS': ['Trouser', 'Trousers'],
+  'SKIRTS': ['Skirt', 'Skirts'],
+};
 export const normalizeColorToCode = (val) => {
   if (!val) return '';
   if (typeof val === 'object') {
@@ -69,7 +82,7 @@ const hexToCode = (hex) => {
 
 export const FILTER_OPTIONS = {
   dressType: [
-    'Traditional Lehenga', 'Designer Saree', 'Cotton Kurti', 'Silk Dress',
+    'Lehenga', 'SAREE', 'Cotton Kurti', 'Silk Dress',
     'Party Wear', 'Casual Wear', 'Wedding Wear', 'Formal Wear',
   ],
   priceSort: ['Low to High', 'High to Low'],
@@ -115,26 +128,29 @@ export const filterUtils = {
     let filtered = [...products];
 
     // 1. CATEGORY FILTER (from navigation or sidebar)
-    if (selectedCategory && selectedCategory !== 'ALL') {
-      const cat = selectedCategory.toUpperCase().trim();
-      
-      filtered = filtered.filter(product => {
-        const productType = (product.dressType || '').toUpperCase().trim();
-        
-        // Direct match
-        if (productType === cat) return true;
-        
-        // Check if it's a curated collection category
-        if (CATEGORY_MAPPING[cat]) {
-          return CATEGORY_MAPPING[cat].some(mappedCat => 
-            productType.includes(mappedCat) || mappedCat.includes(productType)
-          );
-        }
-        
-        // Partial match as fallback
-        return productType.includes(cat) || cat.includes(productType);
-      });
+  // 1. CATEGORY FILTER (from navigation)
+if (selectedCategory && selectedCategory !== 'ALL') {
+  const cat = selectedCategory.toUpperCase().trim();
+  
+  filtered = filtered.filter(product => {
+    const productType = (product.dressType || '').trim();
+    
+     if (CATEGORY_MAPPING[cat]) {
+      return CATEGORY_MAPPING[cat].some(match =>
+        productType.toLowerCase().includes(match.toLowerCase())
+      );
     }
+    // Check if navbar category maps to specific dress types
+    if (NAVBAR_TO_DRESS_TYPE[cat]) {
+      return NAVBAR_TO_DRESS_TYPE[cat].some(dressType => 
+        productType.toLowerCase() === dressType.toLowerCase()
+      );
+    }
+    
+    // Fallback: partial match
+    return productType.toUpperCase().includes(cat);
+  });
+}
 
     // 2. SEARCH TERM FILTER
     if (searchTerm && searchTerm.trim()) {

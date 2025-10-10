@@ -4,6 +4,9 @@ import lehengas from "../../assets/B2cAssets/LandingPageImges/navbarfilterImgs/L
 import anarkali from "../../assets/B2cAssets/LandingPageImges/navbarfilterImgs/Anarkali.png"
 import dupattas from "../../assets/B2cAssets/LandingPageImges/navbarfilterImgs/Dupattas.png"
 import ethinic_jacket from "../../assets/B2cAssets/LandingPageImges/navbarfilterImgs/Ethinic_jacket.png"
+import Trausers from '../../assets/Navbar/Trausers.svg'
+import skirts from '../../assets/Navbar/skirts.svg'
+import blouse from '../../assets/Navbar/blouse.svg'
 
 export const womenCategories = {
     "ETHNIC WEAR": [
@@ -17,12 +20,12 @@ export const womenCategories = {
     "TOP WEAR": [
       // { name: "T-SHIRTS", img: saree },
       // { name: "SHIRTS", img: saree },
-      { name: "BLOUSES", img: saree },
+      { name: "BLOUSES", img: blouse },
     ],
     "BOTTOM WEAR": [
       // { name: "JEANS", img: saree },
-      { name: "TROUSERS", img: saree },
-      { name: "SKIRTS", img: saree },
+      { name: "TROUSERS", img: Trausers },
+      { name: "SKIRTS", img: skirts },
     ],
     // "DRESSES & JUMPSUITS": [
     //   { name: "MAXI DRESSES", img: EtImg },
