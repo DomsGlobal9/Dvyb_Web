@@ -309,9 +309,9 @@ const Navbar = () => {
 
           {/* MOBILE OVERLAY MENU */}
           {mobileMenuOpen && (
-            <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="fixed bg-opacity-50 backdrop-blur-sm z-50  inset-0 z-50 lg:hidden">
               <div
-                className="fixed inset-0 bg-black bg-opacity-50"
+                className="fixed inset-0 "
                 onClick={() => setMobileMenuOpen(false)}
               ></div>
               <div className="fixed top-0 left-0 w-4/5 max-w-sm h-full bg-white shadow-lg overflow-y-auto">
@@ -453,43 +453,58 @@ const Navbar = () => {
             </div>
           )}
 
-   {showModal && (
-  <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm z-50">
-    <div className="bg-white rounded-lg shadow-2xl flex w-full max-w-4xl mx-4 relative">
-      {/* Background image section (left side) */}
-      <div className="w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${twodpopup})` }}>
-        {/* Optional: Add a darkened overlay if needed */}
-        <div className="w-full h-full  bg-opacity-20"></div>
+  {showModal && (
+  <div className="fixed inset-0 flex items-center justify-center  backdrop-blur-sm z-50 overflow-y-auto">
+    <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl mx-4 my-4 sm:my-8 relative flex flex-col md:flex-row">
+      {/* Background image section (hidden on mobile, shown on desktop) */}
+      <div
+        className="hidden md:block md:w-1/2 bg-cover bg-center"
+        style={{ backgroundImage: `url(${twodpopup})` }}
+      >
+        <div className="w-full h-full bg-opacity-20"></div>
       </div>
 
-      {/* Modal content (right side) */}
-      <div className="w-1/2 p-8  flex flex-col justify-center">
+      {/* Mobile background image as header */}
+      <div
+        className="hidden w-full h-40 bg-cover bg-center"
+        style={{ backgroundImage: `url(${twodpopup})` }}
+      >
+        <div className="w-full h-full bg-opacity-20"></div>
+      </div>
+
+      {/* Modal content */}
+      <div className="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-center">
         <button
           onClick={() => {
             setShowModal(false);
             setSelectedProduct('');
           }}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl font-light leading-none w-8 h-8 flex items-center justify-center"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl sm:text-3xl font-light leading-none w-10 h-10 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#5B9BA5] rounded-full"
+          aria-label="Close modal"
         >
           ×
         </button>
 
-        <h2 className="text-xl font-semibold text-gray-900 mb-1">Select a product to try on.</h2>
-        <p className="text-xl font-semibold text-gray-900 mb-6">Want to give it a go?</p>
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">
+          Select a product to try on
+        </h2>
+        <p className="text-base sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
+          Want to give it a go?
+        </p>
 
-        <p className="text-md text-gray-600 mb-4">Select a product*</p>
+        <p className="text-sm sm:text-md text-gray-600 mb-4">Select a product*</p>
 
         {/* Product selection buttons */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-6">
           {['Saree', 'Salwar Suits', 'Lehengas', 'Kurti', 'Dupattas', 'Ethnic Jacket'].map((product) => (
             <button
               key={product}
               onClick={() => setSelectedProduct(product)}
-              className={`py-3 px-4 rounded-4xl border-2 transition-all text-sm font-medium ${
+              className={`py-3 px-4 rounded-full border-2 transition-all text-sm sm:text-base font-medium ${
                 selectedProduct === product
                   ? 'border-gray-300 bg-[#DBF2F5] bg-opacity-10 text-[#0A2B30]'
                   : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-              }`}
+              } focus:outline-none focus:ring-2 focus:ring-[#5B9BA5]`}
             >
               {product}
             </button>
@@ -505,11 +520,11 @@ const Navbar = () => {
                 navigate(`/products?category=${encodeURIComponent(selectedProduct)}`);
               }
             }}
-            className={`w-full py-3 rounded-md font-medium hover:bg-[#A5C5C9] text-white transition-colors uppercase tracking-wide text-sm ${
+            className={`w-full py-3 rounded-md font-medium text-white transition-colors uppercase tracking-wide text-sm sm:text-base ${
               selectedProduct
-                ? 'bg-[#5B9BA5] cursor-pointer'
+                ? 'bg-[#5B9BA5] hover:bg-[#A5C5C9] cursor-pointer'
                 : 'bg-[#B8D4D8] opacity-60 cursor-not-allowed'
-            }`}
+            } focus:outline-none focus:ring-2 focus:ring-[#5B9BA5]`}
             disabled={!selectedProduct}
           >
             Continue Try On
@@ -520,7 +535,7 @@ const Navbar = () => {
               setShowModal(false);
               navigate('/products');
             }}
-            className="w-full py-3 rounded-md border-2 border-[#5B9BA5] text-[#5B9BA5] hover:bg-[#5B9BA5] hover:text-white font-medium transition-colors uppercase tracking-wide text-sm"
+            className="w-full py-3 rounded-md border-2 border-[#5B9BA5] text-[#5B9BA5] hover:bg-[#5B9BA5] hover:text-white font-medium transition-colors uppercase tracking-wide text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#5B9BA5]"
           >
             I Like To Browse
           </button>
@@ -528,8 +543,7 @@ const Navbar = () => {
       </div>
     </div>
   </div>
-)}
-        </>
+)} </>
       )}
     </header>
   );
