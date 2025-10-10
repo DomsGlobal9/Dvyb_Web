@@ -26,14 +26,14 @@ const FashionSelector = () => {
     <div className="flex flex-col lg:flex-row items-start justify-center bg-transparent py-8 px-4 md:px-8 gap-6 lg:gap-12">
       {/* Left Section: Main Hero Image */}
       <div className="relative w-full lg:w-[480px] xl:w-[520px]">
-        <div className="relative rounded-lg overflow-hidden ">
+        <div className="relative rounded-lg  overflow-hidden ">
           <img
             src= 'https://res.cloudinary.com/doiezptnn/image/upload/v1759312994/Frame_1_lrgztv.png'
             alt= 'Default'
             className="w-full h-auto object-cover"
           />
           {/* Label Overlay */}
-          <div className="absolute bottom-10 left-9  bg-white px-5 py-3 shadow-lg">
+          <div className="absolute bottom-7 left-7 -ml-1 md:bottom-10 md:left-10  bg-white px-5 py-3 shadow-lg">
             <p className="text-black text-[11px] font-outfit   font-semibold leading-tight">{selectedGarment !== null ? garments[selectedGarment].name.toUpperCase() : 'SILK SAREE'}</p>
             <p className="text-gray-600 pt-2 text-[10px]">Premium silk</p>
           </div>
