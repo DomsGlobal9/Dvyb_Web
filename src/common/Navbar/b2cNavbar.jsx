@@ -18,7 +18,7 @@ import profile from "../../assets/B2Bassets/NavbarImages/profile.png";
 import { useNavigate } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
 import { subscribeToCart } from "../../services/CartService"; // Import cart service
-
+import twodpopup from '../../assets/Navbar/twodpopup.svg' 
 const Navbar = () => {
   const [showWomenCategories, setShowWomenCategories] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -127,6 +127,7 @@ const Navbar = () => {
     setShowModal(false);
     navigate("/");
   };
+  const [selectedProduct, setSelectedProduct] = useState('');
 
   return (
     <header className="relative bg-white sticky top-0 z-50 shadow-md">
@@ -452,30 +453,82 @@ const Navbar = () => {
             </div>
           )}
 
-          {showModal && (
-            <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-80">
-                <p className="text-gray-800 mb-4 text-center">
-                  For try-on you need to select a product. <br />
-                  Would you like to try?
-                </p>
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={handleYes}
-                    className="px-4 py-2 bg-[#5B9BA5] text-white rounded-lg hover:bg-blue-950"
-                  >
-                    Yes
-                  </button>
-                  <button
-                    onClick={handleNo}
-                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
-                  >
-                    No
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+   {showModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm z-50">
+    <div className="bg-white rounded-lg shadow-2xl flex w-full max-w-4xl mx-4 relative">
+      {/* Background image section (left side) */}
+      <div className="w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${twodpopup})` }}>
+        {/* Optional: Add a darkened overlay if needed */}
+        <div className="w-full h-full  bg-opacity-20"></div>
+      </div>
+
+      {/* Modal content (right side) */}
+      <div className="w-1/2 p-8  flex flex-col justify-center">
+        <button
+          onClick={() => {
+            setShowModal(false);
+            setSelectedProduct('');
+          }}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl font-light leading-none w-8 h-8 flex items-center justify-center"
+        >
+          ×
+        </button>
+
+        <h2 className="text-xl font-semibold text-gray-900 mb-1">Select a product to try on.</h2>
+        <p className="text-xl font-semibold text-gray-900 mb-6">Want to give it a go?</p>
+
+        <p className="text-md text-gray-600 mb-4">Select a product*</p>
+
+        {/* Product selection buttons */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {['Saree', 'Salwar Suits', 'Lehengas', 'Kurti', 'Dupattas', 'Ethnic Jacket'].map((product) => (
+            <button
+              key={product}
+              onClick={() => setSelectedProduct(product)}
+              className={`py-3 px-4 rounded-4xl border-2 transition-all text-sm font-medium ${
+                selectedProduct === product
+                  ? 'border-gray-300 bg-[#DBF2F5] bg-opacity-10 text-[#0A2B30]'
+                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              {product}
+            </button>
+          ))}
+        </div>
+
+        {/* Action buttons */}
+        <div className="space-y-3">
+          <button
+            onClick={() => {
+              if (selectedProduct) {
+                setShowModal(false);
+                navigate(`/products?category=${encodeURIComponent(selectedProduct)}`);
+              }
+            }}
+            className={`w-full py-3 rounded-md font-medium hover:bg-[#A5C5C9] text-white transition-colors uppercase tracking-wide text-sm ${
+              selectedProduct
+                ? 'bg-[#5B9BA5] cursor-pointer'
+                : 'bg-[#B8D4D8] opacity-60 cursor-not-allowed'
+            }`}
+            disabled={!selectedProduct}
+          >
+            Continue Try On
+          </button>
+
+          <button
+            onClick={() => {
+              setShowModal(false);
+              navigate('/products');
+            }}
+            className="w-full py-3 rounded-md border-2 border-[#5B9BA5] text-[#5B9BA5] hover:bg-[#5B9BA5] hover:text-white font-medium transition-colors uppercase tracking-wide text-sm"
+          >
+            I Like To Browse
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
         </>
       )}
     </header>
