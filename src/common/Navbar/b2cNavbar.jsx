@@ -500,11 +500,11 @@ const Navbar = () => {
             <button
               key={product}
               onClick={() => setSelectedProduct(product)}
-              className={`py-3 px-4 rounded-full border-2 transition-all text-sm sm:text-base font-medium ${
+              className={` text-center p-1.5 rounded-4xl border-2 transition-all text-sm sm:text-base font-medium ${
                 selectedProduct === product
                   ? 'border-gray-300 bg-[#DBF2F5] bg-opacity-10 text-[#0A2B30]'
                   : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-              } focus:outline-none focus:ring-2 focus:ring-[#5B9BA5]`}
+              } focus:outline-none  focus:ring-black`}
             >
               {product}
             </button>
