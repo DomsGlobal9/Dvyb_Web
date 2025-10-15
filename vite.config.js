@@ -16,8 +16,13 @@ export default defineConfig({
       extend: {
         fontFamily: {
           outfit: ["Outfit", "sans-serif"],
-          redhat: ['"Red Hat Display"', "sans-serif"],
+          // redhat: ['"Red Hat Display"', "sans-serif"],
+           poppins: ['Poppins', 'sans-serif'],
+        redhat: ['"Red Hat Display"', 'sans-serif'],
         },
+         screens: {
+        'sm425': '425px', // Custom breakpoint for 425px and above
+      },
       },
     },
     content: [

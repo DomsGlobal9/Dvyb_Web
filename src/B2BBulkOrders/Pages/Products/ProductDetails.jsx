@@ -1,23 +1,42 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Package, ArrowLeft, ShoppingCart, Star, Heart, Shield, Truck, X, Eye } from 'lucide-react';
+import { Package, ArrowLeft, ShoppingCart, Star, Heart, X, Eye } from 'lucide-react';
 import TryYourOutfitModal from './Models/TryYourOutfitModal';
 import UploadSelfieModal from './Models/UploadSelfieModal';
 import TryOnPreviewModal from './Models/TryOnPreviewModal';
 import { useAuth } from '../../../context/AuthContext';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { isInWishlist, toggleWishlist } from "../../../services/WishlistService";
 import { colorUtils } from '../../../utils/colorUtils';
 import { addToCart } from '../../../services/CartService';
 import Navbar from '../../../common/Navbar/b2cNavbar';
+import Secure_ic from '../../../assets/ProductsPage/Secure_ic.svg'
+import Shipping_ic from '../../../assets/ProductsPage/Shipping_ic.svg'
+import Breadcrumbs from '../../../common/components/Breadcrumbs';
+import { getProductBreadcrumbs } from '../../../utils/breadcrumbUtil';
+import { useSearchParams } from 'react-router-dom';
 
-const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateToTryOn, onProductClick }) => {
+
+
+const ProductDetailPage = ({ product, onBackClick, allProducts = [], onProductClick }) => {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [showAddToCartModal, setShowAddToCartModal] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [wishlist, setWishlist] = useState([]);
   const { user } = useAuth();
+// const { category, subcategory, productName } = getProductBreadcrumbs(product);
+
+
+//Bread crumbs
+const [searchParams] = useSearchParams();
+  const navCategory = searchParams.get('category'); // Get from URL
+  
+   const { category, section, subcategory, productName } = getProductBreadcrumbs(
+    product,
+    navCategory ? navCategory.toUpperCase() : null
+  );
 
   // Modal states
   const [showTryYourOutfitModal, setShowTryYourOutfitModal] = useState(false);
@@ -32,16 +51,14 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
     }
   }, [product, selectedColor]);
 
+  // Handle modal overflow
   useEffect(() => {
-    const isAnyModalOpen =
-      showTryYourOutfitModal || showUploadSelfieModal || showTryOnPreviewModal || showAddToCartModal;
-
+    const isAnyModalOpen = showTryYourOutfitModal || showUploadSelfieModal || showTryOnPreviewModal || showAddToCartModal;
     if (isAnyModalOpen) {
       document.body.classList.add("overflow-hidden");
     } else {
       document.body.classList.remove("overflow-hidden");
     }
-
     return () => document.body.classList.remove("overflow-hidden");
   }, [showTryYourOutfitModal, showUploadSelfieModal, showTryOnPreviewModal, showAddToCartModal]);
 
@@ -52,20 +69,17 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
   const discountPercent = product.discount || 0;
   const discountedPrice = originalPrice - (originalPrice * discountPercent / 100);
 
-  // Get similar products based on exact color matching
+  // Get similar products based on color matching
   const similarProducts = useMemo(() => {
     if (!allProducts.length) return [];
-
     if (!product.selectedColors || product.selectedColors.length === 0) {
       return allProducts.filter(p => p.id !== product.id).slice(0, 8);
     }
 
     const currentColors = product.selectedColors.map(c => c.toUpperCase().trim());
-
     const filtered = allProducts.filter(p => {
       if (p.id === product.id) return false;
       if (!p.selectedColors || p.selectedColors.length === 0) return false;
-
       const productColors = p.selectedColors.map(c => c.toUpperCase().trim());
       return currentColors.some(currentColor =>
         productColors.some(productColor =>
@@ -75,9 +89,33 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
         )
       );
     });
-
     return filtered.slice(0, 8);
   }, [product, allProducts]);
+
+  // Load wishlist with debouncing
+  useEffect(() => {
+    if (!user) return;
+    
+    const timeoutId = setTimeout(() => {
+      const loadWishlistForSimilarProducts = async () => {
+        try {
+          const productIds = [product.id, ...similarProducts.map(p => p.id)];
+          const wishlistStatuses = await Promise.all(productIds.map(id => isInWishlist(id)));
+          const wishlistedIds = productIds.filter((id, index) => wishlistStatuses[index]);
+          setWishlist(wishlistedIds);
+        } catch (error) {
+          console.error("Failed to load wishlist:", error);
+        }
+      };
+      loadWishlistForSimilarProducts();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [user, product.id, similarProducts]);
+
+  const isSaree = (product.title || product.name || '').toLowerCase().includes('saree') ||
+    (product.fabric || '').toLowerCase().includes('saree') ||
+    (product.craft || '').toLowerCase().includes('saree');
 
   const handleAddToCart = () => {
     if (!user) {
@@ -87,7 +125,7 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
     setShowAddToCartModal(true);
   };
 
-   const handleBuyNow = () => {
+  const handleBuyNow = () => {
     if (!user) {
       toast.error("Please log in to add items to cart!");
       return;
@@ -95,79 +133,48 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
     alert("on the way")
   };
 
-  // MAIN FIX: Properly add item to cart with correct data structure
-  // Check if product is a saree (case-insensitive)
-  const isSaree = (product.title || product.name || '').toLowerCase().includes('saree') ||
-                  (product.fabric || '').toLowerCase().includes('saree') ||
-                  (product.craft || '').toLowerCase().includes('saree');
-
   const handleConfirmAddToCart = async () => {
     if (!user) {
       toast.error("Please log in to continue!");
       return;
     }
-
-    // Only require size selection if product is not a saree
     if (!isSaree && !selectedSize) {
       toast.warning("Please select a size first!");
       return;
     }
-
     if (addingToCart) return;
 
     try {
       setAddingToCart(true);
-
-      // Prepare product data matching CartService expectations
       const productData = {
-        // Basic product info
         name: product.name || product.title,
         title: product.title || product.name,
         price: parseFloat(product.price) || 0,
-        
-        // Selected attributes
         size: isSaree ? 'Free Size' : selectedSize,
         color: selectedColor || (product.selectedColors?.[0] || ''),
-        
-        // Image for cart display (single image, not array)
         image: product.imageUrls?.[0] || '',
-        
-        // All available options (keep as arrays)
         imageUrls: product.imageUrls || [],
         selectedColors: product.selectedColors || [],
         selectedSizes: product.selectedSizes || [],
-        
-        // Product details
         fabric: product.fabric || '',
         craft: product.craft || '',
         description: product.description || '',
-        
-        // Calculate subtotal (price * quantity)
         subtotal: parseFloat(product.price) || 0,
-        
-        // Shipping info
         freeShipping: parseFloat(product.price) > 500,
-        shippingMessage: parseFloat(product.price) > 500 
-          ? null 
+        shippingMessage: parseFloat(product.price) > 500
+          ? null
           : 'Add ₹' + (500 - parseFloat(product.price)) + ' more for free shipping',
-        
-        // Discount info (optional)
         discount: product.discount || 0,
         originalPrice: originalPrice
       };
 
-      // Call the cart service - it handles quantity and final calculations
       await addToCart(product.id, productData, 1);
-      
       const sizeDisplay = isSaree ? '' : ` (${selectedSize})`;
       toast.success(`${productData.name}${sizeDisplay} (${selectedColor}) added to cart!`);
       setShowAddToCartModal(false);
       setSelectedSize('');
-      
     } catch (error) {
       console.error("Error adding to cart:", error);
-      
-      // More specific error messages
       if (error.message.includes("User not found")) {
         toast.error("User account not found. Please log in again.");
       } else if (error.message.includes("authenticated")) {
@@ -186,7 +193,6 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
       toast.error('No image available for try-on');
       return;
     }
-
     setTryOnData({ garmentImage });
     setShowTryYourOutfitModal(true);
   };
@@ -210,24 +216,82 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
     setTryOnData({});
   };
 
+  // Optimistic wishlist toggle
+  const handleToggleWishlist = async (item) => {
+    if (!user) {
+      toast.error("Please log in to manage your wishlist!");
+      return;
+    }
+    
+    const isCurrentlyInWishlist = wishlist.includes(item.id);
+    setWishlist((prev) =>
+      isCurrentlyInWishlist
+        ? prev.filter((id) => id !== item.id)
+        : [...prev, item.id]
+    );
+    
+    try {
+      await toggleWishlist(item.id, item);
+      toast.success(
+        !isCurrentlyInWishlist
+          ? `${item.title || item.name} added to wishlist!`
+          : `${item.title || item.name} removed from wishlist!`
+      );
+    } catch (err) {
+      setWishlist((prev) =>
+        isCurrentlyInWishlist
+          ? [...prev, item.id]
+          : prev.filter((id) => id !== item.id)
+      );
+      console.error(err);
+      toast.error("Error updating wishlist!");
+    }
+  };
+
+  const handleAddToCartFromSimilar = async (item) => {
+    if (!user) {
+      toast.error("Please log in to add to cart!");
+      return;
+    }
+    try {
+      const productData = {
+        name: item.name || item.title,
+        title: item.title || item.name,
+        price: parseFloat(item.price) || 0,
+        size: 'Free Size',
+        color: item.selectedColors?.[0] || '',
+        image: item.imageUrls?.[0] || '',
+        imageUrls: item.imageUrls || [],
+        selectedColors: item.selectedColors || [],
+        selectedSizes: item.selectedSizes || [],
+        fabric: item.fabric || '',
+        craft: item.craft || '',
+        description: item.description || '',
+        subtotal: parseFloat(item.price) || 0,
+        freeShipping: parseFloat(item.price) > 500,
+        discount: item.discount || 0
+      };
+      await addToCart(item.id, productData, 1);
+      toast.success(`${item.title || item.name} added to cart!`);
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      toast.error("Failed to add item to cart.");
+    }
+  };
+
   const AddToCartModal = () => {
     if (!showAddToCartModal) return null;
 
     return (
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-
         <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Select Options</h3>
-            <button 
-              onClick={() => setShowAddToCartModal(false)}
-              className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-            >
+            <button onClick={() => setShowAddToCartModal(false)} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Size Selection - Only show if NOT a saree */}
           {!isSaree && product.selectedSizes?.length > 0 && (
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -246,12 +310,9 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
             </div>
           )}
 
-          {/* Color Selection */}
           {product.selectedColors?.length > 0 && (
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Color
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
               <div className="flex flex-wrap gap-2">
                 {product.selectedColors.map((colorString, index) => {
                   const { name, hex } = colorUtils.parseColor(colorString);
@@ -261,15 +322,10 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                       key={index}
                       onClick={() => setSelectedColor(colorString)}
                       className={`flex items-center space-x-2 border-2 rounded-lg px-3 py-2 transition-all ${
-                        isSelected 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300'
+                        isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div
-                        className="w-5 h-5 rounded-full border border-gray-300"
-                        style={{ backgroundColor: hex }}
-                      />
+                      <div className="w-5 h-5 rounded-full border border-gray-300" style={{ backgroundColor: hex }} />
                       <span className="text-sm capitalize">{name}</span>
                     </button>
                   );
@@ -278,7 +334,6 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="flex gap-3">
             <button
               onClick={() => {
@@ -297,21 +352,19 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
             <button
               onClick={handleConfirmAddToCart}
               disabled={addingToCart || (!isSaree && !selectedSize)}
-              className={`flex-1 border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium flex items-center justify-center transition-all ${
+              className={`flex-1 border-2 border-gray-300 cursor-pointer text-gray-700 py-3 px-6 rounded-lg font-medium flex items-center justify-center transition-all ${
                 addingToCart || (!isSaree && !selectedSize)
-                  ? 'opacity-50 cursor-not-allowed bg-gray-50' 
+                  ? 'opacity-50 cursor-not-allowed bg-gray-50'
                   : 'hover:bg-gray-50 hover:border-gray-400'
               }`}
             >
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              {addingToCart ? 'Adding...' : 'Add to Cart'}
+              <ShoppingCart className="w-4 cursor-pointer h-4 mr-2" />
+              {addingToCart ? 'Adding...' : 'Add to Bag'}
             </button>
           </div>
 
           {!isSaree && !selectedSize && (
-            <p className="text-xs text-amber-600 mt-2 text-center">
-              Please select a size to continue
-            </p>
+            <p className="text-xs text-amber-600 mt-2 text-center">Please select a size to continue</p>
           )}
         </div>
       </div>
@@ -320,32 +373,48 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar/>
+      <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8">
         <button onClick={onBackClick} className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Products
         </button>
+ <Breadcrumbs
+  category={category}
+   section={section}   
+  subcategory={subcategory}
+  productName={productName}
+  />
 
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
             {/* Images Section */}
             <div className="space-y-4">
-              <div className="flex justify-end">
-                <button 
-                  onClick={() => setIsFavorite(!isFavorite)} 
-                  className="p-2 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors"
+              <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleWishlist(product);
+                  }}
+                  className={`absolute top-3 left-3 z-10 p-2 rounded-full transition-all hover:scale-110 shadow-md ${
+                    wishlist.includes(product.id)
+                      ? 'bg-red-500 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                  title={wishlist.includes(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
                 >
-                  <Heart className={`w-5 h-5 transition-colors ${isFavorite ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
+                  <Heart className={`w-5 h-5 transition-colors ${wishlist.includes(product.id) ? 'fill-current' : ''}`} />
                 </button>
-              </div>
 
-              <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden">
                 {product.imageUrls?.length > 0 ? (
                   <img
                     src={product.imageUrls[selectedImageIndex] || product.imageUrls[0]}
                     alt={product.title || product.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+      console.error('Image failed to load:', e.currentTarget.src);
+      e.currentTarget.src = '/placeholder-image.jpg'; // Add placeholder
+    }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -409,14 +478,8 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                     {product.selectedColors.map((colorString, index) => {
                       const { name, hex } = colorUtils.parseColor(colorString);
                       return (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-2 border border-gray-200 rounded-full px-3 py-1"
-                        >
-                          <div
-                            className="w-4 h-4 rounded-full border border-gray-300"
-                            style={{ backgroundColor: hex }}
-                          />
+                        <div key={index} className="flex items-center space-x-2 border border-gray-200 rounded-full px-3 py-1">
+                          <div className="w-4 h-4 rounded-full border border-gray-300" style={{ backgroundColor: hex }} />
                           <span className="text-xs capitalize text-gray-700">{name}</span>
                         </div>
                       );
@@ -426,31 +489,26 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
               )}
 
               <div className="space-y-3 flex gap-5">
-                <button 
-                  onClick={handleAddToCart} 
-                  className="w-auto bg-white text-black py-3 px-6 rounded-lg shadow-sm border font-medium flex items-center justify-center hover:shadow-md transition-all"
-                >
+                <button onClick={handleAddToCart} className="w-auto cursor-pointer bg-white text-black py-3 px-6 rounded-lg shadow-sm border font-medium flex items-center justify-center hover:shadow-md transition-all">
                   <ShoppingCart className="h-5 mr-2" />
                   Add to cart
                 </button>
-                <button 
-                onClick={handleBuyNow}
-                className="w-42 h-12 bg-[#1C4C74] shadow-sm text-white py-3 px-6 rounded-lg hover:bg-[#163d5d] font-medium transition-colors">
+                <button onClick={handleBuyNow} className="w-42 h-12 cursor-pointer bg-[#1C4C74] shadow-sm text-white py-3 px-6 rounded-lg hover:bg-[#163d5d] font-medium transition-colors">
                   Buy Now
                 </button>
               </div>
 
-              <div className="space-y-3 text-sm pt-6">
-                <div className="flex items-center text-gray-600">
-                  <Shield className="w-4 h-4 mr-3" />
+              <div className="space-y-3 border md:w-2/3 border-gray-600 rounded-md text-sm p-7 pt-6">
+                <div className="flex items-center     text-[#3C4242] font-semibold font-poppins ">
+                  <img src={Secure_ic} className="w-auto  h-8 mr-3" alt="Secure" />
                   Secure payment
                   <div className="flex pl-12 items-center text-gray-600">
                     <Package className="w-4 h-4 mr-3" />
                     Free Size
                   </div>
                 </div>
-                <div className="flex items-center pt-5 text-gray-600">
-                  <Truck className="w-4 h-4 mr-3" />
+                <div className="flex  text-[#3C4242] font-semibold items-center pt-5 ">
+                  <img src={Shipping_ic} className="w-auto h-8 mr-3" alt="Shipping" />
                   Free Shipping & Returns
                 </div>
               </div>
@@ -459,25 +517,29 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
           {/* Product Description */}
           <div className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Product Description</h3>
+            <div className='flex gap-[8px]'>
+              <div className='h-[28px] w-1.5 rounded-full bg-[#1C4C74]'></div>
+              <h3 className="text-2xl -mt-1 text-[#3C4242] font-semibold mb-4">Product Description</h3>
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div>
-                <h4 className="font-semibold mb-2">Description</h4>
-                <p className="text-gray-600 text-sm mb-4">{product.description}</p>
+                <h4 className="font-semibold mb-3">Description</h4>
+                <div className='w-[93px] bg-black h-[1.5px] rounded-4xl'></div>
+                <p className="text-gray-600 mt-[16px] text-sm mb-4">{product.description}</p>
                 <p className="text-gray-600 text-sm">Crafted with intricate embroidery. Perfect for any occasion. Comfortable fit and vibrant colors.</p>
 
-                <div className="mt-4 grid bg-blue-100 h-26 items-center p-7 grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <div className="font-medium">Fabric:</div>
-                    <div className="text-gray-600">{product.fabric || 'Premium'}</div>
+                <div className="mt-4 grid bg-[#F2F9FF] h-26 items-center p-7 grid-cols-3 text-sm divide-x divide-gray-300 rounded-xl">
+                  <div className="px-4">
+                    <div className="font-medium text-[#807D7E] mb-1">Fabric:</div>
+                    <div className="text-gray-900">{product.fabric || 'Premium'}</div>
                   </div>
-                  <div>
-                    <div className="font-medium">Pattern:</div>
-                    <div className="text-gray-600">{product.craft || 'Printed'}</div>
+                  <div className="px-4 md:px-14">
+                    <div className="font-medium text-[#807D7E] mb-1">Pattern:</div>
+                    <div className="text-gray-900">{product.craft || 'Printed'}</div>
                   </div>
-                  <div>
-                    <div className="font-medium">Fit:</div>
-                    <div className="text-gray-600">Regular</div>
+                  <div className="px-4 md:px-14">
+                    <div className="font-medium text-[#807D7E] mb-1">Fit:</div>
+                    <div className="text-gray-900">Regular</div>
                   </div>
                 </div>
               </div>
@@ -519,27 +581,46 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                         </div>
                       )}
 
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 backdrop-blur-0 group-hover:backdrop-blur-sm transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <div className="flex space-x-2">
-                          <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors">
-                            <Heart className="w-4 h-4" />
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleWishlist(item);
+                            }}
+                            className={`p-2 cursor-pointer rounded-full hover:scale-110 transition-all ${
+                              wishlist.includes(item.id)
+                                ? 'bg-red-500 text-white'
+                                : 'bg-white text-gray-700 hover:bg-gray-100'
+                            }`}
+                          >
+                            <Heart className={`w-4 h-4 ${wishlist.includes(item.id) ? 'fill-current' : ''}`} />
                           </button>
-                          <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors">
-                            <ShoppingCart className="w-4 h-4" />
-                          </button>
-                          <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors">
-                            <Eye className="w-4 h-4" />
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddToCartFromSimilar(item);
+                            }}
+                            className="p-2 bg-white rounded-full hover:bg-gray-100 hover:scale-110 transition-transform"
+                          >
+                            <ShoppingCart className="w-4 h-4 text-gray-700" />
                           </button>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-3">
-                      <h4 className="font-medium text-sm truncate mb-1">{item.title || item.name}</h4>
-                      <div className="text-xs text-gray-500 mb-2">{item.fabric} • {item.craft}</div>
+                    <div className="p-3 flex justify-between">
+                      <div className="text-xs w-[148px] mb-2">
+                        <h4 className="font-medium text-sm truncate mb-1">{item.title || item.name}</h4>
+                        <p>{item.fabric} • {item.craft}</p>
+                        <div className='pt-2'>
+                          <span className="font-semibold text-[14.4px] pt-4 text-[#1C6BAD]">
+                            ₹{Math.round(item.price - (item.price * (item.discount || 0) / 100))}
+                          </span>
+                        </div>
+                      </div>
 
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-blue-600">₹{Math.round(item.price - (item.price * (item.discount || 0) / 100))}</span>
                         <button
                           onClick={() => {
                             if (onProductClick) {
@@ -547,22 +628,11 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
                               window.scrollTo(0, 0);
                             }
                           }}
-                          className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
+                          className="text-[14px] border-1 border-[#1C4C74] bg-white text-[#1C4C74] p-2 w-[68px] rounded hover:bg-[#1C4C74] hover:text-white transition-colors"
                         >
                           View
                         </button>
                       </div>
-
-                      {item.selectedColors && (
-                        <div className="flex items-center mt-2">
-                          <span className="text-xs text-gray-500 mr-2">Colors:</span>
-                          <div className="flex space-x-1">
-                            {item.selectedColors.slice(0, 3).map((color, index) => (
-                              <div key={index} className="w-3 h-3 rounded-full border" style={{ backgroundColor: color.toLowerCase() }} />
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -578,7 +648,6 @@ const ProductDetailPage = ({ product, onBackClick, allProducts = [], onNavigateT
 
       <AddToCartModal />
 
-      {/* Try-On Modals */}
       <TryYourOutfitModal
         isOpen={showTryYourOutfitModal}
         onClose={handleModalClose}

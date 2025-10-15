@@ -80,6 +80,13 @@ const hexToCode = (hex) => {
   return match ? match.code.toLowerCase() : clean.toLowerCase();
 };
 
+
+
+
+export const normalizeCategory = (str) =>
+  String(str || '').trim().toLowerCase().replace(/\s+/g, '');
+
+
 export const FILTER_OPTIONS = {
   dressType: [
     'Lehenga', 'SAREE', 'Cotton Kurti', 'Silk Dress',
@@ -123,32 +130,60 @@ export const DEFAULT_FILTER_SECTIONS = {
   dressType: true,
 };
 
+
+
 export const filterUtils = {
   applyFilters(products, filters, selectedCategory, searchTerm) {
     let filtered = [...products];
 
     // 1. CATEGORY FILTER (from navigation or sidebar)
   // 1. CATEGORY FILTER (from navigation)
-if (selectedCategory && selectedCategory !== 'ALL') {
-  const cat = selectedCategory.toUpperCase().trim();
+// if (selectedCategory && selectedCategory !== 'ALL') {
+//   const cat = selectedCategory.toUpperCase().trim();
   
+//   filtered = filtered.filter(product => {
+//     const productType = (product.dressType || '').trim();
+    
+//      if (CATEGORY_MAPPING[cat]) {
+//       return CATEGORY_MAPPING[cat].some(match =>
+//         productType.toLowerCase().includes(match.toLowerCase())
+//       );
+//     }
+//     // Check if navbar category maps to specific dress types
+//     if (NAVBAR_TO_DRESS_TYPE[cat]) {
+//       return NAVBAR_TO_DRESS_TYPE[cat].some(dressType => 
+//         productType.toLowerCase() === dressType.toLowerCase()
+//       );
+//     }
+    
+//     // Fallback: partial match
+//     return productType.toUpperCase().includes(cat);
+//   });
+// }
+
+if (selectedCategory && selectedCategory.toUpperCase() !== 'ALL') {
+  const catNorm = normalizeCategory(selectedCategory);
+
   filtered = filtered.filter(product => {
-    const productType = (product.dressType || '').trim();
-    
-     if (CATEGORY_MAPPING[cat]) {
-      return CATEGORY_MAPPING[cat].some(match =>
-        productType.toLowerCase().includes(match.toLowerCase())
-      );
+    const productType = normalizeCategory(product.dressType);
+    const productCat = normalizeCategory(product.category);
+
+    // Check NAVBAR_TO_DRESS_TYPE
+    for (const key in NAVBAR_TO_DRESS_TYPE) {
+      if (normalizeCategory(key) === catNorm) {
+        return NAVBAR_TO_DRESS_TYPE[key].some(d => normalizeCategory(d) === productType);
+      }
     }
-    // Check if navbar category maps to specific dress types
-    if (NAVBAR_TO_DRESS_TYPE[cat]) {
-      return NAVBAR_TO_DRESS_TYPE[cat].some(dressType => 
-        productType.toLowerCase() === dressType.toLowerCase()
-      );
+
+    // Check CATEGORY_MAPPING
+    for (const key in CATEGORY_MAPPING) {
+      if (CATEGORY_MAPPING[key].some(d => normalizeCategory(d) === productType)) {
+        return true;
+      }
     }
-    
+
     // Fallback: partial match
-    return productType.toUpperCase().includes(cat);
+    return productType.includes(catNorm) || productCat.includes(catNorm);
   });
 }
 

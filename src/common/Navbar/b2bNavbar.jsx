@@ -170,7 +170,7 @@ const B2bnavbar = () => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleWomenCategories}
-                className="text-blue-900 font-semibold hover:text-blue-700"
+                className="text-[#0C2D5B] font-semibold hover:text-[#233650]"
               >
                 WOMEN
               </button>
@@ -259,7 +259,7 @@ const B2bnavbar = () => {
                   {/* Mobile Women Dropdown */}
                   <div className="mb-4">
                     <button
-                      className="flex justify-between items-center w-full text-left text-blue-900 font-semibold py-2"
+                      className="flex justify-between items-center w-full text-left text-[#0C2D5B] font-semibold py-2"
                       onClick={toggleWomenCategories}
                     >
                       WOMEN

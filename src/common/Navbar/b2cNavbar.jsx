@@ -108,11 +108,18 @@ const Navbar = () => {
   };
 
   const handleSubcategoryClick = (subcategoryName) => {
-    navigate(`/products?category=${encodeURIComponent(subcategoryName)}`);
-    setShowWomenCategories(false);
-    setActiveCategory(null);
-    setMobileMenuOpen(false);
-  };
+  // ✅ Normalize categories for consistency
+  const normalizedCategory = subcategoryName
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-"); // replaces spaces with hyphens for URL consistency
+
+  navigate(`/products?category=${encodeURIComponent(normalizedCategory)}`);
+  setShowWomenCategories(false);
+  setActiveCategory(null);
+  setMobileMenuOpen(false);
+};
+
 
   const handleTryOnClick = () => {
     setShowModal(true);
@@ -245,35 +252,46 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
          {/* Desktop Navigation */}
-          <nav className="flex flex-row lg:flex-row lg:justify-center justify-around items-center border-t border-b border-gray-300 py-4 text-sm font-medium text-gray-700 space-y-2  lg:space-y-0 lg:space-x-8 relative">
- <div className="relative" ref={dropdownRef}>
+          <nav className="flex flex-row lg:flex-row lg:justify-center gap-[60px] p-8 h-[63px] justify-around  items-center border-t border-b border-gray-300 py-4 text-sm font-medium text-gray-700 space-y-2  lg:space-y-0 lg:space-x-8 relative">
+ <div className="relative " ref={dropdownRef}>
               <button
                 onClick={toggleWomenCategories}
-                className="text-blue-900  cursor-pointer font-semibold lg:text-xl hover:text-blue-700 text-sm"
+                className="text-[#0C2D5B]  cursor-pointer font-semibold pt-3 lg:text-xl hover:text-[#3476CF] text-[18px]"
               >
                 WOMEN
               </button>
+              <div className="pt-[12.5px] ">
+
               {showWomenCategories && (
                 <div
-                  className="fixed left-0 right-0 mt-4 lg:mt-0  cursor-pointer bg-gray-100 shadow-md z-50 w-screen"
+                  className="fixed left-0 right-0  lg:mt-0 cursor-pointer bg-gray-100 shadow-md z-50 w-screen"
                 >
-                  <div className="flex justify-center items-center space-x-8  pt-4 pb-3 border-b border-gray-200">
+                  <div className="flex justify-center items-center space-x-8 h-[52px] bg-[#F2F8FC]  pt-4 pb-3 border-b border-gray-200">
                     {Object.keys(womenCategories).map((cat, index) => (
+                      <div>
                       <button
                         key={index}
                         onClick={() => setActiveCategory(cat)}
                         className={`transition text-[16px] pb-2 ${
                           activeCategory === cat
-                            ? "text-blue-900 border-b-2 cursor-pointer border-blue-900"
-                            : "hover:text-blue-900 cursor-pointer"
+                            ? "text-[#042B44] font-outfit text-[18px]    cursor-pointer "
+                            : "hover:text-[#0C2D5B] text-gray-600  text-[16px] font-normal  cursor-pointer"
                         }`}
                       >
-                        {cat}
+                         {cat}
+                      
+                       
                       </button>
+                        <div className={` ${activeCategory === cat 
+                          ? 'bg-[#0C2D5B] h-0.5 relative top-1.5 rounded-full' 
+                          : ''
+                        }`}></div>
+                        </div>
                     ))}
+                    
                   </div>
                   {activeCategory && (
-                    <div className="w-full  bg-white py-8 px-4">
+                    <div className="w-full  bg-white py-[16.5px] px-4">
                       <div className="max-w-7xl mx-auto flex justify-center gap-8 flex-wrap">
                         {womenCategories[activeCategory].map((item, idx) => (
                           <div
@@ -296,14 +314,18 @@ const Navbar = () => {
                   )}
                 </div>
               )}
+              </div>
             </div>
-             <span className="text-gray-500 cursor-pointer hover:text-gray-700 lg:text-xl text-sm">
-              MEN <span className="text-xs">(coming soon)</span>
+             <span className="text-[#595959] font-outfit cursor-pointer font-normal  text-[16px]">
+              MEN <span className="text-[6px] relative bottom-3 left-1 font-outfit bg-[#EEF2F866] ">COMING SOON</span>
             </span>
-            <span className="text-gray-500 cursor-pointer hover:text-gray-700 lg:text-xl text-sm">
-              KIDS <span className="text-xs">(coming soon)</span>
+            <span className="text-[#595959] font-outfit  cursor-pointer font-normal  text-[16px]">
+              KIDS 
+              {/* <div> */}
+                <span className="text-[6px] relative bottom-3 left-1 font-outfit bg-[#EEF2F866] ">COMING SOON</span>
+                {/* </div>  */}
             </span>
-            <button className="text-[18px] hidden lg:block" onClick={handleTryOnClick}>2D TRY ON</button>
+            <button className="text-[15px] font-outfit text-[#595959]  font-normal  hidden lg:block" onClick={handleTryOnClick}>2D TRY ON</button>
          
             </nav>
 

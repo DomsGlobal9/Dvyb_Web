@@ -140,15 +140,40 @@ const ProductsPage = () => {
   }, []);
 
   // Handle query params for category filtering from navbar
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const category = params.get('category');
-    if (category) {
-      const decodedCategory = decodeURIComponent(category);
-      // Assuming CATEGORIES includes possible values; you can add validation if needed
-      setSelectedCategory(decodedCategory);
+// ✅ Handle query params for category, section, and subcategory (Breadcrumbs support)
+useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const category = params.get('category');
+  const section = params.get('section');
+  const subcategory = params.get('subcategory');
+
+  const decodedCategory = category ? decodeURIComponent(category) : null;
+  const decodedSection = section ? decodeURIComponent(section) : null;
+  const decodedSubcategory = subcategory ? decodeURIComponent(subcategory) : null;
+
+  // Update main selected category (used for overall filtering)
+  if (decodedCategory) {
+    setSelectedCategory(decodedCategory);
+  }
+
+  // 🧠 Build new filters from URL params
+  setFilters((prev) => {
+    const updated = { ...prev };
+
+    // If a section (like "ethnic wear" or "top wear") exists, apply as dressType filter
+    if (decodedSection) {
+      updated.dressType = [decodedSection];
     }
-  }, [location.search]);
+
+    // If a subcategory exists (like "sarees" or "trousers"), apply as productType filter
+    if (decodedSubcategory) {
+      updated.productType = [decodedSubcategory];
+    }
+
+    return updated;
+  });
+}, [location.search]);
+
 
   // Apply filters and search
   const filteredProducts = useMemo(() => {
@@ -349,7 +374,7 @@ const ProductsPage = () => {
           {/* Products Grid - Scrollable */}
           <div className="flex-1 min-w-0">
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 lg:gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
