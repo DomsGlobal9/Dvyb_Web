@@ -31,8 +31,8 @@ const   UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage,garmentName
 
   const modelImages = isSaree ? {
     fair: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757585864/urhcw45ugpa14f43c4pd.jpg',
-    unfair: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678836/darkk_cfvh10.jpg',
-    light: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678831/medium_ptqoay.jpg',
+    unfair: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678831/medium_ptqoay.jpg',
+    light : 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678836/darkk_cfvh10.jpg',
     medium: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678836/normal_cdyh38.jpg'
   } : {
     fair: 'https://res.cloudinary.com/doiezptnn/image/upload/v1760531963/young-beautiful-indian-girl-white-background_gucosk.jpg',
@@ -137,13 +137,20 @@ const   UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage,garmentName
           <div className="flex-1 flex flex-col justify-center items-center">
             <div className="w-full max-w-xs">
               {/* Decorative Image */}
-              <div className="rounded-2xl overflow-hidden shadow-xl">
-                <img 
-                  src="https://res.cloudinary.com/doiezptnn/image/upload/v1760596256/Image_Woman_in_green_loungewear_aczhjz.png"
-                  alt="Fashion model"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+             <div className="rounded-2xl overflow-hidden shadow-xl relative">
+  <img 
+    src={garmentImage}
+    alt="Fashion model"
+    className="w-full h-full object-cover"
+  />
+  {garmentName && (
+    <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+      <p className="text-xs sm:text-sm font-medium text-white leading-tight">
+        {garmentName}
+      </p>
+    </div>
+  )}
+</div>
             </div>
           </div>
         </div>
@@ -169,41 +176,7 @@ const   UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage,garmentName
           {step === 1 ? (
             /* STEP 1: Initial Choice */
             <div className="flex-1 flex flex-col justify-center pb-4 sm:pb-0">
-               {garmentImage && (
-  <div className="mt-2 w-full max-w-[200px] mb-4 sm:mb-6">
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      {/* Header with badge and checkmark */}
-      <div className="bg-white px-3 py-2 flex items-center justify-between border-b border-gray-100">
-        <div className="bg-green-100 rounded-full px-3 py-1">
-          <span className="text-[10px] font-semibold text-green-700 tracking-wide">SELECTED DRESS</span>
-        </div>
-        <div className="bg-green-600 rounded-full p-1 flex-shrink-0">
-          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-          </svg>
-        </div>
-      </div>
-      
-      {/* Product Image */}
-      <div className="bg-white p-3 flex items-center justify-center">
-        <img 
-          src={garmentImage}
-          alt={garmentName || "Selected dress"}
-          className="w-full h-24 object-contain"
-        />
-      </div>
-      
-      {/* Product Name */}
-      {garmentName && (
-        <div className="bg-white px-3 py-2 border-t border-gray-100">
-          <p className="text-xs font-medium text-gray-800 text-center leading-tight">
-            {garmentName}
-          </p>
-        </div>
-      )}
-    </div>
-  </div>
-)}
+          
               <div className="text-center mb-6 sm:mb-8">
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-1 sm:mb-2">2D Try-On</h2>
                 <p className="text-sm sm:text-base text-gray-600">Let's go shopping</p>
@@ -315,35 +288,29 @@ const   UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage,garmentName
     }}
   />
 
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <button 
-                    onClick={() => handleDefaultImageClick(modelImages.fair)}
-                    className="border-2 border-gray-300 rounded-lg h-32 sm:h-40 overflow-hidden hover:border-teal-500 hover:shadow-lg transition-all"
-                  >
-                    <img src={modelImages.fair} alt="Model 1" className="w-full h-full object-contain" />
-                  </button>
-                  
-                  <button 
-                    onClick={() => handleDefaultImageClick(modelImages.unfair)}
-                    className="border-2 border-gray-300 rounded-lg h-32 sm:h-40 overflow-hidden hover:border-teal-500 hover:shadow-lg transition-all"
-                  >
-                    <img src={modelImages.unfair} alt="Model 2" className="w-full h-full object-contain" />
-                  </button>
-                  
-                  <button 
-                    onClick={() => handleDefaultImageClick(modelImages.medium)}
-                    className="border-2 border-gray-300 rounded-lg h-32 sm:h-40 overflow-hidden hover:border-teal-500 hover:shadow-lg transition-all"
-                  >
-                    <img src={modelImages.medium} alt="Model 3" className="w-full h-full object-contain" />
-                  </button>
-                  
-                  <button 
-                    onClick={() => handleDefaultImageClick(modelImages.light)}
-                    className="border-2 border-gray-300 rounded-lg h-32 sm:h-40 overflow-hidden hover:border-teal-500 hover:shadow-lg transition-all"
-                  >
-                    <img src={modelImages.light} alt="Model 4" className="w-full h-full object-contain" />
-                  </button>
-                </div>
+            <div className="grid grid-cols-2 gap-4 sm:gap-5">
+  {[
+    { key: "fair", label: "Light" },
+    { key: "unfair", label: "Fair" },
+    { key: "medium", label: "Dusky" },
+    { key: "light", label: "Dark" },
+  ].map(({ key, label }) => (
+    <div key={key} className="flex flex-col items-center">
+      <button
+        onClick={() => handleDefaultImageClick(modelImages[key])}
+        className="w-full border-2 border-gray-300 rounded-lg h-32 sm:h-40 overflow-hidden hover:border-teal-500 hover:shadow-lg transition-all"
+      >
+        <img
+          src={modelImages[key]}
+          alt={`Model ${label}`}
+          className="w-full h-full object-contain"
+        />
+      </button>
+      <p className="mt-2 text-sm font-medium text-gray-700">{label}</p>
+    </div>
+  ))}
+</div>
+
               </div>
             </div>
           )}
@@ -354,3 +321,55 @@ const   UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage,garmentName
 };
 
 export default UploadSelfieModal;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//      {garmentImage && (
+//   <div className="mt-2 w-full max-w-[200px] mb-4 sm:mb-6">
+//     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+//       {/* Header with badge and checkmark */}
+//       <div className="bg-white px-3 py-2 flex items-center justify-between border-b border-gray-100">
+//         <div className="bg-green-100 rounded-full px-3 py-1">
+//           <span className="text-[10px] font-semibold text-green-700 tracking-wide">SELECTED DRESS</span>
+//         </div>
+//         <div className="bg-green-600 rounded-full p-1 flex-shrink-0">
+//           <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+//             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+//           </svg>
+//         </div>
+//       </div>
+      
+//       {/* Product Image */}
+//       <div className="bg-white p-3 flex items-center justify-center">
+//         <img 
+//           src={garmentImage}
+//           alt={garmentName || "Selected dress"}
+//           className="w-full h-24 object-contain"
+//         />
+//       </div>
+      
+//       {/* Product Name */}
+//       {garmentName && (
+//         <div className="bg-white px-3 py-2 border-t border-gray-100">
+//           <p className="text-xs font-medium text-gray-800 text-center leading-tight">
+//             {garmentName}
+//           </p>
+//         </div>
+//       )}
+//     </div>
+//   </div>
+// )}

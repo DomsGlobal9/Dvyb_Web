@@ -5,7 +5,6 @@ import bg2 from '../../../../assets/ProductsPage/bg2.svg';
 import bg3 from '../../../../assets/ProductsPage/bg3.svg';
 import bg4 from '../../../../assets/ProductsPage/bg4.svg';
 
-
 const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
   const [tryOnResult, setTryOnResult] = useState(null);
   const [tryOnResultNoBg, setTryOnResultNoBg] = useState(null);
