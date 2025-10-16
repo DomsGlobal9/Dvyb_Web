@@ -8,14 +8,17 @@ import {
   Facebook,
   Link,
 } from "lucide-react";
+import { usePopup } from "../../context/ToastPopupContext";
 import { subscribeToCart, removeFromCart } from "../../services/CartService";
 import { useNavigate } from "react-router-dom";
-
+// cartremove
 function CartPage() {
   const [cartItems, setCartItems] = useState([]);
   const [couponCode, setCouponCode] = useState("");
   const [showShareModal, setShowShareModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { showPopup } = usePopup();
+
 const navigate=useNavigate()
   useEffect(() => {
     let unsubscribe = null;
@@ -24,6 +27,7 @@ const navigate=useNavigate()
       try {
         unsubscribe = await subscribeToCart((items) => {
           setCartItems(items);
+          
           setIsLoading(false);
         });
       } catch (error) {
@@ -49,15 +53,28 @@ const navigate=useNavigate()
   navigate("/checkoutpage"); // Update path to match your routing
 };
 
-  const removeItem = async (productId) => {
-    try {
-      await removeFromCart(productId);
-      // Real-time listener will automatically update the cart
-    } catch (error) {
-      console.error("Error removing item from cart:", error);
-      alert(`Failed to remove item: ${error.message}`);
-    }
-  };
+const removeItem = async (product) => {
+  try {
+    // Remove from cart
+    await removeFromCart(product.id);
+
+    // Determine the product title
+    const title = product.name || product.title || "Product";
+
+    // Determine the product image
+    const image =
+      product.imageUrls?.[0] || product.image || product.imageUrl || "";
+
+    // Show toast popup
+    showPopup("cartremove", { title, image });
+
+    console.log("Removed product:", { title, image });
+  } catch (error) {
+    console.error("Error removing item from cart:", error);
+    alert(`Failed to remove item: ${error.message}`);
+  }
+};
+
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + (item.subtotal || 0),
@@ -297,7 +314,7 @@ const navigate=useNavigate()
                     </div>
                     <div className="col-span-2 text-center">
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item)}
                         className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                       >
                         <Trash2 className="h-5 w-5" />
@@ -306,62 +323,58 @@ const navigate=useNavigate()
                   </div>
 
                   {/* Mobile Layout */}
-                  <div className="lg:hidden space-y-3">
-                    <div className="flex space-x-4">
-                      <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0">
-                        <img
-                          // src={
-                          //   item.image ||
-                          //   "https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop"
-                          // }
-                          src={
-                        item.imageUrls && item.imageUrls.length > 0
-                          ? item.imageUrls[0]
-                          : "https://via.placeholder.com/400"
-                      }
-                          alt={item.name}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">
-                          {item.name}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          Color: {item.color || "N/A"}
-                        </p>
-                        <div className="flex justify-between items-center mt-2">
-                          <span className="text-sm text-gray-600">
-                            Size: {item.size || "N/A"}
-                          </span>
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">
-                        Price: ₹{(item.price || 0).toLocaleString()}
-                      </span>
-                      <span className="font-medium">
-                        Subtotal: ₹{(item.subtotal || 0).toLocaleString()}
-                      </span>
-                    </div>
-                    {item.shippingMessage && (
-                      <p className="text-xs text-orange-600">
-                        {item.shippingMessage}
-                      </p>
-                    )}
-                    {item.freeShipping && (
-                      <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                        FREE SHIPPING
-                      </span>
-                    )}
-                  </div>
+                <div className="lg:hidden p-4 bg-white rounded-lg shadow-sm space-y-4 mb-4">
+  <div className="flex items-start gap-4">
+    <div className="w-24 h-24 bg-gray-100 rounded-lg border border-gray-200 overflow-hidden flex-shrink-0 transition-transform hover:scale-105">
+      <img
+        src={
+          item.imageUrls && item.imageUrls.length > 0
+            ? item.imageUrls[0]
+            : "https://via.placeholder.com/400"
+        }
+        alt={item.name}
+        className="w-full h-full object-cover rounded-lg"
+      />
+    </div>
+    <div className="flex-1 space-y-1">
+      <h3 className="text-base font-semibold text-gray-900">
+        {item.name}
+      </h3>
+      <p className="text-sm text-gray-600">
+        Color: {item.color || "N/A"}
+      </p>
+      <div className="flex justify-between items-center mt-2">
+        <span className="text-sm text-gray-600">
+          Size: {item.size || "N/A"}
+        </span>
+        <button
+          onClick={() => removeItem(item)}
+          className="p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-md transition-colors"
+        >
+          <Trash2 className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  </div>
+  <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+    <span className="text-sm text-gray-600">
+      Price: ₹{(item.price || 0).toLocaleString()}
+    </span>
+    <span className="text-base font-semibold text-gray-900">
+      Subtotal: ₹{(item.subtotal || 0).toLocaleString()}
+    </span>
+  </div>
+  {item.shippingMessage && (
+    <p className="text-xs font-medium text-orange-600 mt-2">
+      {item.shippingMessage}
+    </p>
+  )}
+  {item.freeShipping && (
+    <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-3 py-1.5 rounded-md mt-2">
+      FREE SHIPPING
+    </span>
+  )}
+</div>
                 </div>
               ))}
             </div>

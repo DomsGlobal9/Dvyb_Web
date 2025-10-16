@@ -3,17 +3,19 @@ import { Package, Heart, Star } from 'lucide-react';
 import { addToWishlist, removeFromWishlist, isInWishlist } from '../../../services/WishlistService';
 import { addToCart } from '../../../services/CartService';
 import { useAuth } from "../../../context/AuthContext";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 import Bag_ic from '../../../assets/B2cAssets/LandingPageImges/Bag_ic.svg';
 import ion_cart from '../../../assets/ProductsPage/ion_cart-outline.svg'
 import ion_heart from '../../../assets/ProductsPage/iconamoon_heart-light.svg'
+import { usePopup } from "../../../context/ToastPopupContext";
+
 
 const ProductCard = ({ product, onProductClick, onToggleFavorite }) => {
   const [isInWishlistState, setIsInWishlistState] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const { user } = useAuth();
+const { showPopup } = usePopup();
 
   useEffect(() => {
     checkWishlistStatus();
@@ -47,6 +49,10 @@ const ProductCard = ({ product, onProductClick, onToggleFavorite }) => {
         await removeFromWishlist(product.id);
         if (onToggleFavorite) {
           onToggleFavorite(product.id, false);
+            showPopup("wishlistRemove", {
+    title: product.name || product.title,
+    image: product.imageUrls?.[0],
+  });
         }
       } else {
         const productData = {
@@ -64,6 +70,11 @@ const ProductCard = ({ product, onProductClick, onToggleFavorite }) => {
         if (onToggleFavorite) {
           onToggleFavorite(product.id, true);
         }
+        showPopup("wishlist", {
+  title: productData.name,
+  image: productData.image,
+});
+
       }
     } catch (error) {
       // Revert on error
@@ -101,8 +112,11 @@ const ProductCard = ({ product, onProductClick, onToggleFavorite }) => {
       };
 
       await addToCart(product.id, productData, 1);
-      toast.success(`${productData.name} added to cart!`);
-      
+      // toast.success(`${productData.name} added to cart!`);
+      showPopup("cart", {
+  title: productData.name || productData.title,
+  image: productData.imageUrls?.[0],
+});
     } catch (error) {
       console.error("Error adding to cart:", error);
       toast.error("Failed to add item to cart. Please try again.");
@@ -138,15 +152,18 @@ const ProductCard = ({ product, onProductClick, onToggleFavorite }) => {
       handleToggleWishlist(e);
     }}
     disabled={isLoading}
-    className={`p-1.5 rounded-full cursor-pointer shadow-md ${
-      isInWishlistState ? 'bg-red-500 text-white' : 'text-gray-700'
-    }`}
+    className={`p-1.5 rounded-full cursor-pointer shadow-md `}
   >
-    <img
+     <Heart 
+     onClick={(e)=> e.stopPropagation() }
+        className={`w-4 h-4 transition-colors ${
+          isInWishlistState ? 'text-red-500 fill-current' : 'text-gray-600'
+        }`} />
+    {/* <img
       src={ion_heart}
       className={`w-4 h-4 cursor-pointer ${isInWishlistState ? 'fill-current' : ''}`}
       alt="wishlist"
-    />
+    /> */}
   </button>
 </div>
 

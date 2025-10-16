@@ -21,17 +21,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { modelImage, garmentImage } = req.body || {};
+    const { modelImage, garmentImage, category } = req.body || {};
 
     // Validation
     if (!modelImage || !garmentImage) {
       return res.status(400).json({ error: "Both modelImage and garmentImage URLs are required." });
     }
 
-    console.log("Received modelImage:", modelImage);
-    console.log("Received garmentImage:", garmentImage);
+    console.log("✅ Received request:");
+    console.log("   Model Image:", modelImage);
+    console.log("   Garment Image:", garmentImage);
+    console.log("   Category:", category || "auto");
 
-    // Step 1: Call the Fashn API `/run` endpoint
+    // ✅ FIXED: Use "auto" instead of "dresses"
+    // Valid Fashn API categories: "tops", "bottoms", "one-pieces", "auto"
+    const garmentCategory = category || "auto";
+
+    console.log("🔄 Calling Fashn API with category:", garmentCategory);
+
+    // Step 1: Call the Fashn API `/run` endpoint with category
     const runResponse = await fetch(`${FASHN_API_URL}/run`, {
       method: 'POST',
       headers: {
@@ -43,13 +51,14 @@ export default async function handler(req, res) {
         inputs: {
           model_image: modelImage,
           garment_image: garmentImage,
+          category: garmentCategory, // Now sending valid category
         },
       })
     });
 
     if (!runResponse.ok) {
       const errorText = await runResponse.text();
-      console.error("Fashn API error:", errorText);
+      console.error("❌ Fashn API error:", errorText);
       return res.status(500).json({ error: `Fashn API error: ${runResponse.status}` });
     }
 
@@ -60,9 +69,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "No prediction ID received from Fashn API" });
     }
 
+    console.log(`✅ Prediction started with ID: ${predictionId}`);
+
     // Step 2: Poll the `/status/:id` endpoint
-    for (let i = 0; i < 10; i++) {
-      console.log(`Polling attempt ${i + 1} for prediction ${predictionId}`);
+    for (let i = 0; i < 15; i++) {
+      console.log(`🔄 Polling attempt ${i + 1}/15 for prediction ${predictionId}`);
       
       const statusResponse = await fetch(`${FASHN_API_URL}/status/${predictionId}`, {
         headers: {
@@ -71,33 +82,36 @@ export default async function handler(req, res) {
       });
 
       if (!statusResponse.ok) {
-        console.error(`Status check error: ${statusResponse.status}`);
+        console.error(`❌ Status check error: ${statusResponse.status}`);
         return res.status(500).json({ error: `Status check error: ${statusResponse.status}` });
       }
 
       const statusData = await statusResponse.json();
-      console.log(`Status: ${statusData.status}`);
+      console.log(`📊 Status: ${statusData.status}`);
 
       if (statusData.status === "completed") {
-        console.log("Try-on completed successfully");
-        return res.status(200).json({ output: statusData.output });
+        console.log("✅ Try-on completed successfully!");
+        return res.status(200).json({ 
+          output: statusData.output,
+          category: garmentCategory 
+        });
       }
 
       if (statusData.status === "failed") {
-        console.error("Try-on failed:", statusData.error);
+        console.error("❌ Try-on failed:", statusData.error);
         return res.status(500).json({ error: statusData.error || "Try-on failed." });
       }
 
-      // Wait for 2 seconds before next poll
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Wait for 3 seconds before next poll
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     }
 
     // Timeout case
-    console.log("Try-on timed out after 10 attempts");
-    return res.status(504).json({ error: "Try-on timed out." });
+    console.log("⏱️ Try-on timed out after 15 attempts");
+    return res.status(504).json({ error: "Try-on timed out. Please try again." });
 
   } catch (err) {
-    console.error("TryOn error:", err);
+    console.error("❌ TryOn error:", err);
     return res.status(500).json({ error: err.message || "Something went wrong." });
   }
 }

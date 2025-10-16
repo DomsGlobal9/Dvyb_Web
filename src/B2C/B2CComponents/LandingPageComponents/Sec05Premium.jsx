@@ -8,6 +8,7 @@ import { toggleWishlist, isInWishlist } from "../../../services/WishlistService"
 import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { usePopup } from "../../../context/ToastPopupContext"; 
 
 function PremiumSection05() {
   const [products, setProducts] = useState([]);
@@ -17,7 +18,7 @@ function PremiumSection05() {
   const [addingToCart, setAddingToCart] = useState(new Set());
   const [togglingWishlist, setTogglingWishlist] = useState(new Set());
   const [displayedProducts, setDisplayedProducts] = useState([]);
-
+const { showPopup } = usePopup();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -108,7 +109,11 @@ function PremiumSection05() {
       };
 
       await addToCart(product.id, productData, 1);
-      toast.success(`${productData.name} added to cart!`);
+      // toast.success(`${productData.name} added to cart!`);
+      showPopup("cart", {
+  title: productData.name || productData.title,
+  image: productData.imageUrls?.[0],
+});
       
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -151,17 +156,30 @@ function PremiumSection05() {
       const result = await toggleWishlist(product.id, productData);
       
       // Update local wishlist state
-      setWishlistItems(prev => {
-        const newSet = new Set(prev);
-        if (result.inWishlist) {
-          newSet.add(product.id);
-          toast.success(`${productData.name} added to wishlist!`);
-        } else {
-          newSet.delete(product.id);
-          toast.success(`${productData.name} removed from wishlist!`);
-        }
-        return newSet;
-      });
+// Update local wishlist state
+setWishlistItems(prev => {
+  const newSet = new Set(prev);
+  if (result.inWishlist) {
+    newSet.add(product.id);
+  } else {
+    newSet.delete(product.id);
+  }
+  return newSet;
+});
+
+// Trigger toast outside of state setter
+if (result.inWishlist) {
+  showPopup("wishlist", {
+    title: productData.name,
+    image: productData.imageUrls?.[0],
+  });
+} else {
+  showPopup("wishlistRemove", {
+    title: productData.name,
+    image: productData.imageUrls?.[0],
+  });
+}
+
 
     } catch (error) {
       console.error("Error toggling wishlist:", error);

@@ -15,8 +15,8 @@ import Shipping_ic from '../../../assets/ProductsPage/Shipping_ic.svg'
 import Breadcrumbs from '../../../common/components/Breadcrumbs';
 import { getProductBreadcrumbs } from '../../../utils/breadcrumbUtil';
 import { useSearchParams } from 'react-router-dom';
-
-
+import { usePopup } from '../../../context/ToastPopupContext';
+import ProductCard from '../../Components/products/ProductCard';
 
 const ProductDetailPage = ({ product, onBackClick, allProducts = [], onProductClick }) => {
   const [selectedSize, setSelectedSize] = useState('');
@@ -43,6 +43,8 @@ const [searchParams] = useSearchParams();
   const [showUploadSelfieModal, setShowUploadSelfieModal] = useState(false);
   const [showTryOnPreviewModal, setShowTryOnPreviewModal] = useState(false);
   const [tryOnData, setTryOnData] = useState({});
+  const { showPopup } = usePopup();
+  
 
   // Set default color when component loads
   useEffect(() => {
@@ -169,8 +171,12 @@ const [searchParams] = useSearchParams();
       };
 
       await addToCart(product.id, productData, 1);
-      const sizeDisplay = isSaree ? '' : ` (${selectedSize})`;
-      toast.success(`${productData.name}${sizeDisplay} (${selectedColor}) added to cart!`);
+       showPopup("cart", {
+      title: productData.name,
+      image: productData.image,
+    });
+      // const sizeDisplay = isSaree ? '' : ` (${selectedSize})`;
+      // toast.success(`${productData.name}${sizeDisplay} (${selectedColor}) added to cart!`);
       setShowAddToCartModal(false);
       setSelectedSize('');
     } catch (error) {
@@ -217,36 +223,45 @@ const [searchParams] = useSearchParams();
   };
 
   // Optimistic wishlist toggle
-  const handleToggleWishlist = async (item) => {
-    if (!user) {
-      toast.error("Please log in to manage your wishlist!");
-      return;
-    }
+const handleToggleWishlist = async (item) => {
+  if (!user) {
+    toast.error("Please log in to manage your wishlist!");
+    return;
+  }
+  
+  const isCurrentlyInWishlist = wishlist.includes(item.id);
+  setWishlist((prev) =>
+    isCurrentlyInWishlist
+      ? prev.filter((id) => id !== item.id)
+      : [...prev, item.id]
+  );
+  
+  try {
+    await toggleWishlist(item.id, item);
     
-    const isCurrentlyInWishlist = wishlist.includes(item.id);
+    // 🎉 ADD POPUP HERE
+    if (isCurrentlyInWishlist) {
+      showPopup("wishlistRemove", {
+        title: item.title || item.name,
+        image: item.imageUrls?.[0],
+      });
+    } else {
+      showPopup("wishlist", {
+        title: item.title || item.name,
+        image: item.imageUrls?.[0],
+      });
+    }
+  } catch (err) {
     setWishlist((prev) =>
       isCurrentlyInWishlist
-        ? prev.filter((id) => id !== item.id)
-        : [...prev, item.id]
+        ? [...prev, item.id]
+        : prev.filter((id) => id !== item.id)
     );
-    
-    try {
-      await toggleWishlist(item.id, item);
-      toast.success(
-        !isCurrentlyInWishlist
-          ? `${item.title || item.name} added to wishlist!`
-          : `${item.title || item.name} removed from wishlist!`
-      );
-    } catch (err) {
-      setWishlist((prev) =>
-        isCurrentlyInWishlist
-          ? [...prev, item.id]
-          : prev.filter((id) => id !== item.id)
-      );
-      console.error(err);
-      toast.error("Error updating wishlist!");
-    }
-  };
+    console.error(err);
+    toast.error("Error updating wishlist!");
+  }
+};
+
 
   const handleAddToCartFromSimilar = async (item) => {
     if (!user) {
@@ -272,7 +287,11 @@ const [searchParams] = useSearchParams();
         discount: item.discount || 0
       };
       await addToCart(item.id, productData, 1);
-      toast.success(`${item.title || item.name} added to cart!`);
+      // toast.success(`${item.title || item.name} added to cart!`);
+          showPopup("cart", {
+      title: item.title || item.name,
+      image: item.imageUrls?.[0],
+    }); 
     } catch (error) {
       console.error("Add to cart error:", error);
       toast.error("Failed to add item to cart.");
@@ -490,10 +509,10 @@ const [searchParams] = useSearchParams();
 
               <div className="space-y-3 flex gap-5">
                 <button onClick={handleAddToCart} className="w-auto cursor-pointer bg-white text-black py-3 px-6 rounded-lg shadow-sm border font-medium flex items-center justify-center hover:shadow-md transition-all">
-                  <ShoppingCart className="h-5 mr-2" />
-                  Add to cart
+                  <ShoppingCart className="md:h-5 h-4 mr-2" />
+              <span className='text-sm'>  Add to Bag </span>  
                 </button>
-                <button onClick={handleBuyNow} className="w-42 h-12 cursor-pointer bg-[#1C4C74] shadow-sm text-white py-3 px-6 rounded-lg hover:bg-[#163d5d] font-medium transition-colors">
+                <button onClick={handleBuyNow} className="w-42 h-12 text-sm cursor-pointer bg-[#1C4C74] shadow-sm text-white py-3 px-6 rounded-lg hover:bg-[#163d5d] font-medium transition-colors">
                   Buy Now
                 </button>
               </div>
@@ -559,90 +578,38 @@ const [searchParams] = useSearchParams();
           </div>
 
           {/* Similar Products */}
-          <div className="p-6">
-            <h3 className="text-lg font-semibold mb-6">Similar Products</h3>
+         <div className="p-6">
+  <h3 className="text-lg font-bold mb-6">Similar Products</h3>
 
-            {similarProducts.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {similarProducts.map((item) => (
-                  <div key={item.id} className="bg-white rounded-lg overflow-hidden hover:shadow-md transition-shadow group cursor-pointer">
-                    <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
-                      {item.discount > 0 && (
-                        <span className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded z-10">
-                          -{item.discount}%
-                        </span>
-                      )}
-
-                      {item.imageUrls?.[0] ? (
-                        <img src={item.imageUrls[0]} alt={item.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-8 h-8 text-gray-400" />
-                        </div>
-                      )}
-
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 backdrop-blur-0 group-hover:backdrop-blur-sm transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleWishlist(item);
-                            }}
-                            className={`p-2 cursor-pointer rounded-full hover:scale-110 transition-all ${
-                              wishlist.includes(item.id)
-                                ? 'bg-red-500 text-white'
-                                : 'bg-white text-gray-700 hover:bg-gray-100'
-                            }`}
-                          >
-                            <Heart className={`w-4 h-4 ${wishlist.includes(item.id) ? 'fill-current' : ''}`} />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAddToCartFromSimilar(item);
-                            }}
-                            className="p-2 bg-white rounded-full hover:bg-gray-100 hover:scale-110 transition-transform"
-                          >
-                            <ShoppingCart className="w-4 h-4 text-gray-700" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-3 flex justify-between">
-                      <div className="text-xs w-[148px] mb-2">
-                        <h4 className="font-medium text-sm truncate mb-1">{item.title || item.name}</h4>
-                        <p>{item.fabric} • {item.craft}</p>
-                        <div className='pt-2'>
-                          <span className="font-semibold text-[14.4px] pt-4 text-[#1C6BAD]">
-                            ₹{Math.round(item.price - (item.price * (item.discount || 0) / 100))}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <button
-                          onClick={() => {
-                            if (onProductClick) {
-                              onProductClick(item);
-                              window.scrollTo(0, 0);
-                            }
-                          }}
-                          className="text-[14px] border-1 border-[#1C4C74] bg-white text-[#1C4C74] p-2 w-[68px] rounded hover:bg-[#1C4C74] hover:text-white transition-colors"
-                        >
-                          View
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>No similar products found.</p>
-              </div>
-            )}
-          </div>
+  {similarProducts.length > 0 ? (
+    <div className="grid grid-cols-2 sm:grid-cols-3  lg:grid-cols-4 gap-4">
+      {similarProducts.map((item) => (
+        <ProductCard
+          key={item.id}
+          product={item}
+          onProductClick={(product) => {
+            if (onProductClick) {
+              onProductClick(product);
+              window.scrollTo(0, 0);
+            }
+          }}
+          onToggleFavorite={(productId, isAdded) => {
+            // Update local wishlist state
+            setWishlist((prev) =>
+              isAdded
+                ? [...prev, productId]
+                : prev.filter((id) => id !== productId)
+            );
+          }}
+        />
+      ))}
+    </div>
+  ) : (
+    <div className="text-center py-8 text-gray-500">
+      <p>No similar products found.</p>
+    </div>
+  )}
+</div>
         </div>
       </div>
 
@@ -660,6 +627,7 @@ const [searchParams] = useSearchParams();
         onClose={handleModalClose}
         onNext={handleUploadSelfieNext}
         garmentImage={tryOnData.garmentImage}
+         isSaree={isSaree}  
       />
 
       <TryOnPreviewModal

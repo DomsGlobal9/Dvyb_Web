@@ -10,7 +10,12 @@ export default defineConfig({
   },
   css: {
     // You can use this for future global CSS config if needed
-  },
+  }, server: {
+      proxy: {
+        "/api": "http://localhost:5000", // proxy API calls to backend
+      },
+    },
+
   tailwind: {
     theme: {
       extend: {
@@ -32,9 +37,4 @@ export default defineConfig({
   },
 });
 
-    // server: {
-    //   proxy: {
-    //     "/api": "http://localhost:5000", // proxy API calls to backend
-    //   },
-    // },
-
+   

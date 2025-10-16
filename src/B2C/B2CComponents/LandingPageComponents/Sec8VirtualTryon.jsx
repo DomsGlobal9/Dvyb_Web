@@ -10,6 +10,7 @@ import { toggleWishlist, isInWishlist } from "../../../services/WishlistService"
 import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { usePopup } from "../../../context/ToastPopupContext";
 
 // StatsCard unchanged
 const   StatsCard = ({ value, label, sublabel }) => (
@@ -109,17 +110,20 @@ const ProductCard = ({
             </button>
 
             {/* Wishlist - replaced image with Lucide Heart so we can color it */}
-            <button
-              className={`flex items-center justify-center border border-gray-500 px-3 py-2  ${
-                togglingWishlist ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              onClick={(e) => handleWishlistToggle(product, e)}
-              disabled={togglingWishlist}
-            >
-              <Heart
-                className={`w-4 h-4 ${isWishlisted ? "text-red-500" : "text-gray-400"}`}
-              />
-            </button>
+         <button
+  className={`flex items-center justify-center border border-gray-500 px-3 py-2  ${
+    togglingWishlist ? "opacity-50 cursor-not-allowed" : ""
+  }`}
+  onClick={(e) => handleWishlistToggle(product, e)}
+  disabled={togglingWishlist}
+>
+  <Heart 
+    className={`w-5 h-5 transition-colors ${
+      isWishlisted ? 'text-red-500 fill-current' : 'text-gray-300'
+    }`} 
+  />
+</button>
+
           </div>
         </div>
       </div>
@@ -134,6 +138,8 @@ function VirtualTryonSection8() {
   const [addingToCart, setAddingToCart] = useState(new Set());
   const [togglingWishlist, setTogglingWishlist] = useState(new Set());
   const { user } = useAuth();
+  const { showPopup } = usePopup();
+
   const navigate = useNavigate(); // NEW
 
   // NEW: navigate to product details
@@ -182,7 +188,12 @@ function VirtualTryonSection8() {
         imageUrls: product.imageUrls || [],
       };
       await addToCart(product.id, data, 1);
-      toast.success(`${data.name} added to cart!`);
+      // toast.success(`${data.name} added to cart!`);
+      showPopup("cart", {
+  title: data.name,
+  image: data.imageUrls?.[0] || saree, // fallback image
+});
+
     } catch {
       toast.error("Failed to add item to cart.");
     } finally {
@@ -194,37 +205,51 @@ function VirtualTryonSection8() {
     }
   };
 
-  const handleWishlistToggle = async (product, e) => {
-    e.stopPropagation();
-    if (!user) return toast.error("Please log in to manage wishlist!");
-    if (togglingWishlist.has(product.id)) return;
+const handleWishlistToggle = async (product, e) => {
+  e.stopPropagation();
+  if (!user) return toast.error("Please log in to manage wishlist!");
+  if (togglingWishlist.has(product.id)) return;
 
-    try {
-      setTogglingWishlist((prev) => new Set(prev).add(product.id));
-      const data = {
-        name: product.name || product.title,
-        price: parseFloat(product.price) || 0,
-        imageUrls: product.imageUrls || [],
-      };
-      const result = await toggleWishlist(product.id, data);
-      setWishlistItems((prev) => {
-        const newSet = new Set(prev);
-        result.inWishlist ? newSet.add(product.id) : newSet.delete(product.id);
-        toast.success(
-          `${data.name} ${result.inWishlist ? "added to" : "removed from"} wishlist!`
-        );
-        return newSet;
+  try {
+    setTogglingWishlist((prev) => new Set(prev).add(product.id));
+
+    const data = {
+      name: product.name || product.title,
+      price: parseFloat(product.price) || 0,
+      imageUrls: product.imageUrls || [],
+    };
+
+    const result = await toggleWishlist(product.id, data);
+
+    setWishlistItems((prev) => {
+      const newSet = new Set(prev);
+      if (result.inWishlist) newSet.add(product.id);
+      else newSet.delete(product.id);
+      return newSet;
+    });
+
+    // SHOW POPUP OUTSIDE SETSTATE
+    if (result.inWishlist) {
+      showPopup("wishlist", {
+        title: data.name,
+        image: data.imageUrls?.[0] || saree,
       });
-    } catch {
-      toast.error("Failed to update wishlist.");
-    } finally {
-      setTogglingWishlist((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(product.id);
-        return newSet;
+    } else {
+      showPopup("wishlistRemove", {
+        title: data.name,
+        image: data.imageUrls?.[0] || saree,
       });
     }
-  };
+  } catch {
+    toast.error("Failed to update wishlist.");
+  } finally {
+    setTogglingWishlist((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(product.id);
+      return newSet;
+    });
+  }
+};
 
   if (loading)
     return (

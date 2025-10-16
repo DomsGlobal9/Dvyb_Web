@@ -3,8 +3,13 @@ import { ArrowLeft, ArrowRight, User, Upload, Camera, X } from "lucide-react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebase"; // adjust path as needed
 import { useAuth } from "../../../../context/AuthContext"; // adjust path as needed
+import mm2 from '../../../../assets/ProductsPage/mm2.jpg'
+import model1 from '../../../../assets/ProductsPage/model1.jpg'
+import model2 from '../../../../assets/ProductsPage/model2.jpg'
+import model3 from '../../../../assets/ProductsPage/model3.jpg'
+import model4 from '../../../../assets/ProductsPage/model4.jpg'
 
-const UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage }) => {
+const UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage,isSaree  }) => {
   const { user } = useAuth();
   
   // All hooks MUST be called before any conditional returns
@@ -48,11 +53,29 @@ const UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage }) => {
   }, [isOpen, user]);
 
   // Image URLs defined inside component but after hooks
-  const fair = 'https://res.cloudinary.com/doiezptnn/image/upload/v1757585864/urhcw45ugpa14f43c4pd.jpg'
-  const unfair = 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678836/darkk_cfvh10.jpg';
-  const light = 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678831/medium_ptqoay.jpg'
-  const medium = 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678836/normal_cdyh38.jpg'
+  // const sareefair = 'https://res.cloudinary.com/doiezptnn/image/upload/v1757585864/urhcw45ugpa14f43c4pd.jpg'
+  // const sareeunfair = 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678836/darkk_cfvh10.jpg';
+  // const sareelight = 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678831/medium_ptqoay.jpg'
+  // const sareemedium = 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678836/normal_cdyh38.jpg'
 
+  // const fair = 'https://res.cloudinary.com/doiezptnn/image/upload/v1760530680/model1_kpflfb.jpg'
+  // const unfair = 'https://res.cloudinary.com/doiezptnn/image/upload/v1760530681/model4_bszzsd.jpg'
+  // const light = 'https://res.cloudinary.com/doiezptnn/image/upload/v1760530680/model2_eh2sqf.jpg'
+  // const medium = 'https://res.cloudinary.com/doiezptnn/image/upload/v1760530681/model3_h0nadq.jpg'
+  
+  const modelImages = isSaree ? {
+    fair: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757585864/urhcw45ugpa14f43c4pd.jpg',
+    unfair: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678836/darkk_cfvh10.jpg',
+    light: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678831/medium_ptqoay.jpg',
+    medium: 'https://res.cloudinary.com/doiezptnn/image/upload/v1757678836/normal_cdyh38.jpg'
+  } : {
+    fair: 'https://res.cloudinary.com/doiezptnn/image/upload/v1760531963/young-beautiful-indian-girl-white-background_gucosk.jpg',
+    unfair: 'https://res.cloudinary.com/doiezptnn/image/upload/v1760530681/model4_bszzsd.jpg',
+    light: 'https://res.cloudinary.com/doiezptnn/image/upload/v1760530680/model2_eh2sqf.jpg',
+    medium: 'https://res.cloudinary.com/doiezptnn/image/upload/v1760530681/model3_h0nadq.jpg'
+  };
+
+  
   // NOW we can do conditional return - after ALL hooks are called
   if (!isOpen) return null;
 
@@ -186,54 +209,45 @@ const UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage }) => {
               )}
 
               {/* Default Images Grid */}
-              <div className="grid grid-cols-2 gap-4 relative">
-                <button 
-                  onClick={() => handleDefaultImageClick(fair)}
-                  onMouseEnter={() => setHoveredImage(fair)}
-                  onMouseLeave={() => setHoveredImage(null)}
-                  className="border-2 border-gray-300 rounded-lg h-36 overflow-hidden hover:border-sky-400 transition-all"
-                >
-                  <img src={fair} alt="Default model 1" className="w-full h-full object-cover" />
-                </button>
-                <button 
-                  onClick={() => handleDefaultImageClick(unfair)}
-                  onMouseEnter={() => setHoveredImage(unfair)}
-                  onMouseLeave={() => setHoveredImage(null)}
-                  className="border-2 border-gray-300 rounded-lg h-36 overflow-hidden hover:border-sky-400 transition-all"
-                >
-                  <img src={unfair} alt="Default model 2" className="w-full h-full object-cover" />
-                </button>
-                <button 
-                  onClick={() => handleDefaultImageClick(medium)}
-                  onMouseEnter={() => setHoveredImage(medium)}
-                  onMouseLeave={() => setHoveredImage(null)}
-                  className="border-2 border-gray-300 rounded-lg overflow-hidden h-36 hover:border-sky-400 transition-all"
-                >
-                  <img src={medium} alt="Default model 3" className="w-full h-full object-cover" />
-                </button>
-                <button 
-                  onClick={() => handleDefaultImageClick(light)}
-                  onMouseEnter={() => setHoveredImage(light)}
-                  onMouseLeave={() => setHoveredImage(null)}
-                  className="border-2 border-gray-300 rounded-lg h-36 overflow-hidden hover:border-sky-400 transition-all"
-                >
-                  <img src={light} alt="Default model 4" className="w-full h-full object-cover" />
-                </button>
-
-                {/* Hover Preview */}
-                {hoveredImage && (
-                  <div className="absolute -top-4 -right-4 z-50 pointer-events-none">
-                    <div className="bg-white rounded-lg shadow-2xl border-2 border-sky-400 p-2">
-                      <img 
-                        src={hoveredImage} 
-                        alt="Preview" 
-                        className="w-48 h-60 object-cover rounded-md"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
+             {/* Default Images Grid */}
+<div className="grid grid-cols-2 gap-4 relative">
+  <button 
+    onClick={() => handleDefaultImageClick(modelImages.fair)}
+    onMouseEnter={() => setHoveredImage(modelImages.fair)}
+    onMouseLeave={() => setHoveredImage(null)}
+    className="border-2 border-gray-300 rounded-lg h-36 overflow-hidden hover:border-sky-400 transition-all"
+  >
+    <img src={modelImages.fair} alt="Default model 1" className="w-full h-full object-cover" />
+  </button>
+  
+  <button 
+    onClick={() => handleDefaultImageClick(modelImages.unfair)}
+    onMouseEnter={() => setHoveredImage(modelImages.unfair)}
+    onMouseLeave={() => setHoveredImage(null)}
+    className="border-2 border-gray-300 rounded-lg h-36 overflow-hidden hover:border-sky-400 transition-all"
+  >
+    <img src={modelImages.unfair} alt="Default model 2" className="w-full h-full object-cover" />
+  </button>
+  
+  <button 
+    onClick={() => handleDefaultImageClick(modelImages.medium)}
+    onMouseEnter={() => setHoveredImage(modelImages.medium)}
+    onMouseLeave={() => setHoveredImage(null)}
+    className="border-2 border-gray-300 rounded-lg overflow-hidden h-36 hover:border-sky-400 transition-all"
+  >
+    <img src={modelImages.medium} alt="Default model 3" className="w-full h-full object-cover" />
+  </button>
+  
+  <button 
+    onClick={() => handleDefaultImageClick(modelImages.light)}
+    onMouseEnter={() => setHoveredImage(modelImages.light)}
+    onMouseLeave={() => setHoveredImage(null)}
+    className="border-2 border-gray-300 rounded-lg h-36 overflow-hidden hover:border-sky-400 transition-all"
+  >
+    <img src={modelImages.light} alt="Default model 4" className="w-full h-full object-cover" />
+  </button>
+  {/* ... hover preview code ... */}
+</div>
               {/* Upload New Image */}
               <div className="border-2 border-dashed bg-white border-gray-300 rounded-xl p-6 text-center">
                 <input

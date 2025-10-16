@@ -5,40 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const TryOnCart = () => {
   const navigate = useNavigate();
   
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'Blue Flower Print Crop Top',
-      color: 'Yellow',
-      quantity: 1,
-      price: 2900,
-      image: 'https://res.cloudinary.com/doiezptnn/image/upload/v1755929967/aj3ucjkoqrzu2ltabnnw.png', // Placeholder image
-    },
-    {
-      id: 2,
-      name: 'Blue Flower Print Crop Top',
-      color: 'Yellow', 
-      quantity: 1,
-      price: 2900,
-      image: 'https://res.cloudinary.com/doiezptnn/image/upload/v1755858051/b3kbjwzzmtbfzluxd6u9.jpg',
-    },
-    {
-      id: 3,
-      name: 'Blue Flower Print Crop Top',
-      color: 'Yellow',
-      quantity: 1,
-      price: 2900,
-      image: 'https://res.cloudinary.com/doiezptnn/image/upload/v1755848433/kfiqoz3vgcjivv8zayq6.jpg',
-    },
-    {
-      id: 4,
-      name: 'Blue Flower Print Crop Top',
-      color: 'Yellow',
-      quantity: 1,
-      price: 2900,
-      image: 'https://res.cloudinary.com/doiezptnn/image/upload/v1755848433/t5vv2jqqtwwy97rlegjb.webp',
-    }
-  ]);
+  const [cartItems, setCartItems] = useState([]);
 
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [selectAll, setSelectAll] = useState(false);

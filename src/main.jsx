@@ -10,6 +10,7 @@ import { FilterProvider } from './context/FilterContext.jsx';
 import { WishlistProvider } from "./context/WishlistContext";
 import { OrdersProvider } from './context/OrdersContext';
 import Footer from './common/Footer/Footer.jsx';
+import { PopupProvider } from './context/ToastPopupContext.jsx';
 
 createRoot(document.getElementById('root')).render(
    <React.StrictMode>
@@ -21,9 +22,9 @@ createRoot(document.getElementById('root')).render(
            <OrdersProvider>
 
 
-
-      <App />
-      
+ <PopupProvider>   {/* ✅ Added here */}
+                  <App />
+                </PopupProvider>
            </OrdersProvider>
         </WishlistProvider>
       </FilterProvider>

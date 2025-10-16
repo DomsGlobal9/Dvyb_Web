@@ -1,237 +1,7 @@
-
-
-//without bg remove api
-
-// import React, { useState, useEffect } from 'react';
-// import { ArrowLeft } from 'lucide-react';
-// import { useLocation, useNavigate } from 'react-router-dom';
-// import hall from '../../../assets/TryOn/hall.jpg';  
-// import beach from '../../../assets/TryOn/beach.jpg';
-// import office from '../../../assets/TryOn/office.jpg';
-// import mall from '../../../assets/TryOn/mall.jpg';
-
-// function TryOnPreview() {
-//   const { state } = useLocation();
-//   const navigate = useNavigate();
-//   const { modelImage, garmentImage } = state || {};
-//   const [tryOnResult, setTryOnResult] = useState(null);
-//   const [isProcessing, setIsProcessing] = useState(false);
-//   const [errorMsg, setErrorMsg] = useState('');
-//   const [selectedColor, setSelectedColor] = useState('green');
-  
-//   const [selectedBackground, setSelectedBackground] = useState('');
-//   const [backgroundChangedImage, setBackgroundChangedImage] = useState(null);
-//   const [isChangingBackground, setIsChangingBackground] = useState(false);
-//   const [bgError, setBgError] = useState('');
-
-//   const colors = [
-//     { name: 'green', image: garmentImage },
-//     { name: 'purple', image: garmentImage },
-//     { name: 'brown', image: garmentImage },
-//   ];
-
-//   const backgroundOptions = [
-//     { id: 'function-hall', name: 'Function Hall', description: 'Elegant wedding venue', imagePath: hall },
-//     { id: 'beach', name: 'Beach', description: 'Tropical paradise', imagePath: beach },
-//     { id: 'office', name: 'Office', description: 'Professional workspace', imagePath: office },
-//     { id: 'mall', name: 'Mall', description: 'Shopping center', imagePath: mall }
-//   ];
-
-//   useEffect(() => {
-//     if (modelImage && garmentImage) {
-//       performTryOn();
-//     }
-//   }, [modelImage, garmentImage]);
-
-//   const performTryOn = async () => {
-//     setIsProcessing(true);
-//     setErrorMsg('');
-//     setTryOnResult(null);
-//     setBackgroundChangedImage(null);
-//     setSelectedBackground('');
-
-//     try {
-//       const response = await fetch("/api/tryon", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ modelImage, garmentImage }),
-//       });
-
-//       const contentType = response.headers.get("content-type");
-//       if (!contentType || !contentType.includes("application/json")) {
-//         throw new Error("Server returned invalid response format.");
-//       }
-
-//       if (!response.ok) {
-//         const errorData = await response.json();
-//         throw new Error(errorData.error || `API error: ${response.status}`);
-//       }
-
-//       const data = await response.json();
-//       if (data.output && data.output.length > 0) {
-//         setTryOnResult(data.output[0]);
-//       } else {
-//         setErrorMsg("Try-on failed. Please try again with different images.");
-//       }
-//     } catch (error) {
-//       setErrorMsg(error.message || "Something went wrong. Please try again.");
-//     } finally {
-//       setIsProcessing(false);
-//     }
-//   };
-
-//   // Background change function (no external API, just overlaying)
-//   const changeBackground = async (backgroundType) => {
-//     if (!tryOnResult) {
-//       setBgError("No try-on result available for background change");
-//       return;
-//     }
-
-//     setIsChangingBackground(true);
-//     setBgError('');
-//     setSelectedBackground(backgroundType);
-
-//     try {
-//       const selectedBg = backgroundOptions.find(bg => bg.id === backgroundType);
-//       const canvas = document.createElement('canvas');
-//       const ctx = canvas.getContext('2d');
-
-//       const bgImg = new window.Image();
-//       await new Promise((resolve, reject) => {
-//         bgImg.onload = resolve;
-//         bgImg.onerror = reject;
-//         bgImg.crossOrigin = 'anonymous';
-//         bgImg.src = selectedBg.imagePath;
-//       });
-
-//       const personImg = new window.Image();
-//       await new Promise((resolve, reject) => {
-//         personImg.onload = resolve;
-//         personImg.onerror = reject;
-//         personImg.crossOrigin = 'anonymous';
-//         personImg.src = tryOnResult; // directly use tryOn result
-//       });
-
-//       canvas.width = bgImg.width;
-//       canvas.height = bgImg.height;
-
-//       ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-
-//       const maxPersonWidth = canvas.width * 0.7;
-//       const maxPersonHeight = canvas.height * 0.9;
-
-//       let personWidth = personImg.width;
-//       let personHeight = personImg.height;
-
-//       if (personWidth > maxPersonWidth || personHeight > maxPersonHeight) {
-//         const scale = Math.min(maxPersonWidth / personWidth, maxPersonHeight / personHeight);
-//         personWidth *= scale;
-//         personHeight *= scale;
-//       }
-
-//       const personX = (canvas.width - personWidth) / 2;
-//       const personY = canvas.height - personHeight;
-
-//       ctx.drawImage(personImg, personX, personY, personWidth, personHeight);
-
-//       canvas.toBlob((blob) => {
-//         const finalUrl = URL.createObjectURL(blob);
-//         setBackgroundChangedImage(finalUrl);
-//       }, 'image/png', 0.95);
-
-//     } catch (error) {
-//       setBgError(error.message || "Failed to change background.");
-//     } finally {
-//       setIsChangingBackground(false);
-//     }
-//   };
-
-//   const handleBackClick = () => navigate(-1);
-//   const handleColorSelect = (color) => setSelectedColor(color);
-//   const getCurrentDisplayImage = () => backgroundChangedImage || tryOnResult;
-
-//   return (
-//     <div className="min-h-screen bg-[#f1f6fa] flex justify-center">
-//       <div className="max-w-4xl mx-auto bg-white min-h-screen flex">
-//         {/* Left Side */}
-//         <div className="w-1/2 p-6">
-//           <button onClick={handleBackClick} className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4">
-//             <ArrowLeft size={20} /> <span>Back</span>
-//           </button>
-
-//           <div className="aspect-[3/4] rounded-lg overflow-hidden bg-gray-100">
-//             {isProcessing ? (
-//               <div className="w-full h-full flex flex-col items-center justify-center">
-//                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-400 mb-4"></div>
-//                 <p className="text-gray-600 font-medium">Processing try-on...</p>
-//               </div>
-//             ) : errorMsg ? (
-//               <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
-//                 <p className="text-red-600 font-medium mb-2">Try-on failed</p>
-//                 <p className="text-sm text-gray-600 mb-4">{errorMsg}</p>
-//                 <button onClick={performTryOn} className="px-4 py-2 bg-blue-500 text-white rounded-lg">Try Again</button>
-//               </div>
-//             ) : getCurrentDisplayImage() ? (
-//               <img src={getCurrentDisplayImage()} alt="Try-on result" className="w-full h-full object-cover" />
-//             ) : (
-//               <div className="w-full h-full flex items-center justify-center text-gray-400">👔 Try-on result will appear here</div>
-//             )}
-//           </div>
-
-//           {tryOnResult && (
-//             <div className="mt-6">
-//               <h3 className="text-lg font-semibold text-gray-800 mb-3">Change Background</h3>
-//               {bgError && <div className="mb-3 p-2 bg-red-100 border border-red-300 rounded text-red-700 text-sm">{bgError}</div>}
-//               <div className="grid grid-cols-2 gap-3">
-//                 {backgroundOptions.map((bg) => (
-//                   <div key={bg.id} className={`relative rounded-lg overflow-hidden cursor-pointer ${selectedBackground === bg.id ? 'ring-2 ring-blue-500' : ''}`} onClick={() => changeBackground(bg.id)}>
-//                     <img src={bg.imagePath} alt={bg.name} className="w-full h-16 object-cover" />
-//                     <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/40 text-white text-xs">{bg.name}</div>
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-//           )}
-//         </div>
-
-//         {/* Right Side */}
-//         <div className="w-1/2 p-6">
-//           <h1 className="text-lg font-semibold text-gray-800">Raven Hoodie With Black colored Design</h1>
-//           <p className="text-xl font-bold text-gray-900 mt-2">₹1,910 <span className="text-sm text-gray-500 line-through">₹2,500</span> <span className="text-green-600 ml-1">(25% OFF)</span></p>
-//           <div className="flex items-center gap-1 mt-1">
-//             <span className="text-yellow-400">★★★★☆</span>
-//             <span className="text-sm text-gray-600">4.5</span>
-//           </div>
-
-//           <div className="mt-6">
-//             <p className="text-sm font-medium text-gray-700 mb-2">Colours Available</p>
-//             <div className="flex gap-2">
-//               {colors.map((color) => (
-//                 <img key={color.name} src={color.image} alt={color.name} className={`w-16 h-20 rounded-lg cursor-pointer ${selectedColor === color.name ? 'border-2 border-blue-500' : ''}`} onClick={() => handleColorSelect(color.name)} />
-//               ))}
-//             </div>
-//           </div>
-
-//           <div className="mt-6 space-y-3">
-//             <button className="w-full bg-blue-500 text-white py-2 rounded-full hover:bg-blue-600">Add to cart</button>
-//             <button className="w-full bg-blue-700 text-white py-2 rounded-full hover:bg-blue-800">Buy now</button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default TryOnPreview;
-
-
-
-
-//last worked
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import hall from '../../../assets/TryOn/hall.jpg';  // Local image for Function Hall background
+import hall from '../../../assets/TryOn/hall.jpg';
 import beach from '../../../assets/TryOn/beach.jpg';
 import office from '../../../assets/TryOn/office.jpg';
 import mall from '../../../assets/TryOn/mall.jpg';
@@ -239,13 +9,13 @@ import mall from '../../../assets/TryOn/mall.jpg';
 function TryOnPreview() {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { modelImage, garmentImage } = state || {};
+  const { modelImage, garmentImage, garmentType } = state || {};
   const [tryOnResult, setTryOnResult] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [selectedColor, setSelectedColor] = useState('green');
   
-  // New states for background changing
+  // Background states
   const [selectedBackground, setSelectedBackground] = useState('');
   const [backgroundChangedImage, setBackgroundChangedImage] = useState(null);
   const [isChangingBackground, setIsChangingBackground] = useState(false);
@@ -257,7 +27,6 @@ function TryOnPreview() {
     { name: 'brown', image: garmentImage },
   ];
 
-  // Background options with local images
   const backgroundOptions = [
     {
       id: 'function-hall',
@@ -295,14 +64,20 @@ function TryOnPreview() {
     setIsProcessing(true);
     setErrorMsg('');
     setTryOnResult(null);
-    // Reset background states when new try-on starts
     setBackgroundChangedImage(null);
     setSelectedBackground('');
 
     try {
+      // Determine category based on garment type
+      // For lehengas, sarees, gowns -> use "dresses"
+      // For tops, shirts -> use "tops"
+      // For bottoms -> use "bottoms"
+      const category = determineCategory(garmentType);
+
       console.log("Sending to API:", {
         modelImage: modelImage,
         garmentImage: garmentImage,
+        category: category,
       });
 
       const response = await fetch("/api/tryon", {
@@ -313,11 +88,11 @@ function TryOnPreview() {
         body: JSON.stringify({
           modelImage: modelImage,
           garmentImage: garmentImage,
+          category: category, // Send category to API
         }),
       });
 
       console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers.get('content-type'));
 
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
@@ -352,14 +127,48 @@ function TryOnPreview() {
     }
   };
 
-  // Background removal function using Remove.bg API (like in your demo)
+  // Helper function to determine category
+  const determineCategory = (type) => {
+    if (!type) return "dresses"; // Default to full-body
+
+    const lowerType = type.toLowerCase();
+    
+    // Full-body garments
+    if (lowerType.includes('lehenga') || 
+        lowerType.includes('saree') || 
+        lowerType.includes('gown') || 
+        lowerType.includes('dress') ||
+        lowerType.includes('kurta') ||
+        lowerType.includes('anarkali')) {
+      return "dresses";
+    }
+    
+    // Tops
+    if (lowerType.includes('top') || 
+        lowerType.includes('shirt') || 
+        lowerType.includes('blouse') ||
+        lowerType.includes('tshirt') ||
+        lowerType.includes('hoodie')) {
+      return "tops";
+    }
+    
+    // Bottoms
+    if (lowerType.includes('pant') || 
+        lowerType.includes('jeans') || 
+        lowerType.includes('trouser') ||
+        lowerType.includes('skirt')) {
+      return "bottoms";
+    }
+    
+    // Default to dresses for Indian ethnic wear
+    return "dresses";
+  };
+
   const removeBackground = async (imageUrl) => {
     try {
-      // Convert image URL to blob
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       
-      // Try Remove.bg first
       const formData = new FormData();
       formData.append('image_file', blob);
       formData.append('size', 'auto');
@@ -367,7 +176,7 @@ function TryOnPreview() {
       const removeBgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
         method: 'POST',
         headers: {
-          'X-Api-Key': '6pYMsUxaUnTtv2kQ5cvCuLTz', // Your API key from demo
+          'X-Api-Key': '6pYMsUxaUnTtv2kQ5cvCuLTz',
         },
         body: formData,
       });
@@ -384,7 +193,6 @@ function TryOnPreview() {
     }
   };
 
-  // Background change function with background removal
   const changeBackground = async (backgroundType) => {
     if (!tryOnResult) {
       setBgError("No try-on result available for background change");
@@ -398,7 +206,6 @@ function TryOnPreview() {
     try {
       console.log("Removing background from try-on result...");
       
-      // Step 1: Remove background from try-on result
       const personWithoutBg = await removeBackground(tryOnResult);
       
       console.log("Background removed, now changing to:", backgroundType);
@@ -407,7 +214,6 @@ function TryOnPreview() {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
-      // Load background image
       const bgImg = new window.Image();
       await new Promise((resolve, reject) => {
         bgImg.onload = resolve;
@@ -416,7 +222,6 @@ function TryOnPreview() {
         bgImg.src = selectedBg.imagePath;
       });
 
-      // Load person without background
       const personImg = new window.Image();
       await new Promise((resolve, reject) => {
         personImg.onload = resolve;
@@ -425,35 +230,28 @@ function TryOnPreview() {
         personImg.src = personWithoutBg;
       });
 
-      // Set canvas to background size
       canvas.width = bgImg.width;
       canvas.height = bgImg.height;
 
-      // Draw background
       ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
-      // Calculate person size and position
       const maxPersonWidth = canvas.width * 0.7;
       const maxPersonHeight = canvas.height * 0.9;
       
       let personWidth = personImg.width;
       let personHeight = personImg.height;
       
-      // Scale to fit while maintaining aspect ratio
       if (personWidth > maxPersonWidth || personHeight > maxPersonHeight) {
         const scale = Math.min(maxPersonWidth / personWidth, maxPersonHeight / personHeight);
         personWidth *= scale;
         personHeight *= scale;
       }
       
-      // Center horizontally, bottom aligned
       const personX = (canvas.width - personWidth) / 2;
       const personY = canvas.height - personHeight;
       
-      // Draw person (without background) on new background
       ctx.drawImage(personImg, personX, personY, personWidth, personHeight);
 
-      // Create final result
       canvas.toBlob((blob) => {
         const finalUrl = URL.createObjectURL(blob);
         setBackgroundChangedImage(finalUrl);
@@ -476,7 +274,6 @@ function TryOnPreview() {
     setSelectedColor(color);
   };
 
-  // Function to get the current display image (background changed or original try-on result)
   const getCurrentDisplayImage = () => {
     return backgroundChangedImage || tryOnResult;
   };
@@ -484,7 +281,6 @@ function TryOnPreview() {
   return (
     <div className="min-h-screen bg-[#f1f6fa] flex justify-center">
       <div className="max-w-4xl mx-auto bg-white min-h-screen flex">
-        {/* Left Side - Try-On Result Image */}
         <div className="w-1/2 p-6">
           <button
             onClick={handleBackClick}
@@ -498,8 +294,8 @@ function TryOnPreview() {
             {isProcessing ? (
               <div className="w-full h-full flex flex-col items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-400 mb-4"></div>
-                <p className="text-gray-600 font-medium">Processing try-on...</p>
-                <p className="text-sm text-gray-500 mt-1">This may take a few moments</p>
+                <p className="text-gray-600 font-medium">Processing full-body try-on...</p>
+                <p className="text-sm text-gray-500 mt-1">This may take up to 30 seconds</p>
               </div>
             ) : errorMsg ? (
               <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
@@ -539,7 +335,6 @@ function TryOnPreview() {
             )}
           </div>
 
-          {/* Background Options - Show only when try-on result is available */}
           {tryOnResult && (
             <div className="mt-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-3">Change Background</h3>
@@ -592,7 +387,6 @@ function TryOnPreview() {
           )}
         </div>
 
-        {/* Right Side - Product Details */}
         <div className="w-1/2 p-6">
           <h1 className="text-lg font-semibold text-gray-800">Raven Hoodie With Black colored Design</h1>
           <p className="text-xl font-bold text-gray-900 mt-2">₹1,910 <span className="text-sm text-gray-500 line-through">₹2,500</span> <span className="text-green-600 ml-1">(25% OFF)</span></p>
