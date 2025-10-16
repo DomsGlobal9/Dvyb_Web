@@ -17,6 +17,7 @@ import { getProductBreadcrumbs } from '../../../utils/breadcrumbUtil';
 import { useSearchParams } from 'react-router-dom';
 import { usePopup } from '../../../context/ToastPopupContext';
 import ProductCard from '../../Components/products/ProductCard';
+import PropTypes from "prop-types";
 
 const ProductDetailPage = ({ product, onBackClick, allProducts = [], onProductClick }) => {
   const [selectedSize, setSelectedSize] = useState('');
@@ -39,7 +40,7 @@ const [searchParams] = useSearchParams();
   );
 
   // Modal states
-  const [showTryYourOutfitModal, setShowTryYourOutfitModal] = useState(false);
+  // const [showTryYourOutfitModal, setShowTryYourOutfitModal] = useState(false);
   const [showUploadSelfieModal, setShowUploadSelfieModal] = useState(false);
   const [showTryOnPreviewModal, setShowTryOnPreviewModal] = useState(false);
   const [tryOnData, setTryOnData] = useState({});
@@ -55,14 +56,14 @@ const [searchParams] = useSearchParams();
 
   // Handle modal overflow
   useEffect(() => {
-    const isAnyModalOpen = showTryYourOutfitModal || showUploadSelfieModal || showTryOnPreviewModal || showAddToCartModal;
+    const isAnyModalOpen = showUploadSelfieModal || showTryOnPreviewModal || showAddToCartModal;
     if (isAnyModalOpen) {
       document.body.classList.add("overflow-hidden");
     } else {
       document.body.classList.remove("overflow-hidden");
     }
     return () => document.body.classList.remove("overflow-hidden");
-  }, [showTryYourOutfitModal, showUploadSelfieModal, showTryOnPreviewModal, showAddToCartModal]);
+  }, [showUploadSelfieModal, showTryOnPreviewModal, showAddToCartModal]);
 
   if (!product) return null;
 
@@ -199,12 +200,13 @@ const [searchParams] = useSearchParams();
       toast.error('No image available for try-on');
       return;
     }
-    setTryOnData({ garmentImage });
-    setShowTryYourOutfitModal(true);
+    setTryOnData({ garmentImage, garmentName: product.title || product.name });
+    // setShowTryYourOutfitModal(true);
+      setShowUploadSelfieModal(true);
   };
 
   const handleTryYourOutfitNext = (data) => {
-    setShowTryYourOutfitModal(false);
+    // setShowTryYourOutfitModal(false);
     setTryOnData(prev => ({ ...prev, ...data }));
     setShowUploadSelfieModal(true);
   };
@@ -216,7 +218,7 @@ const [searchParams] = useSearchParams();
   };
 
   const handleModalClose = () => {
-    setShowTryYourOutfitModal(false);
+    // setShowTryYourOutfitModal(false);
     setShowUploadSelfieModal(false);
     setShowTryOnPreviewModal(false);
     setTryOnData({});
@@ -615,18 +617,19 @@ const handleToggleWishlist = async (item) => {
 
       <AddToCartModal />
 
-      <TryYourOutfitModal
+      {/* <TryYourOutfitModal
         isOpen={showTryYourOutfitModal}
         onClose={handleModalClose}
         onNext={handleTryYourOutfitNext}
         garmentImage={tryOnData.garmentImage}
-      />
+      /> */}
 
       <UploadSelfieModal
         isOpen={showUploadSelfieModal}
         onClose={handleModalClose}
         onNext={handleUploadSelfieNext}
         garmentImage={tryOnData.garmentImage}
+         garmentName={tryOnData.garmentName}
          isSaree={isSaree}  
       />
 
