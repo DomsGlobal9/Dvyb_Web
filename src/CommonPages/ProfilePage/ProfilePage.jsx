@@ -24,10 +24,10 @@ const ProfilePage = () => {
   }, [activeTab]);
 
   return (
-    <div className="relative flex min-h-screen  ">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="absolute left-64 w-250 flex-1 p-6 ">
-        {activeTab === "my-info" && <MyInfo userId={userId} />}
+   <div className="relative flex">
+  <Sidebar activeTab={activeTab} setActiveTab={setActiveTab}  />
+ <div className="flex-1 ml-64 p-6 pb-20">
+    {activeTab === "my-info" && <MyInfo userId={userId} />}
         {activeTab === "my-orders" && <MyOrders />}
         {activeTab === "my-model" && <ProfileImage />}
         {activeTab === "wishlist" && <WishlistPage />}

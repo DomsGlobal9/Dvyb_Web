@@ -13,7 +13,7 @@ import AppStore from '../../assets/FooterImages/AppStore.svg'
 const Footer = () => {
   const navigate = useNavigate()
   return (
-    <footer className="bg-white text-gray-700 pt-8 pb-6">
+     <footer className="bg-white text-gray-700 pt-8 pb-6 relative z-20 w-full">
       {/* Logo at top */}
       <div className="flex justify-start max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <img src={logo} alt="logo" className="h-[28.46px] object-contain" />

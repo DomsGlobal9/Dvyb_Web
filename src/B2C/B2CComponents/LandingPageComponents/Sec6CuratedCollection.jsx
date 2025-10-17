@@ -118,7 +118,7 @@ function CuratedCollectionSection6() {
 
             {/* Items count + arrow */}
             <div className="flex items-center  text-gray-700 text-sm font-medium">
-              <span>{collection.itemsCount?.toLocaleString()|| 0 } Items</span>
+              {/* <span>{collection.itemsCount?.toLocaleString()|| 0 } Items</span> */}
               <ChevronRight className="w-5 h-5 ml-1 text-[#3C8E9A]  group-hover:text-gray-600 transition-colors" />
             </div>
           </div>

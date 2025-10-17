@@ -125,7 +125,12 @@ const   UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage,garmentName
       <div className="w-full sm:w-[90vw] lg:w-[900px] max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl bg-white rounded-lg relative flex flex-col lg:flex-row">
         
         {/* LEFT SIDE - Always visible on desktop, hidden on mobile */}
-        <div className="hidden lg:flex w-full lg:w-[45%] bg-gradient-to-br from-teal-50 to-sky-50 p-4 sm:p-6 lg:p-8 flex-col">
+        
+        <div
+  className={`hidden lg:flex w-full ${
+    step === 2 ? "lg:w-[18%]" : "lg:w-[45%]"
+  } bg-gradient-to-br  p-4 sm:p-6 lg:p-8 flex-col`}
+>
           <button 
             className="self-start border border-gray-300 bg-white rounded-full px-3 sm:px-4 py-1.5 text-xs sm:text-sm flex items-center gap-1 hover:bg-gray-50 mb-4 sm:mb-6"
             onClick={handleBack}
@@ -138,25 +143,31 @@ const   UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage,garmentName
             <div className="w-full max-w-xs">
               {/* Decorative Image */}
              <div className="rounded-2xl overflow-hidden shadow-xl relative">
-  <img 
-    src={garmentImage}
-    alt="Fashion model"
-    className="w-full h-full object-cover"
-  />
-  {garmentName && (
-    <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg">
-      <p className="text-xs sm:text-sm font-medium text-white leading-tight">
-        {garmentName}
-      </p>
-    </div>
-  )}
+              
+{step === 1 ? (
+  <>
+    <img
+      src={garmentImage}
+      alt="Fashion model"
+      className="w-full h-full object-cover"
+    />
+    {garmentName && (
+      <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+        <p className="text-xs sm:text-sm font-medium text-white leading-tight">
+          {garmentName}
+        </p>
+      </div>
+    )}
+  </>
+) : null}
+
 </div>
             </div>
           </div>
         </div>
 
         {/* RIGHT SIDE - Changes based on step */}
-        <div className="w-full lg:w-[55%] bg-white p-4 sm:p-6 lg:p-8 flex flex-col relative overflow-y-auto max-h-[95vh] sm:max-h-full">
+        <div className="w-full lg:w-[55%] bg-white no-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col relative overflow-y-auto max-h-[95vh] sm:max-h-full">
           {/* Mobile Back Button */}
           <button 
             className="lg:hidden self-start border border-gray-300 bg-white rounded-full px-3 py-1.5 text-xs flex items-center gap-1 hover:bg-gray-50 mb-4"
@@ -288,28 +299,61 @@ const   UploadSelfieModal = ({ isOpen, onClose, onNext, garmentImage,garmentName
     }}
   />
 
-            <div className="grid grid-cols-2 gap-4 sm:gap-5">
+<div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 w-full place-items-center">
   {[
     { key: "fair", label: "Light" },
     { key: "unfair", label: "Fair" },
     { key: "medium", label: "Dusky" },
     { key: "light", label: "Dark" },
-  ].map(({ key, label }) => (
-    <div key={key} className="flex flex-col items-center">
-      <button
-        onClick={() => handleDefaultImageClick(modelImages[key])}
-        className="w-full border-2 border-gray-300 rounded-lg h-32 sm:h-40 overflow-hidden hover:border-teal-500 hover:shadow-lg transition-all"
-      >
-        <img
-          src={modelImages[key]}
-          alt={`Model ${label}`}
-          className="w-full h-full object-contain"
-        />
-      </button>
-      <p className="mt-2 text-sm font-medium text-gray-700">{label}</p>
-    </div>
-  ))}
+  ].map(({ key, label }) => {
+    const isSelected = selectedImage === modelImages[key];
+    return (
+      <div key={key} className="w-full max-w-[140px] sm:max-w-[160px] md:max-w-[180px] lg:max-w-[200px] flex flex-col items-center">
+        <button
+          onClick={() => handleDefaultImageClick(modelImages[key])}
+          className={`relative w-full rounded-2xl overflow-hidden border-2 transition-all duration-300 
+            ${isSelected ? "border-teal-500 shadow-lg" : "border-gray-200 hover:border-teal-400"}
+          `}
+        >
+          <img
+            src={modelImages[key]}
+            alt={`Model ${label}`}
+            className="w-full h-[180px] sm:h-[200px] object-cover"
+          />
+          {isSelected && (
+            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white text-sm font-medium">
+              <div className="mb-1 text-xs tracking-wide bg-teal-500 px-3 py-1 rounded-full">
+                SELECTED
+              </div>
+            </div>
+          )}
+        </button>
+        <p className="text-center text-sm font-semibold text-gray-800 mt-2">{label}</p>
+      </div>
+    );
+  })}
 </div>
+
+{/* Default toggle (checkbox area at bottom) */}
+<div className="mt-6 flex items-center justify-center">
+  <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+    <input type="checkbox" defaultChecked className="accent-teal-500" />
+    Make it default model for all future try-ons (you can always change this in settings)
+  </label>
+</div>
+
+{/* NEXT button */}
+<div className="mt-6 flex justify-end">
+  <button
+    onClick={() => selectedImage && onNext({ modelImage: selectedImage, garmentImage })}
+    disabled={!selectedImage}
+    className={`px-6 py-3 rounded-lg font-medium transition-all text-sm sm:text-base 
+      ${selectedImage ? "bg-teal-500 text-white hover:bg-teal-600" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
+  >
+    NEXT →
+  </button>
+</div>
+
 
               </div>
             </div>

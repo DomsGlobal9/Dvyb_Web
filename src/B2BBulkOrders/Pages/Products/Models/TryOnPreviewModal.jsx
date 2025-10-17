@@ -1,9 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, RotateCcw, Image, Palette, Shirt } from 'lucide-react';
+import React, { useState, useEffect,useMemo } from 'react';
+import colorUtils from '../../../../utils/colorUtils';
+import { ArrowLeft, RotateCcw, Image, Palette, Shirt, ChevronDown } from 'lucide-react';
 import bg1 from '../../../../assets/ProductsPage/bg1.svg';
 import bg2 from '../../../../assets/ProductsPage/bg2.svg';
 import bg3 from '../../../../assets/ProductsPage/bg3.svg';
 import bg4 from '../../../../assets/ProductsPage/bg4.svg';
+import { usePopup } from "../../../../context/ToastPopupContext";
+import { addToWishlist, removeFromWishlist, isInWishlist } from "../../../../services/WishlistService";
+import { addToCart } from "../../../../services/CartService";
+import { useAuth } from "../../../../context/AuthContext";
+import { Heart } from "lucide-react"; // if not already imported
+import toast from "react-hot-toast";
+import Bag_ic from '../../../../assets/B2cAssets/LandingPageImges/Bag_ic.svg'
+
 
 const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
   const [tryOnResult, setTryOnResult] = useState(null);
@@ -21,18 +30,142 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
   const [bgError, setBgError] = useState('');
   const [viewMode, setViewMode] = useState('2D');
 
-  const colors = [
-    { name: 'blue', color: '#2C5F7F', image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%232C5F7F" width="100" height="100"/%3E%3C/svg%3E' },
-    { name: 'yellow', color: '#C4B454', image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23C4B454" width="100" height="100"/%3E%3C/svg%3E' },
-    { name: 'green', color: '#5FB878', image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%235FB878" width="100" height="100"/%3E%3C/svg%3E' },
-    { name: 'purple', color: '#4A5EB8', image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%234A5EB8" width="100" height="100"/%3E%3C/svg%3E' },
-  ];
 
-  const fabricTypes = [
+  const [expandedPanel, setExpandedPanel] = useState(null);
+
+  const { user } = useAuth();
+const { showPopup } = usePopup();
+
+const [isInWishlistState, setIsInWishlistState] = useState(false);
+const [isLoading, setIsLoading] = useState(false);
+const [addingToCart, setAddingToCart] = useState(false);
+
+useEffect(() => {
+  if (tryOnData?.productId) checkWishlistStatus();
+}, [tryOnData?.productId]);
+
+const checkWishlistStatus = async () => {
+  try {
+    const inWishlist = await isInWishlist(tryOnData.productId);
+    setIsInWishlistState(inWishlist);
+  } catch (error) {
+    console.error("Error checking wishlist:", error);
+  }
+};
+
+const handleToggleWishlist = async () => {
+  if (!user) {
+    toast.error("Please log in to continue!");
+    return;
+  }
+
+  const wasInWishlist = isInWishlistState;
+  setIsInWishlistState(!wasInWishlist);
+  setIsLoading(true);
+
+  try {
+    if (wasInWishlist) {
+      await removeFromWishlist(tryOnData.productId);
+      showPopup("wishlistRemove", {
+        title: tryOnData.garmentName || "Product",
+        image: tryOnData.garmentImage,
+      });
+    } else {
+      const productData = {
+        name: tryOnData.garmentName,
+        price: tryOnData.price || 0,
+        image: tryOnData.garmentImage,
+      };
+      await addToWishlist(tryOnData.productId, productData);
+      showPopup("wishlist", {
+        title: productData.name,
+        image: productData.image,
+      });
+    }
+  } catch (err) {
+    setIsInWishlistState(wasInWishlist);
+    toast.error("Failed to update wishlist!");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const handleAddToCart = async () => {
+  if (!user) {
+    toast.error("Please log in to add items to cart!");
+    return;
+  }
+
+  if (addingToCart) return;
+
+  try {
+    setAddingToCart(true);
+
+    const productData = {
+      name: tryOnData.garmentName,
+      title: tryOnData.garmentName,
+      price: parseFloat(tryOnData.price) || 0,
+      imageUrls: [tryOnData.garmentImage],
+      fabric: selectedFabric,
+      color: selectedColor,
+      blouse: selectedBlouse,
+    };
+
+    await addToCart(tryOnData.productId, productData, 1);
+    showPopup("cart", {
+      title: productData.name,
+      image: tryOnData.garmentImage,
+    });
+  } catch (err) {
+    toast.error("Failed to add item to cart!");
+  } finally {
+    setAddingToCart(false);
+  }
+};
+
+
+   const { productId, selectedColors, selectedSizes, fabric, price, discount } = tryOnData || {};
+const colors = useMemo(() => {
+  if (!selectedColors || selectedColors.length === 0) {
+    // Fallback to defaults
+    return [
+      { name: 'blue', color: '#2C5F7F', image: '...' },
+      // ... other defaults
+    ];
+  }
+  
+  // Convert product colors to color objects
+  return selectedColors.map((colorString) => {
+    const { name, hex } = colorUtils.parseColor(colorString);
+    return {
+      name: name,
+      color: hex,
+      image: `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="${encodeURIComponent(hex)}" width="100" height="100"/%3E%3C/svg%3E`
+    };
+  });
+}, [selectedColors]);
+
+// Inside TryOnPreviewModal component
+const fabricTypes = useMemo(() => {
+  // If you have fabric data in product
+  if (fabric) {
+    return [
+      { 
+        id: 'fabric-1', 
+        name: fabric, 
+        category: 'Selected', 
+        style: 'Current',
+        properties: { drape: 'Medium', shine: 'Medium', texture: 'Smooth' } 
+      }
+    ];
+  }
+  // Fallback to static options
+  return [
     { id: 'pure-silk', name: 'Pure Silk', category: 'Premium', style: 'Traditional', properties: { drape: 'Light', shine: 'Medium', texture: 'Soft' } },
     { id: 'zari-work', name: 'Zari Work', category: 'Lightweight', style: 'Modern', properties: { drape: 'Medium', shine: 'High', texture: 'Smooth' } },
     { id: 'heavy-silk', name: 'Heavy Silk', category: 'Premium', style: 'Traditional', properties: { drape: 'Heavy', shine: 'Low', texture: 'Rich' } },
   ];
+}, [fabric]);
 
   const blouseDesigns = [
     { id: 'traditional', name: 'Traditional', image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23E5E7EB" width="100" height="100"/%3E%3Ctext x="50" y="50" text-anchor="middle" dy=".3em" fill="%239CA3AF" font-size="12"%3ETraditional%3C/text%3E%3C/svg%3E' },
@@ -93,7 +226,7 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
       const removeBgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
         method: 'POST',
         headers: {
-          'X-Api-Key': 'LieA99SrSnwMttGh3zPYbCRV', // consider proxying this server-side
+          'X-Api-Key': 'LieA99SrSnwMttGh3zPYbCRV',
         },
         body: formData,
       });
@@ -121,7 +254,6 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
 
   if (!isOpen) return null;
 
-  // ----- HiDPI background compositor (sharper output) -----
   const changeBackground = async (backgroundType) => {
     if (!tryOnResultNoBg) {
       setBgError("Background removal in progress...");
@@ -139,7 +271,7 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
         loadImg(tryOnResultNoBg),
       ]);
 
-      const OUT_W = 900;   // logical CSS pixels
+      const OUT_W = 900;
       const OUT_H = 1200;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -154,16 +286,14 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      // Draw BG
       ctx.drawImage(bgImg, 0, 0, OUT_W, OUT_H);
 
-      // Fit person
       const maxPersonW = OUT_W * 0.64;
       const maxPersonH = OUT_H * 0.9;
       let pw = personImg.naturalWidth || personImg.width;
       let ph = personImg.naturalHeight || personImg.height;
 
-      const scale = Math.min(maxPersonW / pw, maxPersonH / ph, 1); // don't upscale low-res source
+      const scale = Math.min(maxPersonW / pw, maxPersonH / ph, 1);
       pw *= scale; ph *= scale;
 
       const px = (OUT_W - pw) / 2;
@@ -179,7 +309,7 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
         }
         const finalUrl = URL.createObjectURL(blob);
         setBackgroundChangedImage(finalUrl);
-      }, 'image/png'); // PNG = lossless
+      }, 'image/png');
     } catch (error) {
       console.error("Background change failed:", error);
       setBgError(error.message || "Failed to change background. Please try again.");
@@ -188,7 +318,6 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
     }
   };
 
-  // Prefer composed -> cut-out -> original
   const getCurrentDisplayImage = () => {
     return backgroundChangedImage || tryOnResultNoBg || tryOnResult;
   };
@@ -211,11 +340,12 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
     >
       {selectedBackground && <div className="absolute inset-0 bg-black/10"></div>}
 
-      {/* STAGE: centered preview area with contain (no stretching) */}
+      {/* STAGE: centered preview area */}
       <div
         className="absolute inset-0 w-full h-full flex items-center justify-center"
         style={{
-          background: selectedBackground ? 'transparent' : 'radial-gradient(80% 80% at 50% 20%, #1f2937 0%, #111827 100%)'
+          background: selectedBackground ? 'transparent' : 'radial-gradient(80% 80% at 50% 20%, #1f2937 0%, #111827 100%)',
+          paddingBottom: 'max(0px, calc(100vh - 80vh))',
         }}
       >
         {isProcessing ? (
@@ -237,17 +367,11 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
             </button>
           </div>
         ) : getCurrentDisplayImage() ? (
-          <div
-            className="
-              relative 
-              max-w-[48vw] xl:max-w-[40vw] lg:max-w-[46vw] md:max-w-[56vw] sm:max-w-[80vw]
-              max-h-[82vh]
-            "
-          >
+          <div className="relative max-w-[85vw] max-h-[60vh] sm:max-w-[80vw] sm:max-h-[70vh] md:max-w-[56vw] md:max-h-[75vh] lg:max-w-[46vw] lg:max-h-[82vh] xl:max-w-[40vw] xl:max-h-[82vh]">
             <img
               src={getCurrentDisplayImage()}
               alt="Try-on result"
-              className="w-full h-[500px] object-contain drop-shadow-2xl rounded-xl"
+              className="w-full h-full object-contain drop-shadow-2xl rounded-xl"
               draggable={false}
             />
             {(isChangingBackground || isRemovingBg) && (
@@ -271,8 +395,8 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
         )}
       </div>
 
-      {/* TOP CENTER CONTROLS */}
-      <div className={`absolute z-20 flex gap-3 transition-all duration-300 ${
+      {/* TOP CONTROLS - Hidden on mobile */}
+      <div className={`absolute z-20 hidden sm:flex gap-3 transition-all duration-300 ${
         selectedBackground ? 'top-6 left-6' : 'top-6 left-1/2 transform -translate-x-1/2'
       }`}>
         <button
@@ -310,8 +434,18 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
         </div>
       </div>
 
-      {/* LEFT BOTTOM PANEL - CUSTOMIZATION */}
-      <div className="absolute bottom-6 left-6 z-20 w-80 max-h-[calc(100vh-180px)] bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 overflow-y-auto">
+      {/* MOBILE TOP BAR */}
+      <div className="absolute sm:hidden top-0 left-0 right-0 z-20 bg-black/40 backdrop-blur-sm px-4 py-3 flex justify-between items-center">
+        <button onClick={onClose} className="flex items-center justify-center w-10 h-10 bg-white rounded-full">
+          <ArrowLeft size={18} />
+        </button>
+        <button onClick={handleReset} className="flex items-center justify-center w-10 h-10 bg-white rounded-full">
+          <RotateCcw size={18} />
+        </button>
+      </div>
+
+      {/* DESKTOP LEFT PANEL - Customize */}
+      <div className="absolute bottom-6 left-6 z-20 hidden lg:block w-80 max-h-[calc(100vh-180px)] bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 overflow-y-auto">
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-3">
             <Palette className="w-5 h-5 text-gray-700" />
@@ -321,47 +455,30 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
         </div>
 
         <div className="flex gap-2 mb-6 bg-gray-100 rounded-full p-1">
-          <button
-            onClick={() => setSelectedTab('colours')}
-            className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              selectedTab === 'colours' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Colours
-          </button>
-          <button
-            onClick={() => setSelectedTab('fabrics')}
-            className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              selectedTab === 'fabrics' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Fabrics
-          </button>
-          <button
-            onClick={() => setSelectedTab('blouse')}
-            className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              selectedTab === 'blouse' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Blouse
-          </button>
+          {['colours', 'fabrics', 'blouse'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setSelectedTab(tab)}
+              className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                selectedTab === tab ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
         <div className="space-y-4">
           {selectedTab === 'colours' && (
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-3">
-                Colour: <span className="uppercase text-gray-900">{selectedColor}</span>
-              </p>
+              <p className="text-sm font-medium text-gray-700 mb-3">Colour: <span className="uppercase text-gray-900">{selectedColor}</span></p>
               <div className="grid grid-cols-4 gap-3">
                 {colors.map((color) => (
                   <button
                     key={color.name}
                     onClick={() => setSelectedColor(color.name)}
                     className={`aspect-square rounded-xl transition-all ${
-                      selectedColor === color.name
-                        ? 'ring-2 ring-blue-500 ring-offset-2 shadow-lg scale-105'
-                        : 'hover:scale-105 shadow'
+                      selectedColor === color.name ? 'ring-2 ring-blue-500 ring-offset-2 shadow-lg scale-105' : 'hover:scale-105 shadow'
                     }`}
                     style={{ backgroundColor: color.color }}
                   />
@@ -379,9 +496,7 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
                     key={fabric.id}
                     onClick={() => setSelectedFabric(fabric.id)}
                     className={`w-full p-4 rounded-xl text-left transition-all ${
-                      selectedFabric === fabric.id
-                        ? 'bg-blue-50 border-2 border-blue-500 shadow-md'
-                        : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow'
+                      selectedFabric === fabric.id ? 'bg-blue-50 border-2 border-blue-500 shadow-md' : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow'
                     }`}
                   >
                     <div className="font-medium text-gray-900 text-sm mb-1">{fabric.name}</div>
@@ -415,9 +530,7 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
                     key={design.id}
                     onClick={() => setSelectedBlouse(design.id)}
                     className={`rounded-xl overflow-hidden transition-all ${
-                      selectedBlouse === design.id
-                        ? 'ring-2 ring-blue-500 ring-offset-2 shadow-lg scale-105'
-                        : 'hover:scale-105 shadow border border-gray-200'
+                      selectedBlouse === design.id ? 'ring-2 ring-blue-500 ring-offset-2 shadow-lg scale-105' : 'hover:scale-105 shadow border border-gray-200'
                     }`}
                   >
                     <div className="aspect-square bg-gray-100">
@@ -434,14 +547,14 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
         </div>
       </div>
 
-      {/* RIGHT BOTTOM PANEL - SCENES & ACTIONS */}
-      <div className="absolute bottom-6 right-6 z-20 w-80 max-h-[calc(100vh-180px)] bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 overflow-y-auto">
-        <div>
+      {/* DESKTOP RIGHT PANEL - Scenes & Actions */}
+      <div className="absolute bottom-6 right-6 z-20 hidden lg:block w-80 max-h-[calc(100vh-180px)] bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 overflow-y-auto">
+        <div className="mb-4">
           <div className="flex items-center gap-2 mb-3">
             <Image className="w-5 h-5 text-gray-700" />
             <h3 className="text-base font-semibold text-gray-800">Scenes</h3>
           </div>
-          <p className="text-xs text-gray-600 mb-4">Backgrounds</p>
+          <p className="text-xs text-gray-600">Backgrounds</p>
         </div>
 
         {bgError && (
@@ -457,18 +570,11 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
               onClick={() => changeBackground(bg.id)}
               disabled={!tryOnResultNoBg || isChangingBackground}
               className={`relative rounded-xl overflow-hidden transition-all ${
-                selectedBackground === bg.id
-                  ? 'ring-2 ring-blue-500 ring-offset-2 shadow-lg scale-105'
-                  : 'hover:scale-105 shadow-md'
+                selectedBackground === bg.id ? 'ring-2 ring-blue-500 ring-offset-2 shadow-lg scale-105' : 'hover:scale-105 shadow-md'
               } ${!tryOnResultNoBg ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className="aspect-[4/3]">
-                <img
-                  src={bg.image}
-                  alt={bg.name}
-                  className="w-full h-full object-cover [image-rendering:auto]"
-                  draggable={false}
-                />
+                <img src={bg.image} alt={bg.name} className="w-full h-full object-cover" draggable={false} />
               </div>
               {isChangingBackground && selectedBackground === bg.id && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -482,24 +588,227 @@ const TryOnPreviewModal = ({ isOpen, onClose, tryOnData }) => {
         <div>
           <h3 className="text-base font-semibold text-gray-800 mb-3">Quick Actions</h3>
           <div className="space-y-3">
-            <button className="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-3 rounded-full hover:shadow-lg transition-all font-medium flex items-center justify-center gap-2">
-              <Shirt className="w-4 h-4" />
-              Add to Bag
-            </button>
-            <button className="w-full bg-white border border-gray-300 py-3 rounded-full hover:shadow-md transition-all font-medium flex items-center justify-center gap-2">
-              ♥ Add to Wishlist
-            </button>
-            <button className="w-full bg-white border border-gray-300 py-3 rounded-full hover:shadow-md transition-all font-medium flex items-center justify-center gap-2">
+<button 
+  onClick={async () => {
+    if (!user) {
+      toast.error("Please log in!");
+      return;
+    }
+    try {
+      const productData = {
+        name: tryOnData.garmentName,
+        title: tryOnData.garmentName,  // Add title too
+        price: tryOnData.price,
+        imageUrls: [tryOnData.garmentImage],  // ✅ Changed to array
+        fabric: selectedFabric,
+        color: selectedColor,
+        blouse: selectedBlouse,
+      };
+      await addToCart(tryOnData.productId, productData, 1);  // ✅ Use tryOnData.productId
+      showPopup("cart", {
+        title: tryOnData.garmentName,
+        image: tryOnData.garmentImage,
+      });
+    } catch (error) {
+      toast.error("Failed to add to cart");
+    }
+  }}
+  className="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-3 rounded-full hover:shadow-lg transition-all font-medium flex items-center justify-center gap-2"
+>
+  <img src={Bag_ic} className="w-4 h-4" />
+  Add to Bag
+</button>
+        <button 
+  onClick={handleToggleWishlist}
+  disabled={isLoading}
+  className={`w-full py-3 rounded-full transition-all font-medium flex items-center justify-center gap-2 ${
+    isInWishlistState 
+      ? 'bg-red-50 border-2 border-red-500 text-red-500' 
+      : 'bg-white border border-gray-300'
+  }`}
+>
+  <Heart className={`w-4 h-4 ${isInWishlistState ? 'fill-current' : ''}`} />
+  {isInWishlistState ? "In Wishlist" : "Add to Wishlist"}
+</button>
+            <button className="w-full bg-white border border-gray-300 py-3 rounded-full hover:shadow-md transition-all font-medium">
               ↗ Share Look
             </button>
           </div>
         </div>
       </div>
+
+      {/* MOBILE BOTTOM SHEET */}
+      <div className="absolute sm:hidden bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-white via-white to-white/95 rounded-t-3xl shadow-2xl max-h-[50vh] overflow-hidden flex flex-col">
+        {/* Customize Tab */}
+        <button
+          onClick={() => setExpandedPanel(expandedPanel === 'customize' ? null : 'customize')}
+          className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white"
+        >
+          <div className="flex items-center gap-2">
+            <Palette className="w-5 h-5 text-gray-700" />
+            <h3 className="text-base font-semibold text-gray-800">Customize</h3>
+          </div>
+          <ChevronDown size={20} className={`transition-transform ${expandedPanel === 'customize' ? 'rotate-180' : ''}`} />
+        </button>
+
+        {expandedPanel === 'customize' && (
+          <div className="px-6 py-4 max-h-[40vh] overflow-y-auto">
+            <div className="flex gap-2 mb-4 bg-gray-100 rounded-full p-1">
+              {['colours', 'fabrics', 'blouse'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setSelectedTab(tab)}
+                  className={`flex-1 px-3 py-2 rounded-full text-xs font-medium transition-all ${
+                    selectedTab === tab ? 'bg-white shadow text-gray-900' : 'text-gray-600'
+                  }`}
+                >
+                  {tab.slice(0, 3).toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {selectedTab === 'colours' && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-3">Colour: <span className="uppercase">{selectedColor}</span></p>
+                <div className="grid grid-cols-4 gap-2">
+                  {colors.map((color) => (
+                    <button
+                      key={color.name}
+                      onClick={() => setSelectedColor(color.name)}
+                      className={`aspect-square rounded-lg transition-all ${selectedColor === color.name ? 'ring-2 ring-blue-500 ring-offset-2' : 'shadow'}`}
+                      style={{ backgroundColor: color.color }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {selectedTab === 'fabrics' && (
+              <div className="space-y-2">
+                {fabricTypes.map((fabric) => (
+                  <button
+                    key={fabric.id}
+                    onClick={() => setSelectedFabric(fabric.id)}
+                    className={`w-full p-3 rounded-lg text-left transition-all text-sm ${
+                      selectedFabric === fabric.id ? 'bg-blue-50 border-2 border-blue-500' : 'bg-white border border-gray-200'
+                    }`}
+                  >
+                    <div className="font-medium text-gray-900">{fabric.name}</div>
+                    <div className="text-xs text-gray-500">{fabric.category}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {selectedTab === 'blouse' && (
+              <div className="grid grid-cols-3 gap-2">
+                {blouseDesigns.map((design) => (
+                  <button
+                    key={design.id}
+                    onClick={() => setSelectedBlouse(design.id)}
+                    className={`rounded-lg overflow-hidden transition-all ${selectedBlouse === design.id ? 'ring-2 ring-blue-500' : 'shadow border border-gray-200'}`}
+                  >
+                    <div className="aspect-square bg-gray-100">
+                      <img src={design.image} alt={design.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="p-1 bg-white">
+                      <p className="text-xs font-medium text-gray-900 text-center">{design.name}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Scenes Tab */}
+        <button
+          onClick={() => setExpandedPanel(expandedPanel === 'scenes' ? null : 'scenes')}
+          className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white"
+        >
+          <div className="flex items-center gap-2">
+            <Image className="w-5 h-5 text-gray-700" />
+            <h3 className="text-base font-semibold text-gray-800">Scenes</h3>
+          </div>
+          <ChevronDown size={20} className={`transition-transform ${expandedPanel === 'scenes' ? 'rotate-180' : ''}`} />
+        </button>
+
+        {expandedPanel === 'scenes' && (
+          <div className="px-6 py-4 max-h-[40vh] overflow-y-auto">
+            {bgError && (
+              <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs">
+                {bgError}
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {backgroundOptions.map((bg) => (
+                <button
+                  key={bg.id}
+                  onClick={() => changeBackground(bg.id)}
+                  disabled={!tryOnResultNoBg || isChangingBackground}
+                  className={`relative rounded-lg overflow-hidden transition-all ${
+                    selectedBackground === bg.id ? 'ring-2 ring-blue-500' : 'shadow-md'
+                  } ${!tryOnResultNoBg ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <div className="aspect-[4/3]">
+                    <img src={bg.image} alt={bg.name} className="w-full h-full object-cover" draggable={false} />
+                  </div>
+                  {isChangingBackground && selectedBackground === bg.id && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Quick Actions Tab */}
+        <button
+          onClick={() => setExpandedPanel(expandedPanel === 'actions' ? null : 'actions')}
+          className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white"
+        >
+          <div className="flex items-center gap-2">
+            <Shirt className="w-5 h-5 text-gray-700" />
+            <h3 className="text-base font-semibold text-gray-800">Actions</h3>
+          </div>
+          <ChevronDown size={20} className={`transition-transform ${expandedPanel === 'actions' ? 'rotate-180' : ''}`} />
+        </button>
+
+        {expandedPanel === 'actions' && (
+          <div className="px-6 py-4 space-y-2">
+<button
+    onClick={handleAddToCart}
+    disabled={addingToCart}
+    className="flex items-center gap-2 bg-[#1C4C74] text-white px-5 py-2 rounded-full font-medium hover:bg-[#173d5f] transition-all"
+  >
+    🛍️ Add to Bag
+  </button>
+             <button
+    onClick={handleToggleWishlist}
+    disabled={isLoading}
+    className={`flex items-center gap-2 border px-4 py-2 rounded-full transition-all ${
+      isInWishlistState ? 'bg-red-500 text-white' : 'bg-white text-gray-800 hover:bg-gray-100'
+    }`}
+  >
+    <Heart
+      className={`w-4 h-4 ${isInWishlistState ? 'fill-current' : ''}`}
+    />
+    {isInWishlistState ? 'Wishlisted' : 'Add to Wishlist'}
+  </button>
+
+            <button className="w-full bg-white border border-gray-300 py-3 rounded-full hover:shadow-md transition-all font-medium text-sm">
+              ↗ Share Look
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-// small helper
 function loadImg(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();

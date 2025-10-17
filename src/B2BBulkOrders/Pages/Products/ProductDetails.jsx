@@ -200,7 +200,17 @@ const [searchParams] = useSearchParams();
       toast.error('No image available for try-on');
       return;
     }
-    setTryOnData({ garmentImage, garmentName: product.title || product.name });
+   // In ProductDetailPage.jsx, when opening the modal:
+setTryOnData({ 
+  garmentImage, 
+  garmentName: product.title || product.name,
+  productId: product.id,
+  selectedColors: product.selectedColors,
+  selectedSizes: product.selectedSizes,
+  fabric: product.fabric,
+  price: product.price,
+  discount: product.discount
+});
     // setShowTryYourOutfitModal(true);
       setShowUploadSelfieModal(true);
   };
