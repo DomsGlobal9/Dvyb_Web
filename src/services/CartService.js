@@ -59,6 +59,7 @@ export const addToCart = async (productId, productData = {}, quantity = 1) => {
       quantity: Math.max(1, quantity), // Ensure quantity is at least 1
       addedAt: new Date(),
       userId: user.uid,
+      vendorId: productData.userId,
       ...cleanedProductData,
       subtotal: (cleanedProductData.price || 0) * Math.max(1, quantity),
       freeShipping: cleanedProductData.freeShipping ?? false,
