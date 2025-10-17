@@ -61,15 +61,10 @@ console.log("Saving productData:", productData);
       productId,
       addedAt: new Date(),
       userId: user.uid,
+      vendorId: productData.userId,
       ...cleanedProductData
     });
     
-    // await setDoc(wishlistItemRef, {
-    //   productId,
-    //   addedAt: new Date(),
-    //   userId: user.uid,
-    //   ...productData // Include product details like name, price, image, etc.
-    // });
 
     console.log("Item added to wishlist successfully");
     return true;

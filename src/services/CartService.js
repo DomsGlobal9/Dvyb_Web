@@ -35,6 +35,7 @@
     }
   };
 
+<<<<<<< HEAD
   // Add item to cart
   export const addToCart = async (productId, productData = {}, quantity = 1) => {
     try {
@@ -42,6 +43,19 @@
       if (!user) {
         throw new Error("User must be authenticated");
       }
+=======
+    await setDoc(cartItemRef, {
+      productId,
+      quantity: Math.max(1, quantity), // Ensure quantity is at least 1
+      addedAt: new Date(),
+      userId: user.uid,
+      vendorId: productData.userId,
+      ...cleanedProductData,
+      subtotal: (cleanedProductData.price || 0) * Math.max(1, quantity),
+      freeShipping: cleanedProductData.freeShipping ?? false,
+      shippingMessage: cleanedProductData.shippingMessage ?? null
+    });
+>>>>>>> b862a512ae907b263987f28e60aa2887b9590568
 
       const userCollection = await getUserCollection(user.uid);
       const cartItemRef = doc(db, userCollection, user.uid, "cart", productId);
