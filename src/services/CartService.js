@@ -37,54 +37,48 @@
 
 
   // Add item to cart
-  export const addToCart = async (productId, productData = {}, quantity = 1) => {
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error("User must be authenticated");
-      }
+// Add item to cart
+export const addToCart = async (productId, productData = {}, quantity = 1) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error("User must be authenticated");
+    }
 
+    // ✅ STEP 1: Get user collection
+    const userCollection = await getUserCollection(user.uid);
+    
+    // ✅ STEP 2: Create cart item reference
+    const cartItemRef = doc(db, userCollection, user.uid, "cart", productId);
+    
+    // ✅ STEP 3: Clean product data
+    const cleanedProductData = {};
+    for (const [key, value] of Object.entries(productData)) {
+      if (value !== undefined) {
+        cleanedProductData[key] = value;
+      }
+    }
+
+    // ✅ STEP 4: Save to Firestore (ONLY ONCE!)
     await setDoc(cartItemRef, {
       productId,
-      quantity: Math.max(1, quantity), // Ensure quantity is at least 1
+      quantity: Math.max(1, quantity),
       addedAt: new Date(),
       userId: user.uid,
-      vendorId: productData.userId,
+      vendorId: productData.userId || productData.vendorId || null,
       ...cleanedProductData,
       subtotal: (cleanedProductData.price || 0) * Math.max(1, quantity),
       freeShipping: cleanedProductData.freeShipping ?? false,
       shippingMessage: cleanedProductData.shippingMessage ?? null
     });
 
-      const userCollection = await getUserCollection(user.uid);
-      const cartItemRef = doc(db, userCollection, user.uid, "cart", productId);
-      
-      // Filter out undefined values from productData
-      const cleanedProductData = {};
-      for (const [key, value] of Object.entries(productData)) {
-        if (value !== undefined) {
-          cleanedProductData[key] = value;
-        }
-      }
-
-      await setDoc(cartItemRef, {
-        productId,
-        quantity: Math.max(1, quantity), // Ensure quantity is at least 1
-        addedAt: new Date(),
-        userId: user.uid,
-        ...cleanedProductData,
-        subtotal: (cleanedProductData.price || 0) * Math.max(1, quantity),
-        freeShipping: cleanedProductData.freeShipping ?? false,
-        shippingMessage: cleanedProductData.shippingMessage ?? null
-      });
-
-      console.log("Item added to cart successfully");
-      return true;
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      throw error;
-    }
-  };
+    console.log("Item added to cart successfully");
+    return true;
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    throw error;
+  }
+};
 
   // Remove item from cart
   export const removeFromCart = async (productId) => {

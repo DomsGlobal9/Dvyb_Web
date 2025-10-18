@@ -38,6 +38,7 @@ const getUserCollectionAndRole = async (userId) => {
 };
 
 // Add item to wishlist
+// Add item to wishlist
 export const addToWishlist = async (productId, productData = {}) => {
   try {
     const user = auth.currentUser;
@@ -55,16 +56,25 @@ export const addToWishlist = async (productId, productData = {}) => {
         cleanedProductData[key] = value;
       }
     }
-console.log("Saving productData:", productData);
+    
+    console.log("Saving productData:", productData);
 
-    await setDoc(wishlistItemRef, {
+    // ✅ Build the document data - only add vendorId if it exists
+    const docData = {
       productId,
       addedAt: new Date(),
       userId: user.uid,
-      vendorId: productData.userId,
       ...cleanedProductData
-    });
-    
+    };
+
+    // ✅ Only add vendorId if it's defined
+    if (productData.userId !== undefined) {
+      docData.vendorId = productData.userId;
+    } else if (productData.vendorId !== undefined) {
+      docData.vendorId = productData.vendorId;
+    }
+
+    await setDoc(wishlistItemRef, docData);
 
     console.log("Item added to wishlist successfully");
     return true;

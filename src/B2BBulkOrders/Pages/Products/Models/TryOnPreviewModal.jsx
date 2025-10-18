@@ -41,19 +41,25 @@ const [isLoading, setIsLoading] = useState(false);
 const [addingToCart, setAddingToCart] = useState(false);
 
 useEffect(() => {
-  if (tryOnData?.productId) checkWishlistStatus();
+  const checkStatus = async () => {
+    if (tryOnData?.productId) {
+      try {
+        const inWishlist = await isInWishlist(tryOnData.productId);
+        setIsInWishlistState(inWishlist);
+      } catch (error) {
+        console.error("Error checking wishlist:", error);
+      }
+    }
+  };
+  checkStatus();
 }, [tryOnData?.productId]);
-
-const checkWishlistStatus = async () => {
-  try {
-    const inWishlist = await isInWishlist(tryOnData.productId);
-    setIsInWishlistState(inWishlist);
-  } catch (error) {
-    console.error("Error checking wishlist:", error);
-  }
-};
-
+// FIND THIS (around line 59-83):
 const handleToggleWishlist = async () => {
+  console.log("🔍 handleToggleWishlist called");
+  console.log("🔍 user:", user);
+  console.log("🔍 tryOnData:", tryOnData);
+  console.log("🔍 tryOnData.productId:", tryOnData?.productId);
+  
   if (!user) {
     toast.error("Please log in to continue!");
     return;
@@ -65,24 +71,38 @@ const handleToggleWishlist = async () => {
 
   try {
     if (wasInWishlist) {
+      console.log("🗑️ Removing from wishlist:", tryOnData.productId);
       await removeFromWishlist(tryOnData.productId);
       showPopup("wishlistRemove", {
         title: tryOnData.garmentName || "Product",
         image: tryOnData.garmentImage,
       });
+      console.log("✅ Removed successfully");
     } else {
       const productData = {
         name: tryOnData.garmentName,
         price: tryOnData.price || 0,
         image: tryOnData.garmentImage,
+        fabric: tryOnData.fabric || '',
+        craft: tryOnData.craft || '',
+        selectedColors: tryOnData.selectedColors || [],
+        discount: tryOnData.discount || 0
       };
+      
+      console.log("➕ Adding to wishlist:", tryOnData.productId);
+      console.log("📦 Product data:", productData);
+      
       await addToWishlist(tryOnData.productId, productData);
       showPopup("wishlist", {
         title: productData.name,
         image: productData.image,
       });
+      console.log("✅ Added successfully");
     }
   } catch (err) {
+    console.error("❌ Wishlist error:", err);
+    console.error("❌ Error message:", err.message);
+    console.error("❌ Error stack:", err.stack);
     setIsInWishlistState(wasInWishlist);
     toast.error("Failed to update wishlist!");
   } finally {
@@ -91,6 +111,11 @@ const handleToggleWishlist = async () => {
 };
 
 const handleAddToCart = async () => {
+  console.log("🔍 tryOnData:", tryOnData);
+  console.log("🔍 tryOnData.productId:", tryOnData?.productId);
+  console.log("🔍 tryOnData.garmentImage:", tryOnData?.garmentImage);
+  console.log("🔍 tryOnData.imageUrls:", tryOnData?.imageUrls);
+  
   if (!user) {
     toast.error("Please log in to add items to cart!");
     return;
@@ -98,31 +123,45 @@ const handleAddToCart = async () => {
 
   if (addingToCart) return;
 
+  if (!tryOnData?.productId) {
+    toast.error("Product information missing!");
+    return;
+  }
+
   try {
     setAddingToCart(true);
 
     const productData = {
-      name: tryOnData.garmentName,
-      title: tryOnData.garmentName,
+      name: tryOnData.garmentName || "Product",
+      title: tryOnData.garmentName || "Product",
       price: parseFloat(tryOnData.price) || 0,
-      imageUrls: [tryOnData.garmentImage],
-      fabric: selectedFabric,
-      color: selectedColor,
-      blouse: selectedBlouse,
+      imageUrls: tryOnData.imageUrls || [tryOnData.garmentImage],
+      selectedColors: tryOnData.selectedColors || [selectedColor],
+      selectedSizes: tryOnData.selectedSizes || [],
+      fabric: tryOnData.fabric || selectedFabric,
+      craft: tryOnData.craft || '',
+      description: tryOnData.description || ''
     };
 
+    console.log("📦 Sending to cart:", productData);
+    console.log("📦 Product ID:", tryOnData.productId);
+
     await addToCart(tryOnData.productId, productData, 1);
+    
     showPopup("cart", {
       title: productData.name,
-      image: tryOnData.garmentImage,
+      image: productData.imageUrls?.[0],
     });
+
   } catch (err) {
-    toast.error("Failed to add item to cart!");
+    console.error("❌ Full error:", err);
+    console.error("❌ Error message:", err.message);
+    console.error("❌ Error stack:", err.stack);
+    toast.error(err.message || "Failed to add item to cart!");
   } finally {
     setAddingToCart(false);
   }
 };
-
 
    const { productId, selectedColors, selectedSizes, fabric, price, discount } = tryOnData || {};
 const colors = useMemo(() => {
@@ -455,7 +494,7 @@ const fabricTypes = useMemo(() => {
         </div>
 
         <div className="flex gap-2 mb-6 bg-gray-100 rounded-full p-1">
-          {['colours', 'fabrics', 'blouse'].map(tab => (
+          {['colours', 'fabrics'].map(tab => (   //blouse
             <button
               key={tab}
               onClick={() => setSelectedTab(tab)}
@@ -589,34 +628,12 @@ const fabricTypes = useMemo(() => {
           <h3 className="text-base font-semibold text-gray-800 mb-3">Quick Actions</h3>
           <div className="space-y-3">
 <button 
-  onClick={async () => {
-    if (!user) {
-      toast.error("Please log in!");
-      return;
-    }
-    try {
-      const productData = {
-        name: tryOnData.garmentName,
-        title: tryOnData.garmentName,  // Add title too
-        price: tryOnData.price,
-        imageUrls: [tryOnData.garmentImage],  // ✅ Changed to array
-        fabric: selectedFabric,
-        color: selectedColor,
-        blouse: selectedBlouse,
-      };
-      await addToCart(tryOnData.productId, productData, 1);  // ✅ Use tryOnData.productId
-      showPopup("cart", {
-        title: tryOnData.garmentName,
-        image: tryOnData.garmentImage,
-      });
-    } catch (error) {
-      toast.error("Failed to add to cart");
-    }
-  }}
-  className="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-3 rounded-full hover:shadow-lg transition-all font-medium flex items-center justify-center gap-2"
+  onClick={handleAddToCart}
+  disabled={addingToCart}
+  className="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-3 rounded-full hover:shadow-lg transition-all font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
 >
-  <img src={Bag_ic} className="w-4 h-4" />
-  Add to Bag
+  <img src={Bag_ic} className="w-4 h-4" alt="Bag" />
+  {addingToCart ? 'Adding...' : 'Add to Bag'}
 </button>
         <button 
   onClick={handleToggleWishlist}
@@ -631,7 +648,7 @@ const fabricTypes = useMemo(() => {
   {isInWishlistState ? "In Wishlist" : "Add to Wishlist"}
 </button>
             <button className="w-full bg-white border border-gray-300 py-3 rounded-full hover:shadow-md transition-all font-medium">
-              ↗ Share Look
+              Share Look
             </button>
           </div>
         </div>
@@ -782,9 +799,9 @@ const fabricTypes = useMemo(() => {
 <button
     onClick={handleAddToCart}
     disabled={addingToCart}
-    className="flex items-center gap-2 bg-[#1C4C74] text-white px-5 py-2 rounded-full font-medium hover:bg-[#173d5f] transition-all"
+    className="flex items-center gap-2 bg-[#1C4C74] text-white px-5 py-2 rounded-full font-medium hover:bg-[#173d5f] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
   >
-    🛍️ Add to Bag
+    🛍️ {addingToCart ? 'Adding...' : 'Add to Bag'}
   </button>
              <button
     onClick={handleToggleWishlist}

@@ -201,16 +201,30 @@ const [searchParams] = useSearchParams();
       return;
     }
    // In ProductDetailPage.jsx, when opening the modal:
+// setTryOnData({ 
+//   garmentImage, 
+//   garmentName: product.title || product.name,
+//   productId: product.id,
+//   selectedColors: product.selectedColors,
+//   selectedSizes: product.selectedSizes,
+//   fabric: product.fabric,
+//   price: product.price,
+//   discount: product.discount
+  
+// });
+
 setTryOnData({ 
   garmentImage, 
   garmentName: product.title || product.name,
   productId: product.id,
-  selectedColors: product.selectedColors,
-  selectedSizes: product.selectedSizes,
-  fabric: product.fabric,
-  price: product.price,
-  discount: product.discount
+  selectedColors: product.selectedColors || [],
+  selectedSizes: product.selectedSizes || [],
+  fabric: product.fabric || '',
+  price: parseFloat(product.price) || 0,
+  discount: product.discount || 0,
+  imageUrls: product.imageUrls || [garmentImage]
 });
+
     // setShowTryYourOutfitModal(true);
       setShowUploadSelfieModal(true);
   };

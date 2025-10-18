@@ -1,5 +1,6 @@
 // // AccountPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import Sidebar from '../../common/ProfilePageComponents/Sidebar';
 import MyInfo from "../../common/ProfilePageComponents/MyInfo";
 import ProfileImage from "../../common/ProfilePageComponents/PhotoManager";
@@ -15,6 +16,31 @@ import SubscriptionFlow from "../../B2C/B2CComponents/SubscriptionFlow";
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("my-info");
   const userId = "USER_ID_HERE"; // Replace with Firebase Auth UID
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab");
+    if (tabFromUrl) {
+      const validTabs = [
+        "my-info",
+        "my-orders",
+        "my-model",
+        "wishlist",
+        "my-tryon-gallery",
+        "rewards",
+        "refer-earn",
+        "subscriptions",
+      ];
+      if (validTabs.includes(tabFromUrl)) {
+        setActiveTab(tabFromUrl);
+      } else {
+        setActiveTab("my-info"); // Default to my-info if tab is invalid
+      }
+    }
+  }, [location.search, searchParams]);
+
+  
   React.useEffect(() => {
     if (activeTab === "my-model") {
       document.body.style.overflow = "hidden";
@@ -24,10 +50,10 @@ const ProfilePage = () => {
   }, [activeTab]);
 
   return (
-   <div className="relative flex">
-  <Sidebar activeTab={activeTab} setActiveTab={setActiveTab}  />
- <div className="flex-1 ml-64 p-6 pb-20">
-    {activeTab === "my-info" && <MyInfo userId={userId} />}
+    <div className="relative flex min-h-screen  ">
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="absolute left-64 w-250 flex-1 p-6 ">
+        {activeTab === "my-info" && <MyInfo userId={userId} />}
         {activeTab === "my-orders" && <MyOrders />}
         {activeTab === "my-model" && <ProfileImage />}
         {activeTab === "wishlist" && <WishlistPage />}
