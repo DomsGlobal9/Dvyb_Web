@@ -216,7 +216,7 @@ const fabricTypes = useMemo(() => {
   ];
 
   const backgroundOptions = [
-    { id: 'building', name: 'Building', image: bg1 },
+    // { id: 'building', name: 'Building', image: bg1 },
     { id: 'hallway', name: 'Hallway', image: bg2 },
     { id: 'trees', name: 'Trees', image: bg3 },
     { id: 'pool', name: 'Pool', image: bg4 },
@@ -252,38 +252,65 @@ const fabricTypes = useMemo(() => {
     }
   };
 
-  const removeBackgroundFromResult = async (imageUrl) => {
-    setIsRemovingBg(true);
-    try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-
-      const formData = new FormData();
-      formData.append('image_file', blob);
-      formData.append('size', 'auto');
-
-      const removeBgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
-        method: 'POST',
-        headers: {
-          'X-Api-Key': 'LieA99SrSnwMttGh3zPYbCRV',
-        },
-        body: formData,
-      });
-
-      if (!removeBgResponse.ok) {
-        throw new Error(`Remove.bg failed: ${removeBgResponse.status}`);
-      }
-
-      const removedBgBlob = await removeBgResponse.blob();
-      const noBgUrl = URL.createObjectURL(removedBgBlob);
-      setTryOnResultNoBg(noBgUrl);
-    } catch (error) {
-      console.error('Background removal failed:', error);
-    } finally {
-      setIsRemovingBg(false);
+const removeBackgroundFromResult = async (imageUrl) => {
+  setIsRemovingBg(true);
+  console.log("🖼️ Starting background removal for:", imageUrl);
+  
+  try {
+    console.log("📥 Fetching image...");
+    const response = await fetch(imageUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
     }
-  };
+    const blob = await response.blob();
+    console.log("✅ Image fetched, size:", blob.size, "bytes");
 
+    const formData = new FormData();
+    formData.append('image_file', blob);
+    formData.append('size', 'auto');
+
+    console.log("🔑 Using API Key:", 'kLvaXzn7KaA3CJBbNFAxiwqu'.substring(0, 10) + "...");
+    console.log("📤 Sending to Remove.bg...");
+
+    const removeBgResponse = await fetch('https://api.remove.bg/v1.0/removebg', {
+      method: 'POST',
+      headers: {
+        'X-Api-Key': 'kLvaXzn7KaA3CJBbNFAxiwqu',
+      },
+      body: formData,
+    });
+
+    console.log("📥 Remove.bg response status:", removeBgResponse.status);
+    console.log("📥 Response headers:", Object.fromEntries(removeBgResponse.headers.entries()));
+
+    if (!removeBgResponse.ok) {
+      const errorText = await removeBgResponse.text();
+      console.error("❌ Remove.bg error response:", errorText);
+      
+      try {
+        const errorJson = JSON.parse(errorText);
+        console.error("❌ Parsed error:", errorJson);
+        throw new Error(`Remove.bg failed: ${errorJson.errors?.[0]?.title || removeBgResponse.status}`);
+      } catch (e) {
+        throw new Error(`Remove.bg failed: ${removeBgResponse.status} - ${errorText}`);
+      }
+    }
+
+    const removedBgBlob = await removeBgResponse.blob();
+    console.log("✅ Background removed, new size:", removedBgBlob.size, "bytes");
+    
+    const noBgUrl = URL.createObjectURL(removedBgBlob);
+    setTryOnResultNoBg(noBgUrl);
+    console.log("✅ Background removal complete!");
+    
+  } catch (error) {
+    console.error('❌ Background removal failed:', error);
+    console.error('❌ Error details:', error.message);
+    setBgError(`Background removal failed: ${error.message}`);
+  } finally {
+    setIsRemovingBg(false);
+  }
+};
   useEffect(() => {
     const { modelImage, garmentImage } = tryOnData || {};
     if (isOpen && modelImage && garmentImage) {
